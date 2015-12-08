@@ -1,6 +1,16 @@
 require File.expand_path('spec_helper', File.dirname(__FILE__))
 
 RSpec.describe Lypack::Resolver do
+  it "returns an empty dependency array for an empty tree" do
+    tree = {
+      dependencies: {
+      }
+    }
+
+    deps = Lypack::Resolver.resolve(tree)
+    expect(deps).to eq([])
+  end
+  
   it "correctly resolves versions for a dependency tree" do
     tree = {
       dependencies: {

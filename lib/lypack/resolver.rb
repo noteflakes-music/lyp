@@ -74,14 +74,14 @@ module Lypack::Resolver
     
     def select_highest_versioned_permutation(permutations, user_deps)
       sorted = sort_permutations(permutations, user_deps)
-      sorted.empty? ? nil : sorted.last
+      sorted.empty? ? [] : sorted.last
     end
     
-    PACKAGE_REGEXP = /^([^@]+)(?:@(.+))?$/
+    PACKAGE_REF_RE = /^([^@]+)(?:@(.+))?$/
     
     def sort_permutations(permutations, user_deps)
       map = lambda do |m, p|
-        if p =~ PACKAGE_REGEXP
+        if p =~ PACKAGE_REF_RE
           m[$1] = Gem::Version.new($2 || '0.0')
         end
         m
