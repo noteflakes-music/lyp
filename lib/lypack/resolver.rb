@@ -1,12 +1,40 @@
 module Lypack::Resolver
   class << self
     def resolve(tree)
-      user_deps = tree[:dependencies].keys
-      
       permutations = permutate_simplified_tree(tree)
       permutations = filter_invalid_permutations(permutations)
 
+      user_deps = tree[:dependencies].keys
       select_highest_versioned_permutation(permutations, user_deps)
+    end
+    
+    def verify_version_availability(tree)
+      return unless tree[:dependencies]
+      
+      tree[:dependencies].select! do |k, subtree|
+        if subtree[:versions]
+          subtree[:versions].each do |v, vsubtree|
+            remove_unfulfilled_dependency_versions(vsubtree, false)
+          end
+          !subtree[:versions].empty?
+        end
+      end
+    end
+    
+    def remove_unfulfilled_dependency_versions(tree, raise_on_missing_versions = true)
+      return unless tree[:dependencies]
+      
+      tree[:dependencies].select! do |k, subtree|
+        if subtree[:versions]
+          subtree[:versions].each do |v, vsubtree|
+            remove_unfulfilled_dependency_versions(vsubtree, false)
+          end
+          true
+        else
+          raise if raise_on_missing_versions
+          false
+        end
+      end
     end
     
     def permutate_simplified_tree(tree)

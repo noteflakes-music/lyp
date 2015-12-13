@@ -4,26 +4,28 @@ module Lypack::Loader
     INCLUDE = "include".freeze
     REQUIRE = "require".freeze
     
-    # Returns a lilypond file
+    # Process a user file and return a dependency tree
     def process(path)
-      deps_tree = {
+      tree = {
         dependencies: {},
         queue: [],
         processed_files: {}
       }
       
-      queue_file_for_processing(path, deps_tree, deps_tree)
+      queue_file_for_processing(path, tree, tree)
 
-      while job = pull_file_from_queue(deps_tree)
-        process_lilypond_file(job[:path], deps_tree, job[:ptr])
+      while job = pull_file_from_queue(tree)
+        process_lilypond_file(job[:path], tree, job[:ptr])
       end
       
-      deps_tree
+      remove_unfulfilled_dependencies(tree)
+      
+      tree
     end
     
-    def process_lilypond_file(path, deps_tree, deps_ptr)
+    def process_lilypond_file(path, tree, ptr)
       # path is expected to be absolute
-      return if file_processed?(path, deps_tree)
+      return if file_processed?(path, tree)
       
       ly_content = IO.read(path)
       dir = File.dirname(path)
@@ -32,70 +34,107 @@ module Lypack::Loader
         case type
         when INCLUDE
           qualified_path = File.expand_path(path, dir)
-          queue_file_for_processing(qualified_path, deps_tree, deps_ptr)
+          queue_file_for_processing(qualified_path, tree, ptr)
         when REQUIRE
-          find_package_versions(path, deps_tree, deps_hash)
+          find_package_versions(path, tree, ptr)
         end
       end
+      
+      tree[:processed_files][path] == true
     end
-    def file_processed?(path, deps_tree)
-      deps_tree[:processed_files][path]
-    end
-    
-    def queue_file_for_processing(path, deps_tree, deps_ptr)
-      deps_tree[:queue] << {path: path, ptr: deps_ptr}
+    def file_processed?(path, tree)
+      tree[:processed_files][path]
     end
     
-    def pull_file_from_queue(deps_tree)
-      deps_tree[:queue].shift
+    def queue_file_for_processing(path, tree, ptr)
+      (tree[:queue] ||= []) << {path: path, ptr: ptr}
+    end
+    
+    def pull_file_from_queue(tree)
+      tree[:queue].shift
     end
     
     PACKAGE_RE = /^([^@]+)(?:@(.+))?$/
     
-    def find_package_versions(ref, deps_tree, deps_ptr)
-      return unless ref =~ PACKAGE_RE
+    def find_package_versions(ref, tree, ptr)
+      return {} unless ref =~ PACKAGE_RE
+      ref_package = $1
+      version_clause = $2
+
+      matches = find_matching_packages(ref, tree)
+      
+      # Make sure found packages are processed
+      matches.each do |p, subtree|
+        if subtree[:path]
+          queue_file_for_processing(subtree[:path], tree, subtree)
+        end
+      end
+      
+      (ptr[:dependencies] ||= {}).merge!({
+        ref_package => {
+          clause: ref,
+          versions: matches
+        }
+      })
+    end
+    
+    def find_matching_packages(ref, tree)
+      return {} unless ref =~ PACKAGE_RE
       
       ref_package = $1
       version_clause = $2
-      req = Gem::Requirement.new(version_clause || '0')
+      req = Gem::Requirement.new(version_clause || '>=0')
 
-      found = available_packages.select do |p, sub_tree|
-        if p =~ PACKAGE_RE
+      available_packages(tree).select do |package_name, sub_tree|
+        if package_name =~ PACKAGE_RE
           version = Gem::Version.new($2 || '0')
           (ref_package == $1) && (req =~ version)
         else
           nil
         end
       end
-      
-      # Make sure found packages are processed
-      found.each do |p, sub_tree|
-        if sub_tree[:path]
-          queue_file_for_processing(sub_tree[:path], deps_tree, subtree)
-        end
-      end
-      
-      deps_ptr[:dependencies].merge!({
-        ref_package => {
-          clause: version_clause,
-          versions: found
-        }
-      })
     end
     
-    DEFAULT_PACKAGE_DIRECTORY = File.expand_path('~/.lypack/packages')
     MAIN_PACKAGE_FILE = 'package.ly'
     
-    def available_packages(deps_tree)
-      deps_tree[:available_packages] ||= 
-        Dir["#{DEFAULT_PACKAGE_DIRECTORY}/*"].inject({}) do |m, p|
-          m[File.basename(p)] = {
-            path: File.join(p, MAIN_PACKAGE_FILE), 
-            dependencies: {},
-            
-          }
-          m
+    def available_packages(tree)
+      tree[:available_packages] ||= get_available_packages(packages_dir)
+    end
+    
+    def get_available_packages(dir)
+      Dir["#{packages_dir}/*"].inject({}) do |m, p|
+        m[File.basename(p)] = {
+          path: File.join(p, MAIN_PACKAGE_FILE), 
+          dependencies: {},
+          
+        }
+        m
+      end
+    end
+
+    DEFAULT_PACKAGE_DIRECTORY = File.expand_path('~/.lypack/packages')
+
+    def packages_dir
+      DEFAULT_PACKAGE_DIRECTORY
+    end
+    
+    # Recursively remove any dependency for which no version is locally 
+    # available. If no version is found for any of the dependencies specified
+    # by the user, an error is raised.
+    def remove_unfulfilled_dependencies(tree, raise_on_missing = true)
+      return unless tree[:dependencies]
+      
+      tree[:dependencies].each do |package, dependency|
+        dependency[:versions].select! do |version, version_subtree|
+          remove_unfulfilled_dependencies(version_subtree, false)
+          valid = true
+          version_subtree[:dependencies].each do |k, v|
+            valid = false if v[:versions].empty?
+          end
+          valid
         end
+        raise if dependency[:versions].empty? && raise_on_missing
+      end
     end
   end
 end

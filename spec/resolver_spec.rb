@@ -20,7 +20,7 @@ RSpec.describe Lypack::Resolver do
             "a@0.1" => {
               dependencies: {
                 "b" => {
-                  clause: "b@>=0.2",
+                  clause: "b@>=0.2.0",
                   versions: {
                     "b@0.2" => {},
                     "b@0.3" => {}
@@ -31,7 +31,7 @@ RSpec.describe Lypack::Resolver do
             "a@0.2" => {
               dependencies: {
                 "b" => {
-                  clause: "b@~>0.3",
+                  clause: "b@~>0.3.0",
                   versions: {
                     "b@0.3" => {}
                   }
@@ -41,12 +41,12 @@ RSpec.describe Lypack::Resolver do
           }
         },
         "c" => {
-          clause: "c@~>0.1",
+          clause: "c@~>0.1.0",
           versions: {
             "c@0.1" => {
               dependencies: {
                 "b" => {
-                  clause: "b@~>0.2",
+                  clause: "b@~>0.2.0",
                   versions: {
                     "b@0.2" => {}
                   }
