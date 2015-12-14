@@ -3,9 +3,9 @@ Bundler.setup(:default, :spec)
 $spec_dir = File.dirname(__FILE__)
 require File.join(File.expand_path($spec_dir), '../lib/lypack')
 
-$package_setup_dir = Lypack::Loader.packages_dir
+$package_setup_dir = Lypack.packages_dir
 
-module Lypack::Loader
+module Lypack
   def self.packages_dir
     $package_setup_dir
   end
