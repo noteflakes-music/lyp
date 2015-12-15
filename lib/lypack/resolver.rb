@@ -48,7 +48,7 @@ class Lypack::Resolver
       end
     end
     
-    tree[:processed_files][path] == true
+    tree[:processed_files][path] = true
   end
   def file_processed?(path, tree)
     tree[:processed_files][path]
@@ -123,17 +123,26 @@ class Lypack::Resolver
   # Recursively remove any dependency for which no version is locally 
   # available. If no version is found for any of the dependencies specified
   # by the user, an error is raised.
-  def remove_unfulfilled_dependencies(tree, raise_on_missing = true)
+  # 
+  # The processed hash is used for keeping track of dependencies that were
+  # already processed, and thus deal with circular dependencies.
+  def remove_unfulfilled_dependencies(tree, raise_on_missing = true, processed = {})
     return unless tree[:dependencies]
     
     tree[:dependencies].each do |package, dependency|
       dependency[:versions].select! do |version, version_subtree|
-        remove_unfulfilled_dependencies(version_subtree, false)
-        valid = true
-        version_subtree[:dependencies].each do |k, v|
-          valid = false if v[:versions].empty?
+        if processed[version]
+          true
+        else
+          processed[version] = true
+
+          remove_unfulfilled_dependencies(version_subtree, false, processed)
+          valid = true
+          version_subtree[:dependencies].each do |k, v|
+            valid = false if v[:versions].empty?
+          end
+          valid
         end
-        valid
       end
       raise if dependency[:versions].empty? && raise_on_missing
     end
@@ -144,7 +153,7 @@ class Lypack::Resolver
     permutations = filter_invalid_permutations(permutations)
 
     user_deps = tree[:dependencies].keys
-    select_highest_versioned_permutation(permutations, user_deps)
+    select_highest_versioned_permutation(permutations, user_deps).flatten
   end
   
   def verify_version_availability(tree)
@@ -184,12 +193,16 @@ class Lypack::Resolver
     deps[0].product(*deps[1..-1]).map(&:flatten)
   end
   
-  def dependencies_array(tree)
+  def dependencies_array(tree, processed = {})
+    return processed[tree] if processed[tree]
+
     deps_array = []
+    processed[tree] = deps_array
+    
     tree.each do |pack, versions|
       a = []
       versions.each do |version, deps|
-        sub_perms = dependencies_array(deps)
+        sub_perms = dependencies_array(deps, processed)
         if sub_perms == []
           a << version
         else
@@ -202,16 +215,19 @@ class Lypack::Resolver
     deps_array
   end
   
-  def simplified_deps_tree(version)
+  # The processed hash is used to deal with circular dependencies
+  def simplified_deps_tree(version, processed = {})
     return {} unless version[:dependencies]
-
-    dep_versions = {}
+    
+    return processed[version] if processed[version]
+    processed[version] = dep_versions = {}
 
     # For each dependency, generate a deps tree for each available version
-    version[:dependencies].each do |p, opts|
-      opts[:versions].each do |v, opts2|
-        dep_versions[p] ||= {}
-        dep_versions[p][v] = simplified_deps_tree(opts2)
+    version[:dependencies].each do |p, subtree|
+      dep_versions[p] = {}
+      subtree[:versions].each do |v, version_subtree|
+        dep_versions[p][v] = 
+          simplified_deps_tree(version_subtree, processed)
       end
     end
 

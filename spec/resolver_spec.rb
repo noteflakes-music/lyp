@@ -169,6 +169,15 @@ RSpec.describe Lypack::Resolver do
       expect(r).to eq(%w{a@0.1 b@0.1 c@0.1})
     end
   end
+
+  it "Correctly resolves a circular dependency" do
+    with_package_setup(:circular) do
+      resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
+      
+      r = resolver.resolve_package_dependencies
+      expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
+    end
+  end
 end
 
 
