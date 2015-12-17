@@ -219,6 +219,16 @@ RSpec.describe Lypack::Resolver do
       expect {resolver.resolve_package_dependencies}.to raise_error
     end
   end
+
+  it "handles requires in include files" do
+    with_package_setup(:simple) do
+      resolver = Lypack::Resolver.new('spec/user_files/include1.ly')
+      
+      r = resolver.resolve_package_dependencies
+      expect(r).to eq(%w{a@0.1 b@0.1 c@0.1})
+    end
+  end
+
 end
 
 

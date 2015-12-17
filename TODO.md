@@ -1,3 +1,2 @@
-- Add spec for include files. include1.ly => inc/include2.ly => ../include3.ly
 - Add spec setup for 10 packages, each with 5 versions installed and interdependencies.
 - More work on version resolution algorithm: filter older versions for packages with no interdependencies. So if a package does not depend on other packages, nor is a dependency of other packages, we can safely remove all but the latest version.
