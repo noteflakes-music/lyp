@@ -71,6 +71,10 @@ class Lypack::Resolver
 
     matches = find_matching_packages(ref, tree)
     
+    if matches.empty? && (tree == ptr)
+      raise "No package found for requirement #{ref}"
+    end
+    
     # Make sure found packages are processed
     matches.each do |p, subtree|
       if subtree[:path]
@@ -153,19 +157,12 @@ class Lypack::Resolver
     permutations = filter_invalid_permutations(permutations)
 
     user_deps = tree[:dependencies].keys
-    select_highest_versioned_permutation(permutations, user_deps).flatten
-  end
-  
-  def verify_version_availability(tree)
-    return unless tree[:dependencies]
+    result = select_highest_versioned_permutation(permutations, user_deps).flatten
     
-    tree[:dependencies].select! do |k, subtree|
-      if subtree[:versions]
-        subtree[:versions].each do |v, vsubtree|
-          remove_unfulfilled_dependency_versions(vsubtree, false)
-        end
-        !subtree[:versions].empty?
-      end
+    if result.empty? && !tree[:dependencies].empty?
+      raise "Failed to satisfy dependency requirements"
+    else
+      result
     end
   end
   
@@ -187,7 +184,7 @@ class Lypack::Resolver
   
   def permutate_simplified_tree(tree)
     deps = dependencies_array(simplified_deps_tree(tree))
-    return deps if deps.size < 2
+    return deps if deps.empty?
 
     # Return a cartesian product of dependencies
     deps[0].product(*deps[1..-1]).map(&:flatten)
@@ -202,12 +199,16 @@ class Lypack::Resolver
     tree.each do |pack, versions|
       a = []
       versions.each do |version, deps|
+        perms = []
         sub_perms = dependencies_array(deps, processed)
         if sub_perms == []
-          a << version
+          perms += [version]
         else
-          a += [version].product(*sub_perms)
+          sub_perms[0].each do |perm|
+            perms << [version] + [perm].flatten
+          end
         end
+        a += perms
       end
       deps_array << a
     end
@@ -236,9 +237,9 @@ class Lypack::Resolver
   
   def filter_invalid_permutations(permutations)
     valid = []
-    permutations.each do |p|
+    permutations.each do |perm|
       versions = {}; invalid = false
-      p.each do |ref|
+      perm.each do |ref|
         if ref =~ /(.+)@(.+)/
           name, version = $1, $2
           if versions[name] && versions[name] != version
@@ -249,7 +250,7 @@ class Lypack::Resolver
           end
         end
       end
-      valid << p.uniq unless invalid
+      valid << perm.uniq unless invalid
     end
 
     valid
