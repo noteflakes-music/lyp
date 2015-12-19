@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ciconia/lypack.svg?branch=master)](https://travis-ci.org/ciconia/lypack)
+
 # lypack
 
 lypack is a package manager for lilypond.

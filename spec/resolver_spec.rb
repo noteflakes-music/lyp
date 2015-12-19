@@ -155,7 +155,7 @@ RSpec.describe Lypack::Resolver do
   it "processes a user's file and resolves all its dependencies" do
     with_package_setup(:simple) do
       resolver = Lypack::Resolver.new('spec/user_files/simple.ly')
-      o = resolver.process
+      o = resolver.get_dependency_tree
       expect(o[:dependencies].keys).to eq(%w{a c})
 
       expect(o[:dependencies]['a'][:versions].keys).to eq(%w{a@0.1 a@0.2})
