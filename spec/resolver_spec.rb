@@ -188,6 +188,15 @@ RSpec.describe Lypack::Resolver do
     end
   end
 
+  it "correctly resolves dependencies with include files" do
+    with_package_setup(:includes) do
+      resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
+      
+      r = resolver.resolve_package_dependencies
+      expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
+    end
+  end
+
   it "returns no dependencies for file with no requires" do
     with_package_setup(:simple) do
       resolver = Lypack::Resolver.new('spec/user_files/no_require.ly')
