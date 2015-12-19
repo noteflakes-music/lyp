@@ -98,7 +98,7 @@ RSpec.describe Lypack::Resolver do
     with_package_setup(:simple) do
       resolver = Lypack::Resolver.new(nil)
       o = resolver.available_packages({})
-      expect(o.keys).to eq(%w{a@0.1 a@0.2 b@0.1 b@0.2 b@0.2.2 c@0.1 c@0.3})
+      expect(o.keys.sort).to eq(%w{a@0.1 a@0.2 b@0.1 b@0.2 b@0.2.2 c@0.1 c@0.3})
     end
   end
   
@@ -106,19 +106,19 @@ RSpec.describe Lypack::Resolver do
     with_package_setup(:simple) do
       resolver = Lypack::Resolver.new(nil)
       o = resolver.find_matching_packages('b', {})
-      expect(o.keys).to eq(%w{b@0.1 b@0.2 b@0.2.2})
+      expect(o.keys.sort).to eq(%w{b@0.1 b@0.2 b@0.2.2})
 
       o = resolver.find_matching_packages('a@0.1', {})
       expect(o.keys).to eq(%w{a@0.1})
 
       o = resolver.find_matching_packages('a@>=0.1', {})
-      expect(o.keys).to eq(%w{a@0.1 a@0.2})
+      expect(o.keys.sort).to eq(%w{a@0.1 a@0.2})
 
       o = resolver.find_matching_packages('b@~>0.1.0', {})
       expect(o.keys).to eq(%w{b@0.1})
 
       o = resolver.find_matching_packages('b@~>0.2.0', {})
-      expect(o.keys).to eq(%w{b@0.2 b@0.2.2})
+      expect(o.keys.sort).to eq(%w{b@0.2 b@0.2.2})
 
       o = resolver.find_matching_packages('c@~>0.1.0', {})
       expect(o.keys).to eq(%w{c@0.1})
@@ -163,7 +163,7 @@ RSpec.describe Lypack::Resolver do
 
       expect(o[:dependencies]['a'][:versions]['a@0.1'][:dependencies].keys).to eq(%w{b})
 
-      expect(o[:dependencies]['a'][:versions]['a@0.1'][:dependencies]['b'][:versions].keys).to eq(%w{b@0.1 b@0.2 b@0.2.2})
+      expect(o[:dependencies]['a'][:versions]['a@0.1'][:dependencies]['b'][:versions].keys.sort).to eq(%w{b@0.1 b@0.2 b@0.2.2})
       
       r = resolver.resolve_tree(o)
       expect(r).to eq(%w{a@0.1 b@0.1 c@0.1})
