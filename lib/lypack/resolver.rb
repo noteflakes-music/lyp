@@ -43,6 +43,7 @@ class Lypack::Resolver
       process_lilypond_file(job[:path], tree, job[:leaf])
     end
     
+    squash_old_versions(tree)
     remove_unfulfilled_dependencies(tree)
     
     tree
@@ -186,6 +187,36 @@ class Lypack::Resolver
     end
   end
   
+  # Remove old versions of top level dependencies
+  def squash_old_versions(tree)
+    tree[:dependencies].each do |package, subtree|
+      versions = subtree[:versions]
+      last_version = nil
+      versions.keys.sort.each_with_index do |version|
+        if last_version 
+          tree1 = versions[version][:dependencies]
+          tree2 = versions[last_version][:dependencies]
+          if tree1 == tree2
+            versions.delete(last_version)
+          end
+        end
+        last_version = version
+      end
+    end
+  end
+  
+  def find_transitive_packages(tree, non_transitive = [])
+    # tree[:dependencies].each_value do |subtree|
+    #   subtree[:versions].each do |version, version_tree|
+    #
+    #     if version[:dependencies] && non_transitive.include?()
+    #
+    #   end
+    # end
+    #
+    # non_transitive
+  end
+  
   # Resolve the given dependency tree and return a list of concrete packages
   # that meet all dependency requirements.
   #
@@ -311,9 +342,11 @@ class Lypack::Resolver
 
   # Sort permutations by version numbers
   def sort_permutations(permutations, user_deps)
+    versions = {}
+    
     map = lambda do |m, p|
       if p =~ PACKAGE_RE
-        m[$1] = Gem::Version.new($2 || '0.0')
+        m[$1] = versions[p] ||= Gem::Version.new($2 || '0.0')
       end
       m
     end
@@ -323,10 +356,15 @@ class Lypack::Resolver
       y_versions = y.inject({}, &map)
       
       # Naive implementation - add up the comparison scores for each package
-      x_versions.keys.inject(0) do |s, k|
-        cmp = x_versions[k] <=> y_versions[k]
-        s += cmp unless cmp.nil?
-        s
+      x_versions.inject(0) do |score, kv|
+        package = kv[0]
+        cmp = kv[1] <=> y_versions[package]
+        if user_deps.include?(package) && cmp != 0
+          return cmp
+        else
+          score += cmp unless cmp.nil?
+        end
+        score
       end
     end
     

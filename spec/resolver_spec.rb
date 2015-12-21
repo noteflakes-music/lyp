@@ -238,6 +238,17 @@ RSpec.describe Lypack::Resolver do
     end
   end
 
+  it "handles a big package setup" do
+    with_package_setup(:big) do
+      resolver = Lypack::Resolver.new('spec/user_files/simple.ly')
+      
+      r = resolver.resolve_package_dependencies
+      expect(r.sort).to eq(%w{a@0.3.2 b@0.3.2 c@0.3.2 d@0.3.2 e@0.3.2 f@0.2.1 
+        g@0.3.2 h@0.3.2 i@0.3.2 j@0.3.2}
+      )
+    end
+  end
+
 end
 
 
