@@ -165,8 +165,26 @@ RSpec.describe Lypack::Resolver do
 
       expect(o[:dependencies]['a'][:versions]['a@0.1'][:dependencies]['b'][:versions].keys.sort).to eq(%w{b@0.1 b@0.2 b@0.2.2})
       
-      r = resolver.resolve_tree(o)
-      expect(r).to eq(%w{a@0.1 b@0.1 c@0.1})
+      r = resolver.resolve_package_dependencies
+      expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.1 c@0.1})
+      expect(r[:package_paths].keys.sort).to eq(
+        ["a", "b@>=0.1.0", "b@~>0.1.0", "b@~>0.2.0", "c"]
+      )
+      expect(r[:package_paths]["a"]).to eq(
+        File.expand_path('setups/simple/a@0.1/package.ly', $spec_dir)
+      )
+      expect(r[:package_paths]["b@>=0.1.0"]).to eq(
+        File.expand_path('setups/simple/b@0.1/package.ly', $spec_dir)
+      )
+      expect(r[:package_paths]["b@~>0.1.0"]).to eq(
+        File.expand_path('setups/simple/b@0.1/package.ly', $spec_dir)
+      )
+      expect(r[:package_paths]["b@~>0.2.0"]).to eq(
+        File.expand_path('setups/simple/b@0.1/package.ly', $spec_dir)
+      )
+      expect(r[:package_paths]["c"]).to eq(
+        File.expand_path('setups/simple/c@0.1/package.ly', $spec_dir)
+      )
     end
   end
 
@@ -175,7 +193,7 @@ RSpec.describe Lypack::Resolver do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
 
       r = resolver.resolve_package_dependencies
-      expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
+      expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.2 c@0.3})
     end
   end
 
@@ -184,7 +202,7 @@ RSpec.describe Lypack::Resolver do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
 
       r = resolver.resolve_package_dependencies
-      expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
+      expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.2 c@0.3})
     end
   end
 
@@ -193,7 +211,7 @@ RSpec.describe Lypack::Resolver do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
 
       r = resolver.resolve_package_dependencies
-      expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
+      expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.2 c@0.3})
     end
   end
 
@@ -202,7 +220,7 @@ RSpec.describe Lypack::Resolver do
       resolver = Lypack::Resolver.new('spec/user_files/no_require.ly')
 
       r = resolver.resolve_package_dependencies
-      expect(r).to eq([])
+      expect(r[:definite_versions]).to eq([])
     end
   end
 
@@ -219,7 +237,7 @@ RSpec.describe Lypack::Resolver do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
       # here it should not raise, since a@0.2 satisfies the dependency
       # requirements
-      expect(resolver.resolve_package_dependencies).to eq(
+      expect(resolver.resolve_package_dependencies[:definite_versions]).to eq(
         ["a@0.2", "b@0.2", "c@0.3"]
       )
 
@@ -234,7 +252,7 @@ RSpec.describe Lypack::Resolver do
       resolver = Lypack::Resolver.new('spec/user_files/include1.ly')
 
       r = resolver.resolve_package_dependencies
-      expect(r).to eq(%w{a@0.1 b@0.1 c@0.1})
+      expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.1 c@0.1})
     end
   end
 
@@ -243,8 +261,8 @@ RSpec.describe Lypack::Resolver do
       resolver = Lypack::Resolver.new('spec/user_files/simple.ly')
 
       r = resolver.resolve_package_dependencies
-      expect(r.sort).to eq(%w{a@0.3.2 b@0.3.2 c@0.3.2 d@0.3.2 e@0.3.2 f@0.2.1
-        g@0.3.2 h@0.3.2 i@0.3.2 j@0.3.2}
+      expect(r[:definite_versions].sort).to eq(
+        %w{a@0.3.2 b@0.3.2 c@0.3.2 d@0.3.2 e@0.3.2 f@0.2.1 g@0.3.2 h@0.3.2 i@0.3.2 j@0.3.2}
       )
     end
   end

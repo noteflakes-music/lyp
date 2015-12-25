@@ -8,7 +8,19 @@ class Lypack::Resolver
   # 2. Resolve the dependency tree into a list of specific package versions
   def resolve_package_dependencies
     tree = get_dependency_tree
+    
     definite_versions = resolve_tree(tree)
+    specifier_map = map_specifiers_to_versions(tree)
+
+    {
+      definite_versions: definite_versions,
+      package_paths: definite_versions.inject({}) do |h, v|
+        package = v =~ PACKAGE_RE && $1
+        path = tree[:available_packages][v][:path]
+        specifier_map[package].each_key {|s| h[s] = path}
+        h
+      end
+    }
   end
   
   DEP_RE = /\\(require|include) "([^"]+)"/.freeze
