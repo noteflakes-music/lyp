@@ -8,7 +8,7 @@ class Lypack::Resolver
   # 2. Resolve the dependency tree into a list of specific package versions
   def resolve_package_dependencies
     tree = get_dependency_tree
-    resolve_tree(tree)
+    definite_versions = resolve_tree(tree)
   end
   
   DEP_RE = /\\(require|include) "([^"]+)"/.freeze
@@ -187,34 +187,61 @@ class Lypack::Resolver
     end
   end
   
-  # Remove old versions of top level dependencies
+  # Remove redundant older versions of dependencies by collating package 
+  # versions by package specifiers, then removing older versions for any
+  # package for which a single package specifier exists.
   def squash_old_versions(tree)
-    tree[:dependencies].each do |package, subtree|
-      versions = subtree[:versions]
-      last_version = nil
-      versions.keys.sort.each_with_index do |version|
-        if last_version 
-          tree1 = versions[version][:dependencies]
-          tree2 = versions[last_version][:dependencies]
-          if tree1 == tree2
-            versions.delete(last_version)
+    specifiers = map_specifiers_to_versions(tree)
+    
+    compare_versions = lambda do |x, y|
+      v_x = x =~ PACKAGE_RE && Gem::Version.new($2)
+      v_y = y =~ PACKAGE_RE && Gem::Version.new($2)
+      x <=> y
+    end
+    
+    # Remove old versions for anything but 
+    specifiers.each do |package, specifiers|
+      # Remove old versions only if the package is referenced from a single
+      # specifier
+      if specifiers.size == 1
+        specifier = specifiers.values.first
+        specifier.each do |version_tree|
+          # check if all versions have same dependencies. Older versions can be 
+          # safely removed only if their dependencies are identical
+          deps = version_tree.map {|k, v| v[:dependencies]}
+          if deps.uniq.size == 1
+            versions = version_tree.keys.sort(&compare_versions)
+            latest = versions.last
+            version_tree.select! {|v| v == latest}
           end
         end
-        last_version = version
       end
     end
   end
   
-  def find_transitive_packages(tree, non_transitive = [])
-    # tree[:dependencies].each_value do |subtree|
-    #   subtree[:versions].each do |version, version_tree|
-    #
-    #     if version[:dependencies] && non_transitive.include?()
-    #
-    #   end
-    # end
-    #
-    # non_transitive
+  # Return a hash mapping packages to package specifiers to version trees, to
+  # be used to eliminate older versions from the dependency tree
+  def map_specifiers_to_versions(tree)
+    specifiers = {}
+    processed = {}
+    
+    l = lambda do |t|
+      return if processed[t]
+      processed[t] = true
+      t[:dependencies].each do |package, subtree|
+        versions = subtree[:versions]
+        clause = subtree[:clause]
+
+        specifiers[package] ||= {}
+        specifiers[package][clause] ||= []
+        specifiers[package][clause] << versions
+        
+        versions.each_value {|v| l[v]}
+      end
+    end
+    
+    l[tree]
+    specifiers
   end
   
   # Resolve the given dependency tree and return a list of concrete packages
@@ -227,7 +254,7 @@ class Lypack::Resolver
   def resolve_tree(tree)
     permutations = permutate_simplified_tree(tree)
     permutations = filter_invalid_permutations(permutations)
-
+    
     user_deps = tree[:dependencies].keys
     result = select_highest_versioned_permutation(permutations, user_deps).flatten
     

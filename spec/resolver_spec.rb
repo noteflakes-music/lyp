@@ -173,7 +173,7 @@ RSpec.describe Lypack::Resolver do
   it "correctly resolves a circular dependency" do
     with_package_setup(:circular) do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
-      
+
       r = resolver.resolve_package_dependencies
       expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
     end
@@ -182,7 +182,7 @@ RSpec.describe Lypack::Resolver do
   it "correctly resolves a transitive dependency" do
     with_package_setup(:transitive) do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
-      
+
       r = resolver.resolve_package_dependencies
       expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
     end
@@ -191,7 +191,7 @@ RSpec.describe Lypack::Resolver do
   it "correctly resolves dependencies with include files" do
     with_package_setup(:includes) do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
-      
+
       r = resolver.resolve_package_dependencies
       expect(r).to eq(%w{a@0.1 b@0.2 c@0.3})
     end
@@ -200,7 +200,7 @@ RSpec.describe Lypack::Resolver do
   it "returns no dependencies for file with no requires" do
     with_package_setup(:simple) do
       resolver = Lypack::Resolver.new('spec/user_files/no_require.ly')
-      
+
       r = resolver.resolve_package_dependencies
       expect(r).to eq([])
     end
@@ -209,7 +209,7 @@ RSpec.describe Lypack::Resolver do
   it "raises error on an unavailable dependency" do
     with_package_setup(:simple) do
       resolver = Lypack::Resolver.new('spec/user_files/not_found.ly')
-      
+
       expect {resolver.resolve_package_dependencies}.to raise_error
     end
   end
@@ -217,12 +217,12 @@ RSpec.describe Lypack::Resolver do
   it "raises error on an invalid circular dependency" do
     with_package_setup(:circular_invalid) do
       resolver = Lypack::Resolver.new('spec/user_files/circular.ly')
-      # here it should not raise, since a@0.2 satisfies the dependency 
+      # here it should not raise, since a@0.2 satisfies the dependency
       # requirements
       expect(resolver.resolve_package_dependencies).to eq(
         ["a@0.2", "b@0.2", "c@0.3"]
       )
-      
+
       # When the user specifies a@0.1, we should raise!
       resolver = Lypack::Resolver.new('spec/user_files/circular_invalid.ly')
       expect {resolver.resolve_package_dependencies}.to raise_error
@@ -232,7 +232,7 @@ RSpec.describe Lypack::Resolver do
   it "handles requires in include files" do
     with_package_setup(:simple) do
       resolver = Lypack::Resolver.new('spec/user_files/include1.ly')
-      
+
       r = resolver.resolve_package_dependencies
       expect(r).to eq(%w{a@0.1 b@0.1 c@0.1})
     end
@@ -241,9 +241,9 @@ RSpec.describe Lypack::Resolver do
   it "handles a big package setup" do
     with_package_setup(:big) do
       resolver = Lypack::Resolver.new('spec/user_files/simple.ly')
-      
+
       r = resolver.resolve_package_dependencies
-      expect(r.sort).to eq(%w{a@0.3.2 b@0.3.2 c@0.3.2 d@0.3.2 e@0.3.2 f@0.2.1 
+      expect(r.sort).to eq(%w{a@0.3.2 b@0.3.2 c@0.3.2 d@0.3.2 e@0.3.2 f@0.2.1
         g@0.3.2 h@0.3.2 i@0.3.2 j@0.3.2}
       )
     end
