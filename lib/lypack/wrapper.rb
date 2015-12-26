@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module Lypack
   def self.wrap(fn)
     r = Lypack::Resolver.new(fn).resolve_package_dependencies

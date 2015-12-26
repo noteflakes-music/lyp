@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require File.expand_path("../lib/lypack/version", File.dirname(__FILE__))
-require 'tempfile'
 
 if ARGV == ['-v']
   puts "Lypack version #{Lypack::VERSION}"
