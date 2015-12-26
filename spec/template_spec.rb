@@ -4,7 +4,7 @@ RSpec.describe "Lypack::Template" do
   it "renders a simple template" do
     tmpl = <<EOF
 (1.._).each do |i|
-  `\#{i * 10}: `
+  `{{i * 10}}: `
 end
 EOF
     t = Lypack::Template.new(tmpl)
@@ -26,7 +26,7 @@ __render__(:c, _ * 2)
 EOF
 
     c = <<EOF
-`\#{"*" * _} `
+`{{"*" * _}} `
 EOF
 
     Lypack::Template.set(:a, a)
@@ -36,6 +36,22 @@ EOF
     expect(Lypack::Template.render(:a, 3)).to eq(
       "******** ********** ************ \nthe end!"
     )
+  end
+  
+  it "correctly escapes and renders interpolated strings" do
+    a = <<EOF
+`{{"x" + 'y'}}`
+EOF
+
+    b = <<EOF
+`{"x"}`
+EOF
+
+    Lypack::Template.set(:a, a)
+    Lypack::Template.set(:b, b)
+
+    expect(Lypack::Template.render(:a)).to eq("xy")
+    expect(Lypack::Template.render(:b)).to eq("{\"x\"}")
   end
 end
 

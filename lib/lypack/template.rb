@@ -1,13 +1,20 @@
 module Lypack
   class Template
-    DELIMITER = '`'
-    REGEXP = /#{DELIMITER}(((?!#{DELIMITER}).)*)#{DELIMITER}/m
+    EMIT_DELIMITER = '`'.freeze
+    EMIT_RE = /#{EMIT_DELIMITER}(((?!#{EMIT_DELIMITER}).)*)#{EMIT_DELIMITER}/m
+
+    INTERPOLATION_START = "{{".freeze
+    INTERPOLATION_END = "}}".freeze
+    INTERPOLATION_RE = /#{INTERPOLATION_START}((?:(?!#{INTERPOLATION_END}).)*)#{INTERPOLATION_END}/m
+
+    ESCAPED_QUOTE = '\\"'.freeze
+    QUOTE = '"'.freeze
   
     # From the metaid gem
     def metaclass; class << self; self; end; end
 
     def initialize(templ)
-      templ = templ.gsub(REGEXP) {|m| convert_literal($1)}
+      templ = templ.gsub(EMIT_RE) {|m| convert_literal($1)}
       method_str = <<EOF
       define_method(:render) do |_ = {}, env = {}|
         __buffer__ = env[:buffer] ||= ''
@@ -21,14 +28,16 @@ module Lypack
       end
 EOF
 
-      # puts "*" * 20
-      # puts method_str
-      #
       metaclass.instance_eval method_str
     end
   
     def convert_literal(s)
-      "__emit__[\"#{s}\"]"
+      # look for interpolated values, wrap them with #{}
+      s = s.inspect.gsub(INTERPOLATION_RE) do
+        code = $1.gsub(ESCAPED_QUOTE, QUOTE) 
+        "\#{#{code}}"
+      end
+      "__emit__[#{s}]"
     end
     
     # Global template registry
