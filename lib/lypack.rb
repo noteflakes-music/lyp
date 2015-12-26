@@ -7,5 +7,6 @@ module Lypack
   
 end
 
-require 'lypack/resolver'
-require 'lypack/template'
+%w{template resolver wrapper}.each do |f|
+  require File.expand_path("lypack/#{f}", File.dirname(__FILE__))
+end

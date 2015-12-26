@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require File.expand_path("../lib/lypack/version", File.dirname(__FILE__))
+require 'tempfile'
+
+if ARGV == ['-v']
+  puts "Lypack version #{Lypack::VERSION}"
+  # Show lilypond version and exit
+  exec("lilypond -v")
+end
+
+if ARGV.size == 0
+  exec("lilypond")
+else
+  require File.expand_path("../lib/lypack", File.dirname(__FILE__))
+  
+  fn = Lypack.wrap(ARGV.pop)
+
+  ARGV << fn
+  exec("lilypond #{ARGV.join(' ')}")
+end  

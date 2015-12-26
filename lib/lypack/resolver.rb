@@ -13,6 +13,7 @@ class Lypack::Resolver
     specifier_map = map_specifiers_to_versions(tree)
 
     {
+      user_file: @user_file,
       definite_versions: definite_versions,
       package_paths: definite_versions.inject({}) do |h, v|
         package = v =~ PACKAGE_RE && $1
