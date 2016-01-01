@@ -17,4 +17,4 @@ else
 
   ARGV << fn
   exec("lilypond #{ARGV.join(' ')}")
-end  
+end

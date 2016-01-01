@@ -1,2 +1,1 @@
-- Add Lypack::Loader class that creates a wrapper .ly file with: a scheme map of package specifiers to file paths; definition of the \require command; and call to \include with the user's file.
 - Implement lilypond installer, install lilypond wrapper script that resolves a user's file, creates a wrapper .ly script etc.
