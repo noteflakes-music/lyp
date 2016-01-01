@@ -6,13 +6,13 @@ Lypack is currently not installed. In order to use lypack, ~/.lypack/bin has to
 be included in the shell $PATH.
 EOF
 
-require 'highline'
-
 # test installation
 unless Lypack::ENV.installed?
+  require 'highline'
+
   cli = HighLine.new
   STDERR.puts INSTALL_MSG.gsub("\n", " ")
-  
+
   if cli.agree("Would you like to install lypack now? (yes/no)")
     Lypack::ENV.install!
     STDERR.puts "To finish installation please open a new shell"
