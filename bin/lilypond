@@ -13,8 +13,5 @@ if ARGV.size == 0
 else
   require File.expand_path("../lib/lypack", File.dirname(__FILE__))
   
-  fn = Lypack.wrap(ARGV.pop)
-
-  ARGV << fn
-  exec("lilypond #{ARGV.join(' ')}")
+  Lypack::Lilypond.compile(ARGV)
 end

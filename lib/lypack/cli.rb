@@ -27,13 +27,6 @@ program :version,         Lypack::VERSION
 program :description,     'Lypack is a package manager for lilypond.'
 program :help_formatter,  :compact
 
-
-command :list do |c|
-  c.syntax =      "list [PATTERN]"
-  c.description = "Lists installed versions of packages whose name matches PATTERN"
-  c.action do |args, opts|
-    Lypack::Package.list(args.first).each {|p| puts p}
-  end
-end
+require 'lypack/cli/commands'
 
 default_command(:list)
