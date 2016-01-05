@@ -267,6 +267,16 @@ RSpec.describe Lypack::Resolver do
     end
   end
 
+  it "raises error for missing file" do
+    with_package_setup(:big) do
+      resolver = Lypack::Resolver.new('spec/user_files/does_not_exist.ly')
+      
+      expect do
+        resolver.resolve_package_dependencies
+      end.to raise_error
+    end
+  end
+
 end
 
 

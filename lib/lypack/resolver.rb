@@ -87,6 +87,8 @@ class Lypack::Resolver
     end
     
     tree[:processed_files][path] = true
+  rescue Errno::ENOENT
+    raise "Cannot find file #{path}"
   end
   
   def queue_file_for_processing(path, tree, leaf)
