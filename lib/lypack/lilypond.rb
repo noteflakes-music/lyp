@@ -267,6 +267,36 @@ module Lypack::Lilypond
       puts e.message
     end
     
+    def use(version, opts)
+      lilypond_list = list.reverse
+      if version == 'system'
+        lilypond = lilypond_list.find {|v| v[:system] }
+      elsif version == 'stable'
+        lilypond = lilypond_list.find do |v|
+          Gem::Version.new(v[:version]).segments[1] % 2 == 0
+        end
+      elsif version == 'unstable'
+        lilypond = lilypond_list.find do |v|
+          Gem::Version.new(v[:version]).segments[1] % 2 != 0
+        end
+      else
+        if version =~ /^\d+\.\d+$/
+          version = "~>#{version}.0"
+        end
+        req = Gem::Requirement.new(version)
+        lilypond = lilypond_list.find {|v| req =~ Gem::Version.new(v[:version])}
+      end
+      
+      unless lilypond
+        raise "Could not find a lilypond matching \"#{version}\""
+      end
+      
+      set_current_lilypond(lilypond[:path])
+      set_default_lilypond(lilypond[:path]) if opts[:default]
+      
+      lilypond
+    end
+    
     def exec(cmd)
       raise unless system(cmd)
     end
