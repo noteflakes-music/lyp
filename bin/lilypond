@@ -5,10 +5,10 @@ require File.expand_path("../lib/lypack/version", File.dirname(__FILE__))
 require File.expand_path("../lib/lypack", File.dirname(__FILE__))
 lilypond_path = Lypack::Lilypond.current_lilypond
 
-if ARGV == ['-v']
+if (ARGV == ['-v']) || (ARGV == ['--warranty'])
   puts "Lypack version #{Lypack::VERSION}"
   # Show lilypond version and exit
-  exec("#{lilypond_path} -v")
+  exec("#{lilypond_path} #{ARGV.join(' ')}")
 end
 
 if ARGV.size == 0
