@@ -13,5 +13,10 @@ if ARGV.size == 0
 else
   require File.expand_path("../lib/lypack", File.dirname(__FILE__))
   
-  Lypack::Lilypond.compile(ARGV)
+  begin
+    Lypack::Lilypond.compile(ARGV)
+  rescue => e
+    STDERR.puts e.message
+    exit 1
+  end
 end
