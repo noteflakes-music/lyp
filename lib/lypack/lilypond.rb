@@ -1,3 +1,6 @@
+require 'open-uri'
+require 'nokogiri'
+
 module Lypack::Lilypond
   class << self
     def compile(argv)
@@ -116,5 +119,37 @@ module Lypack::Lilypond
         m
       end
     end
+    
+    BASE_URL = "http://download.linuxaudio.org/lilypond/binaries"
+  
+    def search
+      platform = detect_lilypond_platform
+      url = "#{BASE_URL}/#{platform}/"
+      doc = Nokogiri::HTML(open(url))
+      
+      versions = []
+      doc.xpath("//td//a").each do |a|
+        if a[:href] =~ /^lilypond-([0-9\.]+)/
+          versions << $1
+        end
+      end
+      versions
+    end
+    
+    def detect_lilypond_platform
+      case RUBY_PLATFORM
+      when /x86_64-darwin/
+        "darwin-x86"
+      when /ppc-darwin/
+        "darwin-ppc"
+      when "i686-linux"
+        "linux-x86"
+      when "x86_64-linux"
+        "linux-64"
+      when "ppc-linux"
+        "linux-ppc"
+      end
+    end
+  
   end
 end

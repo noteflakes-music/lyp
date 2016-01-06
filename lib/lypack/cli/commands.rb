@@ -53,12 +53,9 @@ command :list do |c|
   end
 end
 
-
-
 command :compile do |c|
   c.syntax = "compile <FILE>"
   c.description = "Resolves package dependencies and invokes lilypond"
-  c.option '-c', '--config FILE', 'Set config file'
   c.action do |args, opts|
     begin
       raise "File not specified" if args.empty?
@@ -66,6 +63,23 @@ command :compile do |c|
     rescue => e
       STDERR.puts e.message
       exit 1
+    end
+  end
+end
+
+command :search do |c|
+  c.syntax = "search <PATTERN>"
+  c.description = "Search for a package or a version of lilypond"
+  c.action do |args, opts|
+    pattern = args.first
+    if pattern == 'lilypond'
+      begin
+        versions = Lypack::Lilypond.search
+        versions.each {|v| puts v}
+      rescue => e
+        STDERR.puts e.message
+        exit 1
+      end
     end
   end
 end
