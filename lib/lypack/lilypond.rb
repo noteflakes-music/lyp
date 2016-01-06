@@ -1,6 +1,3 @@
-require 'open-uri'
-require 'nokogiri'
-
 module Lypack::Lilypond
   class << self
     def compile(argv)
@@ -123,6 +120,9 @@ module Lypack::Lilypond
     BASE_URL = "http://download.linuxaudio.org/lilypond/binaries"
   
     def search
+      require 'open-uri'
+      require 'nokogiri'
+
       platform = detect_lilypond_platform
       url = "#{BASE_URL}/#{platform}/"
       doc = Nokogiri::HTML(open(url))
