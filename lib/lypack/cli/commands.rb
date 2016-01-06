@@ -83,3 +83,22 @@ command :search do |c|
     end
   end
 end
+
+command :install do |c|
+  c.syntax = "install <PACKAGE...>"
+  c.description = "Install a package or a version of lilypond"
+  c.action do |args, opts|
+    begin
+      raise "No package specified" if args.empty?
+      
+      args.each do |package|
+        if package =~ /^lilypond(?:@(.+))?$/
+          Lypack::Lilypond.install($1)
+        end
+      end
+    rescue => e
+      STDERR.puts e.message
+      exit 1
+    end
+  end
+end

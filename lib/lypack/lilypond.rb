@@ -136,6 +136,26 @@ module Lypack::Lilypond
       versions
     end
     
+    def install(version_specifier, opts = {})
+      version = detect_version_from_specifier(version_specifier)
+      raise "No version found matching specifier #{version_specifier}" unless version
+
+      install_version(version)
+
+      lilypond_path = "#{Lypack.lilyponds_dir}/#{version}/bin/lilypond"
+      set_current_lilypond(lilypond_path)
+      set_default_lilypond(lilypond_path) if opts[:default]
+    end
+    
+    def detect_version_from_specifier(version_specifier)
+      if version_specifier =~ /^\d/
+        version_specifier
+      else
+        req = Gem::Requirement.new(version_specifier)
+        search.reverse.find {|v| req =~ Gem::Version.new(v)}
+      end
+    end
+    
     def detect_lilypond_platform
       case RUBY_PLATFORM
       when /x86_64-darwin/
@@ -151,5 +171,104 @@ module Lypack::Lilypond
       end
     end
   
+    def install_version(version)
+      platform = detect_lilypond_platform
+      url = lilypond_install_url(platform, version)
+      fn = Tempfile.new('lypack-lilypond-installer').path
+
+      download_lilypond(url, fn)
+      install_lilypond_files(fn, platform, version)
+    end
+
+    def lilypond_install_url(platform, version)
+      ext = platform =~ /darwin/ ? ".tar.bz2" : ".sh"
+      filename = "lilypond-#{version}-1.#{platform}"
+    
+      "#{BASE_URL}/#{platform}/#{filename}#{ext}"
+    end
+  
+    def download_lilypond(url, fn)
+      STDERR.puts "Downloading #{url}"
+    
+      url_base = url.split('/')[2]
+      url_path = '/'+url.split('/')[3..-1].join('/')
+      download_count = 0
+
+      Net::HTTP.start(url_base) do |http|
+        request_url = URI.escape(url_path)
+        response = http.request_head(request_url)
+        total_size = response['content-length'].to_i
+        pbar = ProgressBar.create(title: 'Download', total: total_size)
+        File.open(fn, 'w') do |f|
+          http.get(request_url) do |data|
+            f << data
+            download_count += data.length 
+            pbar.progress = download_count if download_count <= total_size
+          end
+        end
+        pbar.finish
+      end
+    end
+  
+    def install_lilypond_files(fn, platform, version)
+      case platform
+      when /darwin/
+        install_lilypond_files_osx(fn, version)
+      when /linux/
+        install_lilypond_files_linux(fn, version)
+      end
+    end
+  
+    def install_lilypond_files_osx(fn, version)
+      target = "/tmp/lypack/installer/lilypond"
+      FileUtils.mkdir_p(target)
+    
+      STDERR.puts "Extracting..."
+      exec "tar -xjf #{fn} -C #{target}"
+    
+      copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version)
+    end
+  
+    def install_lilypond_files_linux(fn, version)
+      target = "/tmp/lypack/installer/lilypond"
+      FileUtils.mkdir_p(target)
+    
+      # create temp directory in which to untar file
+      tmp_dir = "/tmp/lypack/#{Time.now.to_f}"
+      FileUtils.mkdir_p(tmp_dir)
+    
+      FileUtils.cd(tmp_dir) do
+        exec "sh #{fn} --tarball"
+      end
+    
+      STDERR.puts "Extracting..."
+      exec "tar -xjf #{tmp_dir}/#{fn} -C #{target}"
+    
+      copy_lilypond_files("#{target}/usr", version)
+    end
+
+    def copy_lilypond_files(base_path, version)
+      target_dir = File.join(Lypack.lilyponds_dir, version)
+      
+      FileUtils.rm_rf(target_dir) if File.exists?(target_dir)
+      
+      # create directory for lilypond files
+      FileUtils.mkdir_p(target_dir)
+    
+      # copy files
+      STDERR.puts "Copying..."
+      %w{bin etc lib lib64 share var}.each do |entry|
+        dir = File.join(base_path, entry)
+        FileUtils.cp_r(dir, target_dir, remove_destination: true) if File.directory?(dir)
+      end
+      
+      STDERR.puts exec "#{target_dir}/bin/lilypond -v"
+    rescue => e
+      puts e.message
+    end
+    
+    def exec(cmd)
+      raise unless system(cmd)
+    end
   end
 end

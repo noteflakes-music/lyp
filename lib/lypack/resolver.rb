@@ -16,7 +16,7 @@ class Lypack::Resolver
       user_file: @user_file,
       definite_versions: definite_versions,
       package_paths: definite_versions.inject({}) do |h, v|
-        package = v =~ PACKAGE_RE && $1
+        package = v =~ Lypack::PACKAGE_RE && $1
         path = tree[:available_packages][v][:path]
         specifier_map[package].each_key {|s| h[s] = path}
         h
@@ -99,15 +99,10 @@ class Lypack::Resolver
     tree[:queue].shift
   end
   
-  # A package specifier is of the form <package>@<version specifier>, where
-  # the version specifier can be simply a version number, or include an operator
-  # before the version number. Accepted operators: >=, ~>
-  PACKAGE_RE = /^([^@]+)(?:@(.+))?$/
-  
   # Find available packaging matching the package specifier, and queue them for
   # processing any include files or transitive dependencies.
   def find_package_versions(ref, tree, leaf)
-    return {} unless ref =~ PACKAGE_RE
+    return {} unless ref =~ Lypack::PACKAGE_RE
     ref_package = $1
     version_clause = $2
 
@@ -135,14 +130,14 @@ class Lypack::Resolver
   
   # Find packages meeting the version requirement
   def find_matching_packages(req, tree)
-    return {} unless req =~ PACKAGE_RE
+    return {} unless req =~ Lypack::PACKAGE_RE
     
     req_package = $1
     req_version = $2
     req = Gem::Requirement.new(req_version || '>=0')
 
     available_packages(tree).select do |package, sub_tree|
-      if package =~ PACKAGE_RE
+      if package =~ Lypack::PACKAGE_RE
         version = Gem::Version.new($2 || '0')
         (req_package == $1) && (req =~ version)
       else
@@ -209,8 +204,8 @@ class Lypack::Resolver
     specifiers = map_specifiers_to_versions(tree)
     
     compare_versions = lambda do |x, y|
-      v_x = x =~ PACKAGE_RE && Gem::Version.new($2)
-      v_y = y =~ PACKAGE_RE && Gem::Version.new($2)
+      v_x = x =~ Lypack::PACKAGE_RE && Gem::Version.new($2)
+      v_y = y =~ Lypack::PACKAGE_RE && Gem::Version.new($2)
       x <=> y
     end
     
@@ -387,7 +382,7 @@ class Lypack::Resolver
     versions = {}
     
     map = lambda do |m, p|
-      if p =~ PACKAGE_RE
+      if p =~ Lypack::PACKAGE_RE
         m[$1] = versions[p] ||= Gem::Version.new($2 || '0.0')
       end
       m

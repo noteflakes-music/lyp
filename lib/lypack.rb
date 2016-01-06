@@ -1,4 +1,9 @@
 module Lypack
+  # A package specifier is of the form <package>@<version specifier>, where
+  # the version specifier can be simply a version number, or include an operator
+  # before the version number. Accepted operators: >=, ~>
+  PACKAGE_RE = /^([^@]+)(?:@(.+))?$/
+
   LYPACK_DIRECTORY = File.expand_path('~/.lypack')
   LYPACK_BIN_DIRECTORY = File.join(LYPACK_DIRECTORY, 'bin')
   DEFAULT_PACKAGE_DIRECTORY = File.join(LYPACK_DIRECTORY, 'packages')

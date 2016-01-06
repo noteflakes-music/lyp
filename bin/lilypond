@@ -2,16 +2,18 @@
 
 require File.expand_path("../lib/lypack/version", File.dirname(__FILE__))
 
+require File.expand_path("../lib/lypack", File.dirname(__FILE__))
+lilypond_path = Lypack::Lilypond.current_lilypond
+
 if ARGV == ['-v']
   puts "Lypack version #{Lypack::VERSION}"
   # Show lilypond version and exit
-  exec("lilypond -v")
+  exec("#{lilypond_path} -v")
 end
 
 if ARGV.size == 0
-  exec("lilypond")
+  exec(lilypond_path)
 else
-  require File.expand_path("../lib/lypack", File.dirname(__FILE__))
   
   begin
     Lypack::Lilypond.compile(ARGV)
