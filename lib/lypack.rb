@@ -2,6 +2,7 @@ module Lypack
   LYPACK_DIRECTORY = File.expand_path('~/.lypack')
   LYPACK_BIN_DIRECTORY = File.join(LYPACK_DIRECTORY, 'bin')
   DEFAULT_PACKAGE_DIRECTORY = File.join(LYPACK_DIRECTORY, 'packages')
+  DEFAULT_LILYPONDS_DIRECTORY = File.join(LYPACK_DIRECTORY, 'lilyponds')
   
   SETTINGS_FILENAME = 'settings.yml'
 
@@ -9,6 +10,10 @@ module Lypack
     DEFAULT_PACKAGE_DIRECTORY
   end
   
+  def self.lilyponds_dir
+    DEFAULT_LILYPONDS_DIRECTORY
+  end
+
   def self.settings_file
     File.join(LYPACK_DIRECTORY, SETTINGS_FILENAME)
   end

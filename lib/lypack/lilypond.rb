@@ -60,7 +60,26 @@ module Lypack::Lilypond
     end
     
     def list
-      lilyponds = list_system_lilyponds # + list_lypack_lilyponds
+      # combine system + lypack-installed lilyponds and sort by version
+      lilyponds = (list_system_lilyponds + list_lypack_lilyponds).sort do |x, y|
+        Gem::Version.new(x[:version]) <=> Gem::Version.new(y[:version])
+      end
+    end
+    
+    def list_lypack_lilyponds
+      default = default_lilypond
+      current = current_lilypond
+      
+      Dir["#{Lypack.lilyponds_dir}/*"].map do |path|
+        version = File.basename(path)
+        path = File.join(path, "bin/lilypond")
+        {
+          path: path,
+          version: version,
+          current: path == current,
+          default: path == default
+        }
+      end
     end
     
     def list_system_lilyponds
