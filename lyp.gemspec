@@ -17,9 +17,9 @@ Gem::Specification.new do |s|
 
   s.executables   = ['lyp', 'lilypond']
 
-  s.add_dependency "highline", "~>1.7.8"
-  s.add_dependency "ruby-progressbar", "~>1.7.5"
-  s.add_dependency "commander", "~>4.3.5"
-  s.add_dependency "nokogiri", "~>1.6.7"
-  s.add_dependency "httpclient", "~>2.7.1"
+  s.add_dependency "highline", "~>1.7", ">=1.7.8"
+  s.add_dependency "ruby-progressbar", "~>1.7", ">=1.7.5"
+  s.add_dependency "commander", "~>4.3", ">=4.3.5"
+  s.add_dependency "nokogiri", "~>1.6", ">=1.6.7"
+  s.add_dependency "httpclient", "~>2.7", ">=2.7.1"
 end
