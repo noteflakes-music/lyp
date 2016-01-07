@@ -319,6 +319,9 @@ module Lypack::Lilypond
       lilypond_list = list.reverse
       if version == 'system'
         lilypond = lilypond_list.find {|v| v[:system] }
+        unless lilypond
+          raise "Could not find a system installed version of lilypond"
+        end
       elsif version == 'stable'
         lilypond = lilypond_list.find do |v|
           Gem::Version.new(v[:version]).segments[1] % 2 == 0

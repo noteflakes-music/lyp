@@ -208,5 +208,36 @@ RSpec.describe "Lypack::Lilypond" do
       expect($1).to eq(version)
     end
   end
+
+  it "switches between installed versions of lilypond" do
+    with_lilyponds(:simple) do
+      Lypack::Lilypond.list
+      expect(Lypack::Lilypond.default_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+      
+      Lypack::Lilypond.use("2.18.1", {})
+      expect(Lypack::Lilypond.default_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.18.1/bin/lilypond")
+      
+      Lypack::Lilypond.use("2.19.15", {default: true})
+      expect(Lypack::Lilypond.default_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
+
+      Lypack::Lilypond.use("stable", {})
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.18.1/bin/lilypond")
+
+      Lypack::Lilypond.use("unstable", {})
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+
+      Lypack::Lilypond.use("2.18", {})
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.18.1/bin/lilypond")
+
+      Lypack::Lilypond.use(">=2.18", {})
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+
+      Lypack::Lilypond.use("~>2.18.1", {})
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.18.1/bin/lilypond")
+    end    
+  end
 end
 
