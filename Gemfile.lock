@@ -5,6 +5,7 @@ GEM
       highline (~> 1.7.2)
     diff-lcs (1.2.5)
     highline (1.7.8)
+    httpclient (2.7.1)
     mini_portile2 (2.0.0)
     nokogiri (1.6.7.1)
       mini_portile2 (~> 2.0.0.rc2)
@@ -29,6 +30,7 @@ PLATFORMS
 DEPENDENCIES
   commander (~> 4.3.5)
   highline (~> 1.7.8)
+  httpclient (~> 2.7.1)
   nokogiri (~> 1.6.7)
   rspec (= 3.2.0)
   ruby-progressbar (~> 1.7.5)

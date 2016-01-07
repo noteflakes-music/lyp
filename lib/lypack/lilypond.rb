@@ -1,3 +1,5 @@
+require 'httpclient'
+
 module Lypack::Lilypond
   class << self
     def compile(argv)
@@ -205,29 +207,29 @@ module Lypack::Lilypond
   
     def download_lilypond(url, fn, opts)
       STDERR.puts "Downloading #{url}" unless opts[:silent]
-    
-      url_base = url.split('/')[2]
-      url_path = '/'+url.split('/')[3..-1].join('/')
+      
       download_count = 0
+      client = HTTPClient.new
+      conn = client.get_async(url)
+      msg = conn.pop
+      total_size = msg.header['Content-Length'].first.to_i
+      io = msg.content
 
-      Net::HTTP.start(url_base) do |http|
-        request_url = URI.escape(url_path)
-        response = http.request_head(request_url)
-        total_size = response['content-length'].to_i
-        unless opts[:silent]
-          pbar = ProgressBar.create(title: 'Download', total: total_size)
-        end
-        File.open(fn, 'w') do |f|
-          http.get(request_url) do |data|
-            f << data
-            download_count += data.length
-            unless opts[:silent]
-              pbar.progress = download_count if download_count <= total_size
-            end
+      unless opts[:silent]
+        pbar = ProgressBar.create(title: 'Download', total: total_size)
+      end
+      File.open(fn, 'w') do |f|
+        while !conn.finished?
+          data = io.read(10000)
+          download_count += data.length
+          f << data
+          unless opts[:silent]
+            pbar.progress = download_count if download_count <= total_size
           end
         end
-        pbar.finish unless opts[:silent]
       end
+      
+      pbar.finish unless opts[:silent]
     end
   
     def install_lilypond_files(fn, platform, version, opts)
@@ -261,7 +263,7 @@ module Lypack::Lilypond
         exec "sh #{fn} --tarball"
       end
       
-      tmp_fn = "#{tmp_dir}/lilypond-#{version}-1.#{platform}.tar.bz2"
+      tmp_fn = "#{tmp_dir}/lilypnd-#{version}-1.#{platform}.tar.bz2"
       
       STDERR.puts "Extracting..." unless opts[:silent]
       exec "tar -xjf #{tmp_fn} -C #{target}"
