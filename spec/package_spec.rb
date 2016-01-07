@@ -2,7 +2,7 @@ require File.expand_path('spec_helper', File.dirname(__FILE__))
 
 RSpec.describe "Lypack::Package" do
   it "returns a list of installed packages" do
-    with_package_setup(:simple) do
+    with_packages(:simple) do
       expect(Lypack::Package.list).to eq(%w{
         a@0.1
         a@0.2
@@ -16,7 +16,7 @@ RSpec.describe "Lypack::Package" do
   end
 
   it "list lilypond versions" do
-    with_package_setup(:simple_with_ly) do
+    with_packages(:simple_with_ly) do
       expect(Lypack::Package.list).to eq(%w{
         a@0.1
         a@0.2
@@ -32,14 +32,14 @@ RSpec.describe "Lypack::Package" do
   end
 
   it "lists packages matching given pattern" do
-    with_package_setup(:simple_with_ly) do
+    with_packages(:simple_with_ly) do
       expect(Lypack::Package.list('a')).to eq(%w{
         a@0.1
         a@0.2
       })
     end
 
-    with_package_setup(:simple_with_ly) do
+    with_packages(:simple_with_ly) do
       expect(Lypack::Package.list('0.1')).to eq(%w{
         a@0.1
         b@0.1
