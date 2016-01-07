@@ -82,7 +82,7 @@ def with_lilyponds(setup)
     Dir["#{$lilyponds_dir}/*"].each do |fn|
       FileUtils.rm_rf(fn) unless original_files.include?(fn)
     end
-
+    
     $lilyponds_dir = old_lilyponds_dir
   end
 end

@@ -16,7 +16,7 @@ RSpec.describe "Lypack::Lilypond" do
       })
     end
   end
-  
+
   it "manages default lilypond setting" do
     with_lilyponds(:empty) do
       # get list and set default to latest version available
@@ -68,15 +68,144 @@ RSpec.describe "Lypack::Lilypond" do
   end
 
   it "installs an arbitrary version of lilypond" do
-    with_lilyponds(:empty) do
-      Lypack::Lilypond.install("2.18.1", {silent: true})
+    with_lilyponds(:simple) do
+      Lypack::Lilypond.list
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
       
-      files = Dir["#{$lilyponds_dir}/2.18.1/bin/*"].map {|fn| File.basename(fn)}
+      Lypack::Lilypond.install("2.18.2", {silent: true})
+      
+      files = Dir["#{$lilyponds_dir}/2.18.2/bin/*"].map {|fn| File.basename(fn)}
       expect(files).to include('lilypond')
       
-      resp = `#{$lilyponds_dir}/2.18.1/bin/lilypond -v`
+      resp = `#{$lilyponds_dir}/2.18.2/bin/lilypond -v`
       resp =~ /LilyPond ([0-9\.]+)/i
-      expect($1).to eq('2.18.1')
+      expect($1).to eq('2.18.2')
+      
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/2.18.2/bin/lilypond"
+      )
+    end
+  end
+  
+  it "installs and sets as default an arbitrary version of lilypond" do
+    with_lilyponds(:simple) do
+      Lypack::Lilypond.list
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      
+      Lypack::Lilypond.install("2.18.2", {silent: true, default: true})
+      
+      files = Dir["#{$lilyponds_dir}/2.18.2/bin/*"].map {|fn| File.basename(fn)}
+      expect(files).to include('lilypond')
+      
+      resp = `#{$lilyponds_dir}/2.18.2/bin/lilypond -v`
+      resp =~ /LilyPond ([0-9\.]+)/i
+      expect($1).to eq('2.18.2')
+      
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.18.2/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/2.18.2/bin/lilypond"
+      )
+    end
+  end
+  
+  it "installs the latest stable version of lilypond" do
+    with_lilyponds(:simple) do
+      Lypack::Lilypond.list
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      
+      version = Lypack::Lilypond.latest_stable_version
+      
+      Lypack::Lilypond.install('stable', {silent: true})
+      
+      files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
+      expect(files).to include('lilypond')
+      
+      resp = `#{$lilyponds_dir}/#{version}/bin/lilypond -v`
+      resp =~ /LilyPond ([0-9\.]+)/i
+      expect($1).to eq(version)
+      
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/#{version}/bin/lilypond"
+      )
+    end
+  end
+  
+  it "installs the latest unstable version of lilypond" do
+    with_lilyponds(:simple) do
+      Lypack::Lilypond.list
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      
+      version = Lypack::Lilypond.latest_unstable_version
+      
+      Lypack::Lilypond.install('unstable', {silent: true})
+      
+      files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
+      expect(files).to include('lilypond')
+      
+      resp = `#{$lilyponds_dir}/#{version}/bin/lilypond -v`
+      resp =~ /LilyPond ([0-9\.]+)/i
+      expect($1).to eq(version)
+      
+      expect(Lypack::Lilypond.default_lilypond).to eq(
+        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
+      )
+      expect(Lypack::Lilypond.current_lilypond).to eq(
+        "#{$lilyponds_dir}/#{version}/bin/lilypond"
+      )
+    end
+  end
+  
+  it "supports version specifiers when installing lilypond" do
+    with_lilyponds(:simple) do
+      Lypack::Lilypond.install('>=2.18.1', {silent: true})
+      version = Lypack::Lilypond.latest_version
+      
+      files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
+      expect(files).to include('lilypond')
+      
+      resp = `#{$lilyponds_dir}/#{version}/bin/lilypond -v`
+      resp =~ /LilyPond ([0-9\.]+)/i
+      expect($1).to eq(version)
+    end
+
+    with_lilyponds(:simple) do
+      Lypack::Lilypond.install('~>2.17.30', {silent: true})
+      version = "2.17.97"
+      
+      files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
+      expect(files).to include('lilypond')
+      
+      resp = `#{$lilyponds_dir}/#{version}/bin/lilypond -v`
+      resp =~ /LilyPond ([0-9\.]+)/i
+      expect($1).to eq(version)
     end
   end
 end

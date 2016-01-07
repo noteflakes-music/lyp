@@ -138,6 +138,7 @@ module Lypack::Lilypond
     
     BASE_URL = "http://download.linuxaudio.org/lilypond/binaries"
   
+    # Returns a list of versions of lilyponds available for download
     def search
       require 'open-uri'
       require 'nokogiri'
@@ -155,6 +156,18 @@ module Lypack::Lilypond
       versions
     end
     
+    def latest_stable_version
+      search.reverse.find {|l| Gem::Version.new(l).segments[1] % 2 == 0}
+    end
+    
+    def latest_unstable_version
+      search.reverse.find {|l| Gem::Version.new(l).segments[1] % 2 != 0}
+    end
+    
+    def latest_version
+      search.last
+    end
+    
     def install(version_specifier, opts = {})
       version = detect_version_from_specifier(version_specifier)
       raise "No version found matching specifier #{version_specifier}" unless version
@@ -167,12 +180,19 @@ module Lypack::Lilypond
     end
     
     def detect_version_from_specifier(version_specifier)
-      if version_specifier =~ /^\d/
+      case version_specifier
+      when /^\d/
         version_specifier
+      when 'stable'
+        latest_stable_version
+      when 'unstable'
+        latest_unstable_version
       else
         req = Gem::Requirement.new(version_specifier)
         search.reverse.find {|v| req =~ Gem::Version.new(v)}
       end
+    rescue => e
+      raise "Invalid version specified: #{version_specifier}"
     end
     
     def detect_lilypond_platform
