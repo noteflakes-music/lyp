@@ -124,3 +124,23 @@ command :use do |c|
     end
   end
 end
+
+command :uninstall do |c|
+  c.syntax = "uninstall <PACKAGE>"
+  c.description = "Uninstall a package or version of lilypond"
+
+  c.action do |args, opts|
+    begin
+      raise "No package specified" if args.empty?
+      
+      args.each do |package|
+        if package =~ /^lilypond(?:@(.+))?$/
+          Lypack::Lilypond.uninstall($1)
+        end
+      end
+    rescue => e
+      STDERR.puts e.message
+      exit 1
+    end
+  end
+end
