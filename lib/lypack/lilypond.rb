@@ -225,7 +225,7 @@ module Lypack::Lilypond
         pbar = ProgressBar.create(title: 'Download', total: total_size)
       end
       File.open(fn, 'w+') do |f|
-        while !conn.finished? && (data = io.read(10000))
+        while data = io.read(10000)
           download_count += data.bytesize
           f << data
           unless opts[:silent]
@@ -233,7 +233,7 @@ module Lypack::Lilypond
           end
         end
       end
-      puts "Got #{download_count} bytes"
+      puts "Got #{download_count}/#{total_size} bytes"
       pbar.finish unless opts[:silent]
     end
   
