@@ -29,74 +29,81 @@ module Lypack::Lilypond
     # The current lilypond path is stored in a temporary file named by the 
     # session id. Thus we can persist the version selected by the user
     def current_lilypond
-      settings = get_sid_settings(Process.getsid)
+      settings = get_session_settings
 
       if !settings[:current]
         settings[:current] = default_lilypond
-        set_sid_settings(Process.getsid, settings)
+        set_session_settings(settings)
       end
       
       settings[:current]
     end
     
     def set_current_lilypond(path)
-      settings = get_sid_settings(Process.getsid)
+      settings = get_session_settings
       settings[:current] = path
-      set_sid_settings(Process.getsid, settings)
+      set_session_settings(settings)
     end
     
-    def get_sid_settings(sid)
-      YAML.load(IO.read(sid_settings_filename(Process.getsid))) rescue {}
+    def get_session_settings
+      YAML.load(IO.read(session_settings_filename)) rescue {}
     end
     
-    def set_sid_settings(sid, settings)
-      File.open(sid_settings_filename(Process.getsid), 'w+') do |f|
+    def set_session_settings(settings)
+      File.open(session_settings_filename, 'w+') do |f|
         f << YAML.dump(settings)
       end
     end
     
-    def sid_settings_filename(sid)
-      "/tmp/lypack.session.#{sid}.yml"
+    def session_settings_filename
+      "/tmp/lypack.session.#{Process.getsid}.yml"
     end
     
     def list
-      # combine system + lypack-installed lilyponds and sort by version
-      lilyponds = (list_system_lilyponds + list_lypack_lilyponds).sort do |x, y|
+      # combine system + lypack-installed lilyponds
+      lilyponds = system_lilyponds + lypack_lilyponds
+      
+      default = default_lilypond
+      unless default
+        latest = system_lilyponds.last || lypack_lilyponds.last
+        if latest
+          default = latest[:path]
+          set_default_lilypond(default)
+        end
+      end
+      current = current_lilypond
+      
+      lilyponds.each do |l|
+        l[:default] = l[:path] == default
+        l[:current] = l[:path] == current
+      end
+      
+      # sort by version
+      lilyponds.sort! do |x, y|
         Gem::Version.new(x[:version]) <=> Gem::Version.new(y[:version])
       end
     end
     
-    def list_lypack_lilyponds
-      default = default_lilypond
-      current = current_lilypond
+    def lypack_lilyponds
+      list = []
       
-      Dir["#{Lypack.lilyponds_dir}/*"].map do |path|
+      Dir["#{Lypack.lilyponds_dir}/*"].each do |path|
+        next unless File.directory?(path) && File.basename(path) =~ /^[\d\.]+$/
+        
         version = File.basename(path)
         path = File.join(path, "bin/lilypond")
-        {
+        list << {
           path: path,
-          version: version,
-          current: path == current,
-          default: path == default
+          version: version
         }
       end
+      
+      list
     end
     
-    def list_system_lilyponds
-      list = `which -a lilypond`
-      list = list.lines.map {|f| f.chomp}.reject do |l|
-        l =~ /^#{Lypack::LYPACK_BIN_DIRECTORY}/
-      end
-      
+    def system_lilyponds
+      list = get_system_lilyponds_paths
       return list if list.empty?
-      
-      default = default_lilypond
-      if default.nil?
-        default = list.first
-        set_default_lilypond(default)
-      end
-      
-      current = current_lilypond
       
       list.inject([]) do |m, path|
         begin
@@ -105,15 +112,20 @@ module Lypack::Lilypond
             m << {
               path: path,
               version: $1,
-              system: true,
-              current: path == current,
-              default: path == default
+              system: true
             }
           end
         rescue
           # ignore error
         end
         m
+      end
+    end
+    
+    def get_system_lilyponds_paths
+      list = `which -a lilypond`
+      list = list.lines.map {|f| f.chomp}.reject do |l|
+        l =~ /^#{Lypack::LYPACK_BIN_DIRECTORY}/
       end
     end
     
@@ -140,7 +152,7 @@ module Lypack::Lilypond
       version = detect_version_from_specifier(version_specifier)
       raise "No version found matching specifier #{version_specifier}" unless version
 
-      install_version(version)
+      install_version(version, opts)
 
       lilypond_path = "#{Lypack.lilyponds_dir}/#{version}/bin/lilypond"
       set_current_lilypond(lilypond_path)
@@ -171,24 +183,24 @@ module Lypack::Lilypond
       end
     end
   
-    def install_version(version)
+    def install_version(version, opts)
       platform = detect_lilypond_platform
-      url = lilypond_install_url(platform, version)
+      url = lilypond_install_url(platform, version, opts)
       fn = Tempfile.new('lypack-lilypond-installer').path
 
-      download_lilypond(url, fn)
-      install_lilypond_files(fn, platform, version)
+      download_lilypond(url, fn, opts)
+      install_lilypond_files(fn, platform, version, opts)
     end
 
-    def lilypond_install_url(platform, version)
+    def lilypond_install_url(platform, version, opts)
       ext = platform =~ /darwin/ ? ".tar.bz2" : ".sh"
       filename = "lilypond-#{version}-1.#{platform}"
     
       "#{BASE_URL}/#{platform}/#{filename}#{ext}"
     end
   
-    def download_lilypond(url, fn)
-      STDERR.puts "Downloading #{url}"
+    def download_lilypond(url, fn, opts)
+      STDERR.puts "Downloading #{url}" unless opts[:silent]
     
       url_base = url.split('/')[2]
       url_path = '/'+url.split('/')[3..-1].join('/')
@@ -198,38 +210,42 @@ module Lypack::Lilypond
         request_url = URI.escape(url_path)
         response = http.request_head(request_url)
         total_size = response['content-length'].to_i
-        pbar = ProgressBar.create(title: 'Download', total: total_size)
+        unless opts[:silent]
+          pbar = ProgressBar.create(title: 'Download', total: total_size)
+        end
         File.open(fn, 'w') do |f|
           http.get(request_url) do |data|
             f << data
-            download_count += data.length 
-            pbar.progress = download_count if download_count <= total_size
+            download_count += data.length
+            unless opts[:silent]
+              pbar.progress = download_count if download_count <= total_size
+            end
           end
         end
-        pbar.finish
+        pbar.finish unless opts[:silent]
       end
     end
   
-    def install_lilypond_files(fn, platform, version)
+    def install_lilypond_files(fn, platform, version, opts)
       case platform
       when /darwin/
-        install_lilypond_files_osx(fn, version)
+        install_lilypond_files_osx(fn, version, opts)
       when /linux/
-        install_lilypond_files_linux(fn, version)
+        install_lilypond_files_linux(fn, version, opts)
       end
     end
   
-    def install_lilypond_files_osx(fn, version)
+    def install_lilypond_files_osx(fn, version, opts)
       target = "/tmp/lypack/installer/lilypond"
       FileUtils.mkdir_p(target)
     
-      STDERR.puts "Extracting..."
+      STDERR.puts "Extracting..." unless opts[:silent]
       exec "tar -xjf #{fn} -C #{target}"
     
-      copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version)
+      copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version, opts)
     end
   
-    def install_lilypond_files_linux(fn, version)
+    def install_lilypond_files_linux(fn, version, opts)
       target = "/tmp/lypack/installer/lilypond"
       FileUtils.mkdir_p(target)
     
@@ -241,13 +257,13 @@ module Lypack::Lilypond
         exec "sh #{fn} --tarball"
       end
     
-      STDERR.puts "Extracting..."
+      STDERR.puts "Extracting..." unless opts[:silent]
       exec "tar -xjf #{tmp_dir}/#{fn} -C #{target}"
     
-      copy_lilypond_files("#{target}/usr", version)
+      copy_lilypond_files("#{target}/usr", version, opts)
     end
 
-    def copy_lilypond_files(base_path, version)
+    def copy_lilypond_files(base_path, version, opts)
       target_dir = File.join(Lypack.lilyponds_dir, version)
       
       FileUtils.rm_rf(target_dir) if File.exists?(target_dir)
@@ -256,13 +272,13 @@ module Lypack::Lilypond
       FileUtils.mkdir_p(target_dir)
     
       # copy files
-      STDERR.puts "Copying..."
+      STDERR.puts "Copying..." unless opts[:silent]
       %w{bin etc lib lib64 share var}.each do |entry|
         dir = File.join(base_path, entry)
         FileUtils.cp_r(dir, target_dir, remove_destination: true) if File.directory?(dir)
       end
       
-      STDERR.puts exec "#{target_dir}/bin/lilypond -v"
+      STDERR.puts exec "#{target_dir}/bin/lilypond -v"  unless opts[:silent]
     rescue => e
       puts e.message
     end

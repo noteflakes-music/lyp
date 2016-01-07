@@ -19,6 +19,16 @@ module Lypack
   def self.settings_file
     File.join($packages_dir, Lypack::SETTINGS_FILENAME)
   end
+  
+  module Lilypond
+    def self.get_system_lilyponds_paths
+      []
+    end
+
+    def session_settings_filename
+      "/tmp/lypack.session.#{Process.pid}.yml"
+    end
+  end
 end
 
 def with_packages(setup)
@@ -27,12 +37,14 @@ def with_packages(setup)
     $packages_dir = File.expand_path("package_setups/#{setup}", $spec_dir)
     
     # remove settings file
-    FileUtils.rm(Lypack.settings_file) if File.file?(Lypack.settings_file)
-
+    FileUtils.rm_f(Lypack.settings_file)
+    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
+    
     yield
   ensure
     # remove settings file
-    FileUtils.rm(Lypack.settings_file) if File.file?(Lypack.settings_file)
+    FileUtils.rm_f(Lypack.settings_file)
+    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
 
     $packages_dir = old_packages_dir
   end
@@ -44,12 +56,22 @@ def with_lilyponds(setup)
     $lilyponds_dir = File.expand_path("lilypond_setups/#{setup}", $spec_dir)
 
     # remove settings file
-    FileUtils.rm(Lypack.settings_file) if File.file?(Lypack.settings_file)
+    FileUtils.rm_f(Lypack.settings_file)
+    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
     
+    original_files = Dir["#{$lilyponds_dir}/*"]
+
     yield
   ensure
     # remove settings file
-    FileUtils.rm(Lypack.settings_file) if File.file?(Lypack.settings_file)
+    FileUtils.rm_f(Lypack.settings_file)
+    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
+    
+    # remove any created files
+    
+    Dir["#{$lilyponds_dir}/*"].each do |fn|
+      FileUtils.rm_rf(fn) unless original_files.include?(fn)
+    end
 
     $lilyponds_dir = old_lilyponds_dir
   end
