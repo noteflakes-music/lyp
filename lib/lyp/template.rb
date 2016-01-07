@@ -1,4 +1,4 @@
-module Lypack
+module Lyp
   class Template
     EMIT_DELIMITER = '`'.freeze
     EMIT_RE = /#{EMIT_DELIMITER}(((?!#{EMIT_DELIMITER}).)*)#{EMIT_DELIMITER}/m

@@ -1,13 +1,13 @@
 require File.expand_path('spec_helper', File.dirname(__FILE__))
 
-RSpec.describe "Lypack::Template" do
+RSpec.describe "Lyp::Template" do
   it "renders a simple template" do
     tmpl = <<EOF
 (1.._).each do |i|
   `{{i * 10}}: `
 end
 EOF
-    t = Lypack::Template.new(tmpl)
+    t = Lyp::Template.new(tmpl)
     
     expect(t.render(5)).to eq("10: 20: 30: 40: 50: ")
   end
@@ -29,11 +29,11 @@ EOF
 `{{"*" * _}} `
 EOF
 
-    Lypack::Template.set(:a, a)
-    Lypack::Template.set(:b, b)
-    Lypack::Template.set(:c, c)
+    Lyp::Template.set(:a, a)
+    Lyp::Template.set(:b, b)
+    Lyp::Template.set(:c, c)
     
-    expect(Lypack::Template.render(:a, 3)).to eq(
+    expect(Lyp::Template.render(:a, 3)).to eq(
       "******** ********** ************ \nthe end!"
     )
   end
@@ -47,11 +47,11 @@ EOF
 `{"x"}`
 EOF
 
-    Lypack::Template.set(:a, a)
-    Lypack::Template.set(:b, b)
+    Lyp::Template.set(:a, a)
+    Lyp::Template.set(:b, b)
 
-    expect(Lypack::Template.render(:a)).to eq("xy")
-    expect(Lypack::Template.render(:b)).to eq("{\"x\"}")
+    expect(Lyp::Template.render(:a)).to eq("xy")
+    expect(Lyp::Template.render(:b)).to eq("{\"x\"}")
   end
 end
 

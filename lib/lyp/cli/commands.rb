@@ -45,10 +45,10 @@ command :list do |c|
     pattern = args.first
     if pattern.nil? || pattern == 'lilypond'
       STDOUT.puts LILYPOND_PREAMBLE
-      Lypack::Lilypond.list.each {|info| puts format_lilypond_entry(info)}
+      Lyp::Lilypond.list.each {|info| puts format_lilypond_entry(info)}
       STDOUT.puts LILYPOND_LEGEND
     else
-      Lypack::Package.list(args.first).each {|p| puts p}
+      Lyp::Package.list(args.first).each {|p| puts p}
     end
   end
 end
@@ -59,7 +59,7 @@ command :compile do |c|
   c.action do |args, opts|
     begin
       raise "File not specified" if args.empty?
-      Lypack::Lilypond.compile(ARGV[1..-1])
+      Lyp::Lilypond.compile(ARGV[1..-1])
     rescue => e
       STDERR.puts e.message
       exit 1
@@ -74,7 +74,7 @@ command :search do |c|
     pattern = args.first
     if pattern == 'lilypond'
       begin
-        versions = Lypack::Lilypond.search
+        versions = Lyp::Lilypond.search
         versions.each {|v| puts v}
       rescue => e
         STDERR.puts e.message
@@ -94,7 +94,7 @@ command :install do |c|
       
       args.each do |package|
         if package =~ /^lilypond(?:@(.+))?$/
-          Lypack::Lilypond.install($1, opts.__hash__)
+          Lyp::Lilypond.install($1, opts.__hash__)
         end
       end
     rescue => e
@@ -116,7 +116,7 @@ command :use do |c|
         version = $1
       end
       
-      lilypond = Lypack::Lilypond.use(version, opts.__hash__)
+      lilypond = Lyp::Lilypond.use(version, opts.__hash__)
       puts "Using version #{lilypond[:version]}"
     rescue => e
       STDERR.puts e.message
@@ -135,7 +135,7 @@ command :uninstall do |c|
       
       args.each do |package|
         if package =~ /^lilypond(?:@(.+))?$/
-          Lypack::Lilypond.uninstall($1)
+          Lyp::Lilypond.uninstall($1)
         end
       end
     rescue => e

@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/ciconia/lypack.svg?branch=master)](https://travis-ci.org/ciconia/lypack)
+[![Build Status](https://travis-ci.org/ciconia/lyp.svg?branch=master)](https://travis-ci.org/ciconia/lyp)
 
-# lypack
+# lyp
 
-lypack is a package manager for lilypond.
+lyp is a package manager for lilypond.
 
-Initial spec is [here](https://github.com/ciconia/lypack/wiki/General-spec).
+Initial spec is [here](https://github.com/ciconia/lyp/wiki/General-spec).
 
 

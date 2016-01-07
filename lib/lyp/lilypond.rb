@@ -1,10 +1,10 @@
 require 'httpclient'
 require 'uri'
 
-module Lypack::Lilypond
+module Lyp::Lilypond
   class << self
     def compile(argv)
-      fn = Lypack.wrap(argv.pop)
+      fn = Lyp.wrap(argv.pop)
       argv << fn
       
       invoke(argv)
@@ -22,11 +22,11 @@ module Lypack::Lilypond
     end
     
     def default_lilypond
-      Lypack::Settings['lilypond/default']
+      Lyp::Settings['lilypond/default']
     end
     
     def set_default_lilypond(path)
-      Lypack::Settings['lilypond/default'] = path
+      Lyp::Settings['lilypond/default'] = path
     end
     
     # The current lilypond path is stored in a temporary file named by the 
@@ -59,7 +59,7 @@ module Lypack::Lilypond
     end
     
     def session_settings_filename
-      "/tmp/lypack.session.#{Process.getsid}.yml"
+      "/tmp/lyp.session.#{Process.getsid}.yml"
     end
     
     CMP_VERSION = proc do |x, y|
@@ -68,11 +68,11 @@ module Lypack::Lilypond
     
     def list
       system_list = system_lilyponds
-      lypack_list = lypack_lilyponds
+      lyp_list = lyp_lilyponds
       
       default = default_lilypond
       unless default
-        latest = system_list.sort(&CMP_VERSION).last || lypack_list.sort(&CMP_VERSION).last
+        latest = system_list.sort(&CMP_VERSION).last || lyp_list.sort(&CMP_VERSION).last
         if latest
           default = latest[:path]
           set_default_lilypond(default)
@@ -80,7 +80,7 @@ module Lypack::Lilypond
       end
       current = current_lilypond
       
-      lilyponds = system_list + lypack_list
+      lilyponds = system_list + lyp_list
 
       lilyponds.each do |l|
         l[:default] = l[:path] == default
@@ -91,10 +91,10 @@ module Lypack::Lilypond
       lilyponds.sort!(&CMP_VERSION)
     end
     
-    def lypack_lilyponds
+    def lyp_lilyponds
       list = []
       
-      Dir["#{Lypack.lilyponds_dir}/*"].each do |path|
+      Dir["#{Lyp.lilyponds_dir}/*"].each do |path|
         next unless File.directory?(path) && File.basename(path) =~ /^[\d\.]+$/
         
         version = File.basename(path)
@@ -132,7 +132,7 @@ module Lypack::Lilypond
     def get_system_lilyponds_paths
       list = `which -a lilypond`
       list = list.lines.map {|f| f.chomp}.reject do |l|
-        l =~ /^#{Lypack::LYPACK_BIN_DIRECTORY}/
+        l =~ /^#{Lyp::LYPACK_BIN_DIRECTORY}/
       end
     end
     
@@ -174,7 +174,7 @@ module Lypack::Lilypond
 
       install_version(version, opts)
 
-      lilypond_path = "#{Lypack.lilyponds_dir}/#{version}/bin/lilypond"
+      lilypond_path = "#{Lyp.lilyponds_dir}/#{version}/bin/lilypond"
       set_current_lilypond(lilypond_path)
       set_default_lilypond(lilypond_path) if opts[:default]
     end
@@ -228,7 +228,7 @@ module Lypack::Lilypond
     
     def temp_install_filename(url)
       u = URI(url)
-      "/tmp/lypack-installer-#{File.basename(u.path)}"
+      "/tmp/lyp-installer-#{File.basename(u.path)}"
     end
   
     def download_lilypond(url, fn, opts)
@@ -266,7 +266,7 @@ module Lypack::Lilypond
     end
   
     def install_lilypond_files_osx(fn, version, opts)
-      target = "/tmp/lypack/installer/lilypond"
+      target = "/tmp/lyp/installer/lilypond"
       FileUtils.mkdir_p(target)
     
       STDERR.puts "Extracting..." unless opts[:silent]
@@ -276,11 +276,11 @@ module Lypack::Lilypond
     end
   
     def install_lilypond_files_linux(fn, platform, version, opts)
-      target = "/tmp/lypack/installer/lilypond"
+      target = "/tmp/lyp/installer/lilypond"
       FileUtils.mkdir_p(target)
     
       # create temp directory in which to untar file
-      tmp_dir = "/tmp/lypack/#{Time.now.to_f}"
+      tmp_dir = "/tmp/lyp/#{Time.now.to_f}"
       FileUtils.mkdir_p(tmp_dir)
     
       FileUtils.cd(tmp_dir) do
@@ -296,7 +296,7 @@ module Lypack::Lilypond
     end
 
     def copy_lilypond_files(base_path, version, opts)
-      target_dir = File.join(Lypack.lilyponds_dir, version)
+      target_dir = File.join(Lyp.lilyponds_dir, version)
       
       FileUtils.rm_rf(target_dir) if File.exists?(target_dir)
       

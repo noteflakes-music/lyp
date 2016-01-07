@@ -12,5 +12,5 @@
   package
   lilypond
 }.each do |f|
-  require File.expand_path("lypack/#{f}", File.dirname(__FILE__))
+  require File.expand_path("lyp/#{f}", File.dirname(__FILE__))
 end

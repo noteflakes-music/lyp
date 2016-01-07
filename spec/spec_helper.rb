@@ -1,14 +1,14 @@
 Bundler.setup(:default, :spec)
 
 $spec_dir = File.dirname(__FILE__)
-require File.join(File.expand_path($spec_dir), '../lib/lypack')
+require File.join(File.expand_path($spec_dir), '../lib/lyp')
 require 'fileutils'
 require 'open3'
 
-$packages_dir = Lypack.packages_dir
-$lilyponds_dir = Lypack.lilyponds_dir
+$packages_dir = Lyp.packages_dir
+$lilyponds_dir = Lyp.lilyponds_dir
 
-module Lypack
+module Lyp
   def self.packages_dir
     $packages_dir
   end
@@ -18,7 +18,7 @@ module Lypack
   end
   
   def self.settings_file
-    "/tmp/#{Lypack::SETTINGS_FILENAME}"
+    "/tmp/#{Lyp::SETTINGS_FILENAME}"
   end
   
   module Lilypond
@@ -27,7 +27,7 @@ module Lypack
     end
 
     def self.session_settings_filename
-      "/tmp/lypack.session.#{Process.pid}.yml"
+      "/tmp/lyp.session.#{Process.pid}.yml"
     end
     
     def self.exec(cmd)
@@ -47,14 +47,14 @@ def with_packages(setup)
     $packages_dir = File.expand_path("package_setups/#{setup}", $spec_dir)
     
     # remove settings file
-    FileUtils.rm_f(Lypack.settings_file)
-    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
+    FileUtils.rm_f(Lyp.settings_file)
+    FileUtils.rm_f(Lyp::Lilypond.session_settings_filename)
     
     yield
   ensure
     # remove settings file
-    FileUtils.rm_f(Lypack.settings_file)
-    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
+    FileUtils.rm_f(Lyp.settings_file)
+    FileUtils.rm_f(Lyp::Lilypond.session_settings_filename)
 
     $packages_dir = old_packages_dir
   end
@@ -66,16 +66,16 @@ def with_lilyponds(setup)
     $lilyponds_dir = File.expand_path("lilypond_setups/#{setup}", $spec_dir)
 
     # remove settings file
-    FileUtils.rm_f(Lypack.settings_file)
-    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
+    FileUtils.rm_f(Lyp.settings_file)
+    FileUtils.rm_f(Lyp::Lilypond.session_settings_filename)
     
     original_files = Dir["#{$lilyponds_dir}/*"]
 
     yield
   ensure
     # remove settings file
-    FileUtils.rm_f(Lypack.settings_file)
-    FileUtils.rm_f(Lypack::Lilypond.session_settings_filename)
+    FileUtils.rm_f(Lyp.settings_file)
+    FileUtils.rm_f(Lyp::Lilypond.session_settings_filename)
     
     # remove any created files
     

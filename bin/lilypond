@@ -1,15 +1,15 @@
 #!/usr/bin/env ruby
 
-require File.expand_path("../lib/lypack/version", File.dirname(__FILE__))
+require File.expand_path("../lib/lyp/version", File.dirname(__FILE__))
 
-require File.expand_path("../lib/lypack/directories", File.dirname(__FILE__))
-require File.expand_path("../lib/lypack/settings", File.dirname(__FILE__))
-require File.expand_path("../lib/lypack/lilypond", File.dirname(__FILE__))
+require File.expand_path("../lib/lyp/directories", File.dirname(__FILE__))
+require File.expand_path("../lib/lyp/settings", File.dirname(__FILE__))
+require File.expand_path("../lib/lyp/lilypond", File.dirname(__FILE__))
 
-lilypond_path = Lypack::Lilypond.current_lilypond
+lilypond_path = Lyp::Lilypond.current_lilypond
 
 if (ARGV == ['-v']) || (ARGV == ['--warranty'])
-  puts "Lypack version #{Lypack::VERSION}"
+  puts "Lyp version #{Lyp::VERSION}"
   # Show lilypond version and exit
   exec("#{lilypond_path} #{ARGV.join(' ')}")
 end
@@ -19,7 +19,7 @@ if ARGV.size == 0
 else
   
   begin
-    Lypack::Lilypond.compile(ARGV)
+    Lyp::Lilypond.compile(ARGV)
   rescue => e
     STDERR.puts e.message
     exit 1

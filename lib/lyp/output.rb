@@ -1,6 +1,6 @@
 require 'ruby-progressbar'
 
-module Lypack
+module Lyp
   PROGRESS_FORMAT = '%t:%B:%p%%'
   
   # Simple wrapper around ProgressBar

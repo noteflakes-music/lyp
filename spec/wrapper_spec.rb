@@ -1,15 +1,15 @@
 require File.expand_path('spec_helper', File.dirname(__FILE__))
 
-RSpec.describe "Lypack.wrap" do
+RSpec.describe "Lyp.wrap" do
   it "returns the same filename for a file without dependencies" do
     fn = File.expand_path('user_files/no_require.ly', File.dirname(__FILE__))
-    expect(Lypack.wrap(fn)).to eq(fn)
+    expect(Lyp.wrap(fn)).to eq(fn)
   end
   
   it "creates a wrapper file containing dependency paths for a file with dependencies" do
     with_packages(:simple) do
       orig_fn = File.expand_path('user_files/simple.ly', File.dirname(__FILE__))
-      fn = Lypack.wrap(orig_fn)
+      fn = Lyp.wrap(orig_fn)
       expect(fn).to_not eq(orig_fn)
       
       code = IO.read(fn)

@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
-require "lypack/cli"
+require "lyp/cli"
 

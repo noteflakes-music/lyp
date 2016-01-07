@@ -1,13 +1,13 @@
 require 'yaml'
 
-module Lypack::Settings
+module Lyp::Settings
   class << self
     def get
-      YAML.load(IO.read(Lypack.settings_file)) rescue {}
+      YAML.load(IO.read(Lyp.settings_file)) rescue {}
     end
     
     def set(o)
-      File.open(Lypack.settings_file, 'w+') {|f| f << YAML.dump(o)}
+      File.open(Lyp.settings_file, 'w+') {|f| f << YAML.dump(o)}
     end
     
     def [](path)

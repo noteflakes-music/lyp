@@ -1,4 +1,4 @@
-class Lypack::Resolver
+class Lyp::Resolver
   def initialize(user_file)
     @user_file = user_file
   end
@@ -16,7 +16,7 @@ class Lypack::Resolver
       user_file: @user_file,
       definite_versions: definite_versions,
       package_paths: definite_versions.inject({}) do |h, v|
-        package = v =~ Lypack::PACKAGE_RE && $1
+        package = v =~ Lyp::PACKAGE_RE && $1
         path = tree[:available_packages][v][:path]
         specifier_map[package].each_key {|s| h[s] = path}
         h
@@ -102,7 +102,7 @@ class Lypack::Resolver
   # Find available packaging matching the package specifier, and queue them for
   # processing any include files or transitive dependencies.
   def find_package_versions(ref, tree, leaf)
-    return {} unless ref =~ Lypack::PACKAGE_RE
+    return {} unless ref =~ Lyp::PACKAGE_RE
     ref_package = $1
     version_clause = $2
 
@@ -130,14 +130,14 @@ class Lypack::Resolver
   
   # Find packages meeting the version requirement
   def find_matching_packages(req, tree)
-    return {} unless req =~ Lypack::PACKAGE_RE
+    return {} unless req =~ Lyp::PACKAGE_RE
     
     req_package = $1
     req_version = $2
     req = Gem::Requirement.new(req_version || '>=0')
 
     available_packages(tree).select do |package, sub_tree|
-      if package =~ Lypack::PACKAGE_RE
+      if package =~ Lyp::PACKAGE_RE
         version = Gem::Version.new($2 || '0')
         (req_package == $1) && (req =~ version)
       else
@@ -150,13 +150,13 @@ class Lypack::Resolver
   
   # Memoize and return a hash of available packages
   def available_packages(tree)
-    tree[:available_packages] ||= get_available_packages(Lypack.packages_dir)
+    tree[:available_packages] ||= get_available_packages(Lyp.packages_dir)
   end
   
   # Return a hash of all packages found in the packages directory, creating a
   # leaf for each package
   def get_available_packages(dir)
-    Dir["#{Lypack.packages_dir}/*"].inject({}) do |m, p|
+    Dir["#{Lyp.packages_dir}/*"].inject({}) do |m, p|
       m[File.basename(p)] = {
         path: File.join(p, MAIN_PACKAGE_FILE), 
         dependencies: {},
@@ -204,8 +204,8 @@ class Lypack::Resolver
     specifiers = map_specifiers_to_versions(tree)
     
     compare_versions = lambda do |x, y|
-      v_x = x =~ Lypack::PACKAGE_RE && Gem::Version.new($2)
-      v_y = y =~ Lypack::PACKAGE_RE && Gem::Version.new($2)
+      v_x = x =~ Lyp::PACKAGE_RE && Gem::Version.new($2)
+      v_y = y =~ Lyp::PACKAGE_RE && Gem::Version.new($2)
       x <=> y
     end
     
@@ -382,7 +382,7 @@ class Lypack::Resolver
     versions = {}
     
     map = lambda do |m, p|
-      if p =~ Lypack::PACKAGE_RE
+      if p =~ Lyp::PACKAGE_RE
         m[$1] = versions[p] ||= Gem::Version.new($2 || '0.0')
       end
       m
