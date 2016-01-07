@@ -235,7 +235,7 @@ module Lypack::Lilypond
       when /darwin/
         install_lilypond_files_osx(fn, version, opts)
       when /linux/
-        install_lilypond_files_linux(fn, version, opts)
+        install_lilypond_files_linux(fn, platform, version, opts)
       end
     end
   
@@ -249,7 +249,7 @@ module Lypack::Lilypond
       copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version, opts)
     end
   
-    def install_lilypond_files_linux(fn, version, opts)
+    def install_lilypond_files_linux(fn, platform, version, opts)
       target = "/tmp/lypack/installer/lilypond"
       FileUtils.mkdir_p(target)
     
@@ -260,9 +260,11 @@ module Lypack::Lilypond
       FileUtils.cd(tmp_dir) do
         exec "sh #{fn} --tarball"
       end
-    
+      
+      tmp_fn = "#{tmp_dir}/lilypnd-#{version}-1.#{platform}.tar.bz2"
+      
       STDERR.puts "Extracting..." unless opts[:silent]
-      exec "tar -xjf #{tmp_dir}/#{fn} -C #{target}"
+      exec "tar -xjf #{tmp_fn} -C #{target}"
     
       copy_lilypond_files("#{target}/usr", version, opts)
     end
