@@ -233,7 +233,6 @@ module Lypack::Lilypond
           end
         end
       end
-      puts "Got #{download_count}/#{total_size} bytes"
       pbar.finish unless opts[:silent]
     end
   
