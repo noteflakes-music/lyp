@@ -226,13 +226,14 @@ module Lypack::Lilypond
       end
       File.open(fn, 'w+') do |f|
         while !conn.finished? && (data = io.read(10000))
-          download_count += data.length
+          download_count += data.bytesize
           f << data
           unless opts[:silent]
             pbar.progress = download_count if download_count <= total_size
           end
         end
       end
+      puts "Got #{download_count} bytes"
       pbar.finish unless opts[:silent]
     end
   
