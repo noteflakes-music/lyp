@@ -192,10 +192,12 @@ module Lypack::Lilypond
     def install_version(version, opts)
       platform = detect_lilypond_platform
       url = lilypond_install_url(platform, version, opts)
-      fn = Tempfile.new('lypack-lilypond-installer').path
+      tmp = Tempfile.new('lypack-lilypond-installer')
 
-      download_lilypond(url, fn, opts)
-      install_lilypond_files(fn, platform, version, opts)
+      download_lilypond(url, tmp.path, opts)
+      install_lilypond_files(tmp.path, platform, version, opts)
+    ensure
+      tmp.close
     end
 
     def lilypond_install_url(platform, version, opts)
@@ -218,9 +220,8 @@ module Lypack::Lilypond
       unless opts[:silent]
         pbar = ProgressBar.create(title: 'Download', total: total_size)
       end
-      File.open(fn, 'w') do |f|
-        while !conn.finished?
-          data = io.read(10000)
+      File.open(fn, 'w+') do |f|
+        while !conn.finished? && (data = io.read(10000))
           download_count += data.length
           f << data
           unless opts[:silent]
@@ -228,7 +229,6 @@ module Lypack::Lilypond
           end
         end
       end
-      
       pbar.finish unless opts[:silent]
     end
   
