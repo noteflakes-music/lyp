@@ -6,3 +6,7 @@ rvm:
   - 2.2.0
   - 2.2.2
 script: bundle exec rspec
+cache:
+  bundler: true
+  directories:
+    - /tmp
