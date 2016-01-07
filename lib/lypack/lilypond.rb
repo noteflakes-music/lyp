@@ -263,7 +263,7 @@ module Lypack::Lilypond
         exec "sh #{fn} --tarball"
       end
       
-      tmp_fn = "#{tmp_dir}/lilypnd-#{version}-1.#{platform}.tar.bz2"
+      tmp_fn = "#{tmp_dir}/lilypond-#{version}-1.#{platform}.tar.bz2"
       
       STDERR.puts "Extracting..." unless opts[:silent]
       exec "tar -xjf #{tmp_fn} -C #{target}"
