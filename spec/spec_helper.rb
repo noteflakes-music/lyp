@@ -17,7 +17,7 @@ module Lypack
   end
   
   def self.settings_file
-    File.join($packages_dir, Lypack::SETTINGS_FILENAME)
+    "/tmp/#{Lypack::SETTINGS_FILENAME}"
   end
   
   module Lilypond
