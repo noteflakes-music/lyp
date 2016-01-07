@@ -59,13 +59,17 @@ module Lypack::Lilypond
       "/tmp/lypack.session.#{Process.getsid}.yml"
     end
     
+    CMP_VERSION = proc do |x, y|
+      Gem::Version.new(x[:version]) <=> Gem::Version.new(y[:version])
+    end
+    
     def list
-      # combine system + lypack-installed lilyponds
-      lilyponds = system_lilyponds + lypack_lilyponds
+      system_list = system_lilyponds
+      lypack_list = lypack_lilyponds
       
       default = default_lilypond
       unless default
-        latest = system_lilyponds.last || lypack_lilyponds.last
+        latest = system_list.sort(&CMP_VERSION).last || lypack_list.sort(&CMP_VERSION).last
         if latest
           default = latest[:path]
           set_default_lilypond(default)
@@ -73,15 +77,15 @@ module Lypack::Lilypond
       end
       current = current_lilypond
       
+      lilyponds = system_list + lypack_list
+
       lilyponds.each do |l|
         l[:default] = l[:path] == default
         l[:current] = l[:path] == current
       end
       
       # sort by version
-      lilyponds.sort! do |x, y|
-        Gem::Version.new(x[:version]) <=> Gem::Version.new(y[:version])
-      end
+      lilyponds.sort!(&CMP_VERSION)
     end
     
     def lypack_lilyponds

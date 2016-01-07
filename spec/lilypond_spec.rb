@@ -8,7 +8,9 @@ RSpec.describe "Lypack::Lilypond" do
     end
     
     with_lilyponds(:simple) do
-      list = Lypack::Lilypond.lypack_lilyponds
+      list = Lypack::Lilypond.lypack_lilyponds.sort do |x, y|
+        Gem::Version.new(x[:version]) <=> Gem::Version.new(y[:version])        
+      end
       expect(list.map {|l| l[:version]}).to eq(%w{
         2.18.1 2.19.15 2.19.21
       })
