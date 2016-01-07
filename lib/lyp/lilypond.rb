@@ -130,9 +130,12 @@ module Lyp::Lilypond
     end
     
     def get_system_lilyponds_paths
+      self_bin_dir = File.dirname(File.expand_path($0))
+      
       list = `which -a lilypond`
       list = list.lines.map {|f| f.chomp}.reject do |l|
-        l =~ /^#{Lyp::LYPACK_BIN_DIRECTORY}/
+        dir = File.dirname(l)
+        (dir == Lyp::LYPACK_BIN_DIRECTORY) || (dir == self_bin_dir)
       end
     end
     
@@ -187,6 +190,8 @@ module Lyp::Lilypond
         latest_stable_version
       when 'unstable'
         latest_unstable_version
+      when 'latest'
+        latest_version
       else
         req = Gem::Requirement.new(version_specifier)
         search.reverse.find {|v| req =~ Gem::Version.new(v)}
@@ -284,7 +289,7 @@ module Lyp::Lilypond
       FileUtils.mkdir_p(tmp_dir)
     
       FileUtils.cd(tmp_dir) do
-        exec "sh #{fn} --tarball"
+        exec "sh #{fn} --tarball >/dev/null"
       end
       
       tmp_fn = "#{tmp_dir}/lilypond-#{version}-1.#{platform}.tar.bz2"

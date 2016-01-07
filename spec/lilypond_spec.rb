@@ -125,16 +125,7 @@ RSpec.describe "Lyp::Lilypond" do
   
   it "installs the latest stable version of lilypond" do
     with_lilyponds(:simple) do
-      Lyp::Lilypond.list
-      expect(Lyp::Lilypond.default_lilypond).to eq(
-        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
-      )
-      expect(Lyp::Lilypond.current_lilypond).to eq(
-        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
-      )
-      
       version = Lyp::Lilypond.latest_stable_version
-      
       Lyp::Lilypond.install('stable', {silent: true})
       
       files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
@@ -143,28 +134,12 @@ RSpec.describe "Lyp::Lilypond" do
       resp = `#{$lilyponds_dir}/#{version}/bin/lilypond -v`
       resp =~ /LilyPond ([0-9\.]+)/i
       expect($1).to eq(version)
-      
-      expect(Lyp::Lilypond.default_lilypond).to eq(
-        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
-      )
-      expect(Lyp::Lilypond.current_lilypond).to eq(
-        "#{$lilyponds_dir}/#{version}/bin/lilypond"
-      )
     end
   end
   
   it "installs the latest unstable version of lilypond" do
     with_lilyponds(:simple) do
-      Lyp::Lilypond.list
-      expect(Lyp::Lilypond.default_lilypond).to eq(
-        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
-      )
-      expect(Lyp::Lilypond.current_lilypond).to eq(
-        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
-      )
-      
       version = Lyp::Lilypond.latest_unstable_version
-      
       Lyp::Lilypond.install('unstable', {silent: true})
       
       files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
@@ -173,13 +148,20 @@ RSpec.describe "Lyp::Lilypond" do
       resp = `#{$lilyponds_dir}/#{version}/bin/lilypond -v`
       resp =~ /LilyPond ([0-9\.]+)/i
       expect($1).to eq(version)
+    end
+  end
+  
+  it "installs the latest version of lilypond" do
+    with_lilyponds(:simple) do
+      version = Lyp::Lilypond.latest_version
+      Lyp::Lilypond.install('latest', {silent: true})
       
-      expect(Lyp::Lilypond.default_lilypond).to eq(
-        "#{$lilyponds_dir}/2.19.21/bin/lilypond"
-      )
-      expect(Lyp::Lilypond.current_lilypond).to eq(
-        "#{$lilyponds_dir}/#{version}/bin/lilypond"
-      )
+      files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
+      expect(files).to include('lilypond')
+      
+      resp = `#{$lilyponds_dir}/#{version}/bin/lilypond -v`
+      resp =~ /LilyPond ([0-9\.]+)/i
+      expect($1).to eq(version)
     end
   end
   
