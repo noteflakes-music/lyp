@@ -1,4 +1,5 @@
 require 'httpclient'
+require 'uri'
 
 module Lypack::Lilypond
   class << self
@@ -192,12 +193,10 @@ module Lypack::Lilypond
     def install_version(version, opts)
       platform = detect_lilypond_platform
       url = lilypond_install_url(platform, version, opts)
-      tmp = Tempfile.new('lypack-lilypond-installer')
+      fn = temp_install_filename(url)
 
-      download_lilypond(url, tmp.path, opts)
-      install_lilypond_files(tmp.path, platform, version, opts)
-    ensure
-      tmp.close
+      download_lilypond(url, fn, opts) unless File.file?(fn)
+      install_lilypond_files(fn, platform, version, opts)
     end
 
     def lilypond_install_url(platform, version, opts)
@@ -205,6 +204,11 @@ module Lypack::Lilypond
       filename = "lilypond-#{version}-1.#{platform}"
     
       "#{BASE_URL}/#{platform}/#{filename}#{ext}"
+    end
+    
+    def temp_install_filename(url)
+      u = URI(url)
+      "/tmp/lypack-installer-#{File.basename(u.path)}"
     end
   
     def download_lilypond(url, fn, opts)
