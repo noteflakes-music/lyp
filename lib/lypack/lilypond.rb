@@ -317,23 +317,25 @@ module Lypack::Lilypond
     
     def use(version, opts)
       lilypond_list = list.reverse
-      if version == 'system'
+      
+      case version
+      when 'system'
         lilypond = lilypond_list.find {|v| v[:system] }
         unless lilypond
           raise "Could not find a system installed version of lilypond"
         end
-      elsif version == 'stable'
+      when 'latest'
+        lilypond = lilypond_list.first
+      when 'stable'
         lilypond = lilypond_list.find do |v|
           Gem::Version.new(v[:version]).segments[1] % 2 == 0
         end
-      elsif version == 'unstable'
+      when 'unstable'
         lilypond = lilypond_list.find do |v|
           Gem::Version.new(v[:version]).segments[1] % 2 != 0
         end
       else
-        if version =~ /^\d+\.\d+$/
-          version = "~>#{version}.0"
-        end
+        version = "~>#{version}.0" if version =~ /^\d+\.\d+$/
         req = Gem::Requirement.new(version)
         lilypond = lilypond_list.find {|v| req =~ Gem::Version.new(v[:version])}
       end
@@ -346,6 +348,26 @@ module Lypack::Lilypond
       set_default_lilypond(lilypond[:path]) if opts[:default]
       
       lilypond
+    end
+    
+    def uninstall(version)
+      lilyponds = list.reverse
+      lilypond = lilyponds.find {|l| l[:version] == version && !l[:system]}
+      unless lilypond
+        raise "Invalid version specified: #{version}"
+      end
+      lilyponds.delete(lilypond)
+      latest = lilyponds.first
+      
+      if lilypond[:default]
+        set_default_lilypond(latest && latest[:path])
+      end
+      if lilypond[:current]
+        set_current_lilypond(latest && latest[:path])
+      end
+      
+      lilypond_dir = File.expand_path('../..', lilypond[:path])
+      FileUtils.rm_rf(lilypond_dir)
     end
     
     def exec(cmd)

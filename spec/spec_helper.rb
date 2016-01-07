@@ -86,3 +86,10 @@ def with_lilyponds(setup)
     $lilyponds_dir = old_lilyponds_dir
   end
 end
+
+# Install hooks to create and delete tmp directory
+RSpec.configure do |config|
+  config.after(:all) do
+    FileUtils.rmdir("#{$spec_dir}/lilypond_setups/simple_copy") rescue nil
+  end
+end

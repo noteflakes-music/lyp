@@ -223,6 +223,9 @@ RSpec.describe "Lypack::Lilypond" do
       expect(Lypack::Lilypond.default_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
       expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
 
+      Lypack::Lilypond.use("latest", {})
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+
       Lypack::Lilypond.use("stable", {})
       expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.18.1/bin/lilypond")
 
@@ -237,7 +240,43 @@ RSpec.describe "Lypack::Lilypond" do
 
       Lypack::Lilypond.use("~>2.18.1", {})
       expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.18.1/bin/lilypond")
-    end    
+    end
+    
+    
+  end
+
+  it "uninstalls a local version of lilypond" do
+    # create a copy of the lilypond setup
+    FileUtils.cp_r("#{$spec_dir}/lilypond_setups/simple", "#{$spec_dir}/lilypond_setups/simple_copy")
+    
+    with_lilyponds(:simple_copy) do
+      versions = Lypack::Lilypond.list.map {|l| l[:version]}
+      expect(versions).to eq(%w{2.18.1 2.19.15 2.19.21})
+      
+      expect(Lypack::Lilypond.default_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
+
+      # invalid versions
+      expect {Lypack::Lilypond.uninstall("")}.to raise_error
+      expect {Lypack::Lilypond.uninstall("stable")}.to raise_error
+      expect {Lypack::Lilypond.uninstall(">=2.18")}.to raise_error
+      expect {Lypack::Lilypond.uninstall("2.18.2")}.to raise_error
+      
+      Lypack::Lilypond.uninstall("2.19.21")
+      versions = Lypack::Lilypond.list.map {|l| l[:version]}
+      expect(versions).to eq(%w{2.18.1 2.19.15})
+
+      expect(Lypack::Lilypond.default_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
+      expect(Lypack::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
+
+      Lypack::Lilypond.uninstall("2.18.1")
+      Lypack::Lilypond.uninstall("2.19.15")
+      versions = Lypack::Lilypond.list.map {|l| l[:version]}
+      expect(versions).to eq([])
+
+      expect(Lypack::Lilypond.default_lilypond).to be_nil
+      expect(Lypack::Lilypond.current_lilypond).to be_nil
+    end
   end
 end
 
