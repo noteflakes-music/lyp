@@ -25,7 +25,7 @@ module Lypack
       []
     end
 
-    def session_settings_filename
+    def self.session_settings_filename
       "/tmp/lypack.session.#{Process.pid}.yml"
     end
   end
