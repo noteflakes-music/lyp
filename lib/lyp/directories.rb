@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Lyp
   # A package specifier is of the form <package>@<version specifier>, where
   # the version specifier can be simply a version number, or include an operator
@@ -12,15 +14,21 @@ module Lyp
   SETTINGS_FILENAME = 'settings.yml'
 
   def self.packages_dir
-    DEFAULT_PACKAGE_DIRECTORY
+    ensure_dir(DEFAULT_PACKAGE_DIRECTORY)
   end
   
   def self.lilyponds_dir
-    DEFAULT_LILYPONDS_DIRECTORY
+    ensure_dir(DEFAULT_LILYPONDS_DIRECTORY)
   end
 
   def self.settings_file
+    ensure_dir(LYPACK_DIRECTORY)
     File.join(LYPACK_DIRECTORY, SETTINGS_FILENAME)
+  end
+  
+  def self.ensure_dir(dir)
+    FileUtils.mkdir_p(dir) unless File.directory?(dir)
+    dir
   end
 end
 
