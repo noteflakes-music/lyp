@@ -50,26 +50,40 @@ RSpec.describe "Lyp::Package" do
 
   it "correctly converts a package name to a git url" do
     expect(Lyp::Package.package_git_url('ciconia/stylush')).to eq(
-    "https://github.com/ciconia/stylush.git"
+      "https://github.com/ciconia/stylush.git"
     )
     
     expect(Lyp::Package.package_git_url('github.com/a/b')).to eq(
-    "https://github.com/a/b.git"
+      "https://github.com/a/b.git"
     )
     
     expect(Lyp::Package.package_git_url('acme.de/c/d')).to eq(
-    "https://acme.de/c/d.git"
+      "https://acme.de/c/d.git"
     )
     
     expect(Lyp::Package.package_git_url('http://down.load/myrepo.git')).to eq(
-    "http://down.load/myrepo.git"
+      "http://down.load/myrepo.git"
     )
 
     expect(Lyp::Package.package_git_url('git@github.com:e/f.git')).to eq(
-    "git@github.com:e/f.git"
+      "git@github.com:e/f.git"
     )
     
     expect {Lyp::Package.package_git_url('blah')}.to raise_error
+  end
+  
+  it "correctly converts a git URL to a local temp path" do
+    expect(Lyp::Package.git_url_to_local_path("https://github.com/ciconia/stylush.git")).to eq(
+      "/tmp/lyp/repos/github.com/ciconia/stylush"
+    )
+
+    expect(Lyp::Package.git_url_to_local_path("http://down.load/myrepo.git")).to eq(
+      "/tmp/lyp/repos/down.load/myrepo"
+    )
+    
+    expect(Lyp::Package.git_url_to_local_path("git@github.com:e/f.git")).to eq(
+      "/tmp/lyp/repos/github.com/e/f"
+    )
   end
 
 end

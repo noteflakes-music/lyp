@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Lyp::Package
   class << self
     
@@ -27,7 +29,7 @@ module Lyp::Package
     
     def package_git_url(package)
       case package
-      when /^((git@)|(http\:)|(https\:))/
+      when /^(?:(?:[^\:]+)|http|https)\:/
         package
       when /^([^\.]+\..+)\/[^\/]+\/.+(?<!\.git)$/ # .git missing from end of URL
         "https://#{package}.git"
@@ -39,5 +41,21 @@ module Lyp::Package
         raise "Invalid package specified"
       end
     end
+    
+    TEMP_REPO_ROOT_PATH = "/tmp/lyp/repos"
+
+    def git_url_to_local_path(url)
+      case url
+      when /^(?:http|https)\:(?:\/\/)?(.+)$/
+        path = $1.gsub(/\.git$/, '')
+        "#{TEMP_REPO_ROOT_PATH}/#{path}"
+      when /^(?:.+@)([^\:]+)\:(?:\/\/)?(.+)$/
+        domain, path = $1, $2.gsub(/\.git$/, '')
+        "#{TEMP_REPO_ROOT_PATH}/#{domain}/#{path}"
+      else
+        raise "Invalid URL #{url}"
+      end
+    end
+    
   end
 end
