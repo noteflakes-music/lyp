@@ -174,7 +174,8 @@ module Lyp::Lilypond
     def install(version_specifier, opts = {})
       version = detect_version_from_specifier(version_specifier)
       raise "No version found matching specifier #{version_specifier}" unless version
-
+      
+      STDERR.puts "Installing version #{version}" unless opts[:silent]
       install_version(version, opts)
 
       lilypond_path = "#{Lyp.lilyponds_dir}/#{version}/bin/lilypond"
@@ -262,30 +263,34 @@ module Lyp::Lilypond
     end
   
     def install_lilypond_files(fn, platform, version, opts)
+      tmp_target = "/tmp/lyp-lilypond-#{version}"
+      FileUtils.mkdir_p(tmp_target)
+
       case platform
       when /darwin/
-        install_lilypond_files_osx(fn, version, opts)
+        install_lilypond_files_osx(fn, tmp_target, platform, version, opts)
       when /linux/
-        install_lilypond_files_linux(fn, platform, version, opts)
+        install_lilypond_files_linux(fn, tmp_target, platform, version, opts)
       end
+      
+    ensure
+      FileUtils.rm_rf(tmp_target)
     end
   
-    def install_lilypond_files_osx(fn, version, opts)
-      target = "/tmp/lyp/installer/lilypond"
-      FileUtils.mkdir_p(target)
-    
+    def install_lilypond_files_osx(fn, target, platform, version, opts)
       STDERR.puts "Extracting..." unless opts[:silent]
       exec "tar -xjf #{fn} -C #{target}"
     
       copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version, opts)
     end
   
-    def install_lilypond_files_linux(fn, platform, version, opts)
-      target = "/tmp/lyp/installer/lilypond"
-      FileUtils.mkdir_p(target)
-    
-      # create temp directory in which to untar file
-      tmp_dir = "/tmp/lyp/#{Time.now.to_f}"
+    # Since linux versions are distributed as sh archives, we need first to 
+    # extract the sh archive, then extract the resulting tar file
+    def install_lilypond_files_linux(fn, target, platform, version, opts)
+      STDERR.puts "Extracting..." unless opts[:silent]
+
+      # create temp directory in which to extract .sh file
+      tmp_dir = "/tmp/lyp-#{Time.now.to_f}"
       FileUtils.mkdir_p(tmp_dir)
     
       FileUtils.cd(tmp_dir) do
@@ -294,10 +299,11 @@ module Lyp::Lilypond
       
       tmp_fn = "#{tmp_dir}/lilypond-#{version}-1.#{platform}.tar.bz2"
       
-      STDERR.puts "Extracting..." unless opts[:silent]
-      exec "tar -xjf #{tmp_fn} -C #{target}"
+      exec "tar -xjf #{tmp_fn} -C #{tmp_target}"
     
       copy_lilypond_files("#{target}/usr", version, opts)
+    ensure
+      FileUtils.rm_rf(tmp_dir)
     end
 
     def copy_lilypond_files(base_path, version, opts)
