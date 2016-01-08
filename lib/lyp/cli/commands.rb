@@ -149,7 +149,11 @@ command :uninstall do |c|
       raise "No package specified" if args.empty?
       
       args.each do |package|
-        if package =~ /^lilypond(?:@(.+))?$/
+        case package
+        when 'self'
+          Lyp::System.uninstall!
+        when /^lilypond(?:@(.+))?$/
+          Lyp::System.test_installed_status!
           Lyp::Lilypond.uninstall($1)
         end
       end

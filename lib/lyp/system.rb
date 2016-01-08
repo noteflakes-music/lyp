@@ -37,7 +37,7 @@ EOF
       setup_bin_scripts
       
       if installed?(no_path_check: true)
-        puts "\nTo finish installation, open a new shell or run 'source ~/#{File.basename(profile_fn)}'\n\n"
+        puts "\nTo finish installation, open a new shell or run 'source ~/#{File.basename(profile_fn)}'.\n\n"
       else
         raise "Failed to install lyp"
       end
@@ -89,6 +89,27 @@ EOF
     
     def setup_release_bin_scripts(bin_dir)
       # to be implemented
+    end
+    
+    def uninstall!
+      puts "\nUninstalling lyp...\n\nRemoving ~/.lyp/bin from $PATH..."
+      
+      # Remove ~/.lyp/bin from $PATH
+      PROFILE_FILES.each do |fn|
+        next unless File.file?(fn)
+        
+        content = IO.read(fn)
+        if (content =~ /\.lyp\/bin/)
+          content.gsub!(/\n?.*\.lyp\/bin.*\n/, '')
+          File.open(fn, 'w+') {|f| f << content}
+        end
+      end
+      
+      puts "Removing binary scripts..."
+      # Delete bin scripts
+      FileUtils.rm("#{Lyp::LYP_BIN_DIRECTORY}/*") rescue nil
+      
+      puts "\nTo completely remove installed packages and lilyponds run 'rm -rf ~/.lyp'.\n\n"
     end
   end
 end
