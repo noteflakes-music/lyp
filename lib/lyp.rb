@@ -1,8 +1,6 @@
 %w{
-  output
-  env
-  
   directories
+  system
   settings
   
   template

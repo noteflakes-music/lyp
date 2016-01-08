@@ -135,7 +135,7 @@ module Lyp::Lilypond
       list = `which -a lilypond`
       list = list.lines.map {|f| f.chomp}.reject do |l|
         dir = File.dirname(l)
-        (dir == Lyp::LYPACK_BIN_DIRECTORY) || (dir == self_bin_dir)
+        (dir == Lyp::LYP_BIN_DIRECTORY) || (dir == self_bin_dir)
       end
     end
     

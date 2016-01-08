@@ -42,6 +42,8 @@ command :list do |c|
   c.syntax =      "list [PATTERN]"
   c.description = "Lists installed versions of packages whose name matches PATTERN"
   c.action do |args, opts|
+    Lyp::System.test_installed_status!
+
     pattern = args.first
     if pattern.nil? || pattern == 'lilypond'
       STDOUT.puts LILYPOND_PREAMBLE
@@ -57,6 +59,8 @@ command :compile do |c|
   c.syntax = "compile <FILE>"
   c.description = "Resolves package dependencies and invokes lilypond"
   c.action do |args, opts|
+    Lyp::System.test_installed_status!
+    
     begin
       raise "File not specified" if args.empty?
       Lyp::Lilypond.compile(ARGV[1..-1])
@@ -71,6 +75,8 @@ command :search do |c|
   c.syntax = "search <PATTERN>"
   c.description = "Search for a package or a version of lilypond"
   c.action do |args, opts|
+    Lyp::System.test_installed_status!
+
     pattern = args.first
     if pattern == 'lilypond'
       begin
@@ -89,17 +95,22 @@ command :install do |c|
   c.description = "Install a package or a version of lilypond"
   c.option "-d", "--default", "Set default version"
   c.action do |args, opts|
+    
     begin
       raise "No package specified" if args.empty?
       
       args.each do |package|
-        if package =~ /^lilypond(?:@(.+))?$/
+        case package
+        when 'self'
+          Lyp::System.install!
+        when /^lilypond(?:@(.+))?$/
+          Lyp::System.test_installed_status!
           Lyp::Lilypond.install($1, opts.__hash__)
         end
       end
-    rescue => e
-      STDERR.puts e.message
-      exit 1
+    # rescue => e
+    #   STDERR.puts e.message
+    #   exit 1
     end
   end
 end
@@ -110,6 +121,8 @@ command :use do |c|
   c.option "-d", "--default", "Set default version"
 
   c.action do |args, opts|
+    Lyp::System.test_installed_status!
+
     begin
       version = args.first
       if version =~ /^lilypond@(.+)$/
@@ -130,6 +143,8 @@ command :uninstall do |c|
   c.description = "Uninstall a package or version of lilypond"
 
   c.action do |args, opts|
+    Lyp::System.test_installed_status!
+
     begin
       raise "No package specified" if args.empty?
       

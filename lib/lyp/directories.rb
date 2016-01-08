@@ -6,10 +6,10 @@ module Lyp
   # before the version number. Accepted operators: >=, ~>
   PACKAGE_RE = /^([^@]+)(?:@(.+))?$/
 
-  LYPACK_DIRECTORY = File.expand_path('~/.lyp')
-  LYPACK_BIN_DIRECTORY = File.join(LYPACK_DIRECTORY, 'bin')
-  DEFAULT_PACKAGE_DIRECTORY = File.join(LYPACK_DIRECTORY, 'packages')
-  DEFAULT_LILYPONDS_DIRECTORY = File.join(LYPACK_DIRECTORY, 'lilyponds')
+  LYP_DIRECTORY = File.expand_path('~/.lyp')
+  LYP_BIN_DIRECTORY = File.join(LYP_DIRECTORY, 'bin')
+  DEFAULT_PACKAGE_DIRECTORY = File.join(LYP_DIRECTORY, 'packages')
+  DEFAULT_LILYPONDS_DIRECTORY = File.join(LYP_DIRECTORY, 'lilyponds')
   
   SETTINGS_FILENAME = 'settings.yml'
 
@@ -22,8 +22,8 @@ module Lyp
   end
 
   def self.settings_file
-    ensure_dir(LYPACK_DIRECTORY)
-    File.join(LYPACK_DIRECTORY, SETTINGS_FILENAME)
+    ensure_dir(LYP_DIRECTORY)
+    File.join(LYP_DIRECTORY, SETTINGS_FILENAME)
   end
   
   def self.ensure_dir(dir)
