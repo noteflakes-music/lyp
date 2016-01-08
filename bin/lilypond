@@ -1,15 +1,19 @@
 #!/usr/bin/env ruby
 
-require File.expand_path("../lib/lyp/version", File.dirname(__FILE__))
+require 'lyp/version'
+require 'lyp/directories'
+require 'lyp/settings'
+require 'lyp/lilypond'
 
-require File.expand_path("../lib/lyp/directories", File.dirname(__FILE__))
-require File.expand_path("../lib/lyp/settings", File.dirname(__FILE__))
-require File.expand_path("../lib/lyp/lilypond", File.dirname(__FILE__))
+STDERR.puts "Lyp version #{Lyp::VERSION}"
 
 lilypond_path = Lyp::Lilypond.current_lilypond
+unless lilypond_path && File.file?(lilypond_path)
+  STDERR.puts "No version of lilypond found. To install lilypond run 'lyp install lilypond'."
+  exit 1
+end
 
 if (ARGV == ['-v']) || (ARGV == ['--warranty'])
-  puts "Lyp version #{Lyp::VERSION}"
   # Show lilypond version and exit
   exec("#{lilypond_path} #{ARGV.join(' ')}")
 end
