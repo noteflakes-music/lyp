@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors       = ["Sharon Rosner"]
   s.email         = 'ciconia@gmail.com'
 
-  s.homepage      = 'http://github.com/ciconia/lyp'
+  s.homepage      = 'http://github.com/noteflakes/lyp'
   s.license       = 'MIT'
 
   s.require_path  = 'lib'

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ciconia/lyp.svg?branch=master)](https://travis-ci.org/ciconia/lyp)
+[![Build Status](https://travis-ci.org/noteflakes/lyp.svg?branch=master)](https://travis-ci.org/noteflakes/lyp)
 
 # lyp - a package manager for lilypond
 
