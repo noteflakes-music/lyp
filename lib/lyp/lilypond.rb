@@ -186,7 +186,7 @@ module Lyp::Lilypond
       case version_specifier
       when /^\d/
         version_specifier
-      when 'stable'
+      when nil, 'stable'
         latest_stable_version
       when 'unstable'
         latest_unstable_version
