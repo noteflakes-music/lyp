@@ -23,6 +23,7 @@ GEM
       rspec-support (~> 3.2.0)
     rspec-support (3.2.2)
     ruby-progressbar (1.7.5)
+    rugged (0.23.3)
 
 PLATFORMS
   ruby
@@ -34,3 +35,7 @@ DEPENDENCIES
   nokogiri (~> 1.6.7)
   rspec (= 3.2.0)
   ruby-progressbar (~> 1.7.5)
+  rugged (~> 0.23.3)
+
+BUNDLED WITH
+   1.10.6

@@ -24,5 +24,20 @@ module Lyp::Package
         end
       end
     end
+    
+    def package_git_url(package)
+      case package
+      when /^((git@)|(http\:)|(https\:))/
+        package
+      when /^([^\.]+\..+)\/[^\/]+\/.+(?<!\.git)$/ # .git missing from end of URL
+        "https://#{package}.git"
+      when /^([^\.]+\..+)\/.+/
+        "https://#{package}"
+      when /^[^\/]+\/[^\/]+$/
+        "https://github.com/#{package}.git"
+      else
+        raise "Invalid package specified"
+      end
+    end
   end
 end
