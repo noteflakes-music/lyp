@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/ciconia/lyp.svg?branch=master)](https://travis-ci.org/ciconia/lyp)
 
-# lyp - the lilypond package manager
+# lyp - a package manager for lilypond
 
 lyp is a tool to install and manage packages for lilypond, and install versions of lilypond.
 
