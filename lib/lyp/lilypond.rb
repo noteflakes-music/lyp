@@ -299,7 +299,7 @@ module Lyp::Lilypond
       
       tmp_fn = "#{tmp_dir}/lilypond-#{version}-1.#{platform}.tar.bz2"
       
-      exec "tar -xjf #{tmp_fn} -C #{tmp_target}"
+      exec "tar -xjf #{tmp_fn} -C #{target}"
     
       copy_lilypond_files("#{target}/usr", version, opts)
     ensure
