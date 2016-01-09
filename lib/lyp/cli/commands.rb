@@ -45,7 +45,7 @@ command :list do |c|
     Lyp::System.test_installed_status!
 
     pattern = args.first
-    if pattern.nil? || pattern == 'lilypond'
+    if pattern == 'lilypond'
       STDOUT.puts LILYPOND_PREAMBLE
       Lyp::Lilypond.list.each {|info| puts format_lilypond_entry(info)}
       STDOUT.puts LILYPOND_LEGEND
@@ -94,6 +94,17 @@ command :search do |c|
           puts "\n * Currently installed\n\n"
         end
       end
+    else
+      packages = Lyp::Package.list_lyp_index(pattern)
+      if packages.empty?
+        puts "\nNo matching package found in lyp-index\n\n"
+      else
+        puts "\nAvailable packages:\n\n"
+        packages.each do |p|
+          puts "   #{p[:name]}"
+        end
+        puts "\n\n"
+      end
     end
   end
 end
@@ -114,6 +125,9 @@ command :install do |c|
         when /^lilypond(?:@(.+))?$/
           Lyp::System.test_installed_status!
           Lyp::Lilypond.install($1, opts.__hash__)
+        else
+          Lyp::System.test_installed_status!
+          Lyp::Package.install(package)
         end
       end
     end

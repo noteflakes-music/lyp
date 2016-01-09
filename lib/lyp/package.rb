@@ -53,6 +53,8 @@ module Lyp::Package
       
       install_package_dependencies(package_path)
       
+      puts "\nInstalled #{package}@#{version}\n\n"
+      
       # return the installed version
       version
     end
@@ -64,6 +66,7 @@ module Lyp::Package
         repo.fetch('origin', [repo.head.name])
       else
         FileUtils.mkdir_p(File.dirname(tmp_path))
+        puts "Cloning #{url}..."
         repo = Rugged::Repository.clone_at(url, tmp_path)
       end
       repo
@@ -72,6 +75,7 @@ module Lyp::Package
     def checkout_package_version(repo, version)
       # Select commit to checkout
       if version.nil? || (version == '')
+        puts "Checkout master branch..."
         repo.checkout('master', strategy: :force)
         version = 'head'
       else
@@ -79,7 +83,7 @@ module Lyp::Package
         unless tag
           raise "Could not find tag matching #{version_specifier}"
         end
-
+        puts "Checkout #{tag.name} tag"
         repo.checkout(tag.name, strategy: :force)
         version = tag_version(tag)
       end
@@ -122,6 +126,18 @@ module Lyp::Package
     def search_lyp_index(package)
       entry = lyp_index['packages'][package]
       entry && entry['url']
+    end
+    
+    def list_lyp_index(pattern = nil)
+      list = lyp_index['packages'].inject([]) do |m, kv|
+        m << kv[1].merge(name: kv[0])
+      end
+      
+      if pattern
+        list.select! {|p| p[:name] =~ /#{pattern}/}
+      end
+      
+      list.sort_by {|p| p[:name]}
     end
     
     def lyp_index
