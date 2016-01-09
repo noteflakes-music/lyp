@@ -64,9 +64,6 @@ command :compile do |c|
     begin
       raise "File not specified" if args.empty?
       Lyp::Lilypond.compile(ARGV[1..-1])
-    rescue => e
-      STDERR.puts e.message
-      exit 1
     end
   end
 end
@@ -78,13 +75,24 @@ command :search do |c|
     Lyp::System.test_installed_status!
 
     pattern = args.first
-    if pattern == 'lilypond'
+    pattern =~ Lyp::PACKAGE_RE
+    package, version = $1, $2
+    req = (version && Gem::Requirement.new(version)) rescue nil
+    
+    if package == 'lilypond'
       begin
-        versions = Lyp::Lilypond.search
-        versions.each {|v| puts v}
-      rescue => e
-        STDERR.puts e.message
-        exit 1
+        versions = Lyp::Lilypond.search(version)
+        
+        if versions.empty?
+          puts "\nNo versions of lilypond are available for download\n\n"
+        else
+          puts "\nAvailable versions of lilypond:\n\n"
+          versions.each do |v|
+            prefix = v[:installed] ? " * " : "   "
+            puts "#{prefix}#{v[:version]}"
+          end
+          puts "\n * Currently installed\n\n"
+        end
       end
     end
   end
@@ -108,9 +116,6 @@ command :install do |c|
           Lyp::Lilypond.install($1, opts.__hash__)
         end
       end
-    # rescue => e
-    #   STDERR.puts e.message
-    #   exit 1
     end
   end
 end
@@ -131,9 +136,6 @@ command :use do |c|
       
       lilypond = Lyp::Lilypond.use(version, opts.__hash__)
       puts "Using version #{lilypond[:version]}"
-    rescue => e
-      STDERR.puts e.message
-      exit 1
     end
   end
 end
@@ -157,9 +159,6 @@ command :uninstall do |c|
           Lyp::Lilypond.uninstall($1)
         end
       end
-    rescue => e
-      STDERR.puts e.message
-      exit 1
     end
   end
 end

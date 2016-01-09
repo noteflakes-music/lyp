@@ -142,7 +142,7 @@ module Lyp::Lilypond
     BASE_URL = "http://download.linuxaudio.org/lilypond/binaries"
   
     # Returns a list of versions of lilyponds available for download
-    def search
+    def search(version_specifier = nil)
       require 'open-uri'
       require 'nokogiri'
 
@@ -156,19 +156,39 @@ module Lyp::Lilypond
           versions << $1
         end
       end
-      versions
+
+      installed_versions = list.map {|l| l[:version]}
+      versions.select {|v| version_match(v, version_specifier, versions)}.map do |v|
+        {
+          version: v,
+          installed: installed_versions.include?(v)
+        }
+      end
+    end
+    
+    def version_match(version, specifier, all_versions)
+      case specifier
+      when 'latest'
+        version == all_versions.last
+      when 'stable'
+        Gem::Version.new(version).segments[1].even?
+      when 'unstable'
+        Gem::Version.new(version).segments[1].odd?
+      else
+        Gem::Requirement.new(specifier) =~ Gem::Version.new(version)
+      end
     end
     
     def latest_stable_version
-      search.reverse.find {|l| Gem::Version.new(l).segments[1] % 2 == 0}
+      search.reverse.find {|l| Gem::Version.new(l[:version]).segments[1].even?}[:version]
     end
     
     def latest_unstable_version
-      search.reverse.find {|l| Gem::Version.new(l).segments[1] % 2 != 0}
+      search.reverse.find {|l| Gem::Version.new(l[:version]).segments[1].odd?}[:version]
     end
     
     def latest_version
-      search.last
+      search.last[:version]
     end
     
     def install(version_specifier, opts = {})
@@ -195,10 +215,13 @@ module Lyp::Lilypond
         latest_version
       else
         req = Gem::Requirement.new(version_specifier)
-        search.reverse.find {|v| req =~ Gem::Version.new(v)}
+        lilypond = search.reverse.find {|l| req =~ Gem::Version.new(l[:version])}
+        if lilypond
+          lilypond[:version]
+        else
+          raise "Could not find version matching #{version_specifier}"
+        end
       end
-    rescue => e
-      raise "Invalid version specified: #{version_specifier}"
     end
     
     def detect_lilypond_platform
@@ -339,11 +362,11 @@ module Lyp::Lilypond
         lilypond = lilypond_list.first
       when 'stable'
         lilypond = lilypond_list.find do |v|
-          Gem::Version.new(v[:version]).segments[1] % 2 == 0
+          Gem::Version.new(v[:version]).segments[1].even?
         end
       when 'unstable'
         lilypond = lilypond_list.find do |v|
-          Gem::Version.new(v[:version]).segments[1] % 2 != 0
+          Gem::Version.new(v[:version]).segments[1].odd?
         end
       else
         version = "~>#{version}.0" if version =~ /^\d+\.\d+$/
