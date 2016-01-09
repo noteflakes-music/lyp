@@ -93,6 +93,10 @@ RSpec.describe "Lyp::Package" do
 
   it "correctly converts a git URL to a package path" do
     with_packages(:simple) do
+      expect(Lyp::Package.git_url_to_package_path("dummy", '0.2.1')).to eq(
+        "#{Lyp::packages_dir}/dummy@0.2.1"
+      )
+
       expect(Lyp::Package.git_url_to_package_path("https://github.com/ciconia/stylush.git", nil)).to eq(
         "#{Lyp::packages_dir}/github.com/ciconia/stylush@head"
       )
@@ -113,7 +117,7 @@ RSpec.describe "Lyp::Package" do
     repo = Rugged::Repository.clone_at('https://github.com/noteflakes/lyp-package-template', tmp_dir)
     tags = Lyp::Package.repo_tags(repo)
     versions = tags.map {|t| Lyp::Package.tag_version(t)}
-    expect(versions).to eq(%w{0.1.0 0.2.0 0.2.1})
+    expect(versions).to eq(%w{0.1.0 0.2.0 0.2.1 0.3.0})
   end
   
   it "correctly selects the highest versioned tag for a given version specifier" do
@@ -128,8 +132,25 @@ RSpec.describe "Lyp::Package" do
     
     expect(select[nil]).to be_nil
     expect(select["0.2.0"]).to eq("v0.2.0")
-    expect(select[">=0.1.0"]).to eq("v0.2.1")
+    expect(select[">=0.1.0"]).to eq("v0.3.0")
     expect(select["~>0.1.0"]).to eq("v0.1.0")
     expect(select["~>0.2.0"]).to eq("v0.2.1")
+  end
+  
+  it "installs multiple versions of a package" do
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
+    # create a copy of the packages setup
+    FileUtils.cp_r("#{$spec_dir}/package_setups/simple", "#{$spec_dir}/package_setups/simple_copy")
+
+    with_packages(:simple_copy) do
+      version = Lyp::Package.install('dummy')
+      expect(version).to eq("head")
+      
+      paths = Dir["#{$packages_dir}/dummy*"].map {|fn| File.basename(fn)}
+      expect(paths).to eq(['dummy@head'])
+      
+      expect(Lyp::Package.list('dummy')).to eq(['dummy@head'])
+    end
+    
   end
 end

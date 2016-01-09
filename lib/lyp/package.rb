@@ -30,7 +30,52 @@ module Lyp::Package
       end
     end
     
-    def package_git_url(package)
+    def install(package_specifier)
+      unless package_specifier =~ Lyp::PACKAGE_RE
+        raise "Invalid package specifier #{package_specifier}"
+      end
+      package, version = $1, $2
+      
+      url = package_git_url(package)
+      tmp_path = git_url_to_temp_path(url)
+
+      # Create repository
+      if File.directory?(tmp_path)
+        repo = Rugged::Repository.new(tmp_path)
+        repo.fetch('origin', [repo.head.name])
+      else
+        FileUtils.mkdir_p(File.dirname(tmp_path))
+        repo = Rugged::Repository.clone_at(url, tmp_path)
+      end
+
+      # Select commit to checkout
+      if version.nil? || (version == '')
+        commit = repo.head.target
+        version = 'head'
+      else
+        tag = select_git_tag(repo, version_specifier)
+        version = tag.name
+        unless tag
+          raise "Could not find tag matching #{version_specifier}"
+        end
+        commit = tag.target
+      end
+      repo.checkout(commit.oid)
+
+      # Copy files
+      package_path = git_url_to_package_path(package !~ /\// ? package : url, version)
+      FileUtils.mkdir_p(File.dirname(package_path))
+      FileUtils.rm_rf(package_path)
+      FileUtils.cp_r(tmp_path, package_path)
+
+      # scan package files for dependencies
+      #   for each dependency, check if it's installed
+      #     if not, install it recursively
+      
+      version
+    end
+    
+    def package_git_url(package, search_index = true)
       case package
       when /^(?:(?:[^\:]+)|http|https)\:/
         package
@@ -86,7 +131,11 @@ module Lyp::Package
         domain, path = $1, $2.gsub(/\.git$/, '')
         "#{Lyp::packages_dir}/#{domain}/#{path}@#{version}"
       else
-        raise "Invalid URL #{url}"
+        if url !~ /\//
+          "#{Lyp::packages_dir}/#{url}@#{version}"
+        else
+          raise "Invalid URL #{url}"
+        end
       end
     end
     
