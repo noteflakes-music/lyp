@@ -11,8 +11,7 @@
 # package-refs is a hash table with an entry for each package reference made
 # using \require, either in user files or in package files (for transitive dependencies).
 
-`\version "2.19.31"
-
+`
 #(begin
   (define package-refs (make-hash-table))`
 
@@ -54,5 +53,5 @@ require = #(define-void-function (parser location package)(string?)
 `
 #(ly:debug "package loader is ready")
 #(ly:set-option 'relative-includes #t)
-\include "{{_[:user_file]}}"
+\include "{{File.expand_path(_[:user_file])}}"
 `
