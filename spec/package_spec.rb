@@ -142,7 +142,7 @@ RSpec.describe "Lyp::Package" do
     FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
 
     with_packages(:simple_copy) do
-      version = Lyp::Package.install('dummy')
+      version = Lyp::Package.install('dummy', silent: true)
       expect(version).to eq("head")
       
       paths = Dir["#{$packages_dir}/dummy*"].map {|fn| File.basename(fn)}
@@ -150,16 +150,16 @@ RSpec.describe "Lyp::Package" do
       
       expect(Lyp::Package.list('dummy')).to eq(['dummy@head'])
 
-      version = Lyp::Package.install('dummy@0.2.0')
+      version = Lyp::Package.install('dummy@0.2.0', silent: true)
       expect(version).to eq("0.2.0")
 
-      version = Lyp::Package.install('dummy@~>0.1.0')
+      version = Lyp::Package.install('dummy@~>0.1.0', silent: true)
       expect(version).to eq("0.1.0")
 
-      version = Lyp::Package.install('dummy@~>0.2.0')
+      version = Lyp::Package.install('dummy@~>0.2.0', silent: true)
       expect(version).to eq("0.2.1")
 
-      version = Lyp::Package.install('dummy@>=0.1.0')
+      version = Lyp::Package.install('dummy@>=0.1.0', silent: true)
       expect(version).to eq("0.3.0")
 
       expect(Lyp::Package.list('dummy')).to eq(%w{
@@ -173,13 +173,13 @@ RSpec.describe "Lyp::Package" do
     FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
 
     with_packages(:simple_copy) do
-      version = Lyp::Package.install('dependency-test@0.1')
+      version = Lyp::Package.install('dependency-test@0.1', silent: true)
       expect(version).to eq("0.1.0")
       
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
       expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@head})
 
-      version = Lyp::Package.install('dependency-test@>=0.2.0')
+      version = Lyp::Package.install('dependency-test@>=0.2.0', silent: true)
       expect(version).to eq("0.2.0")
       
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
