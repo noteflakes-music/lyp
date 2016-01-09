@@ -8,7 +8,6 @@ module Lyp::Lilypond
       argv << fn
       
       invoke(argv)
-      exec("#{current_lilypond} #{argv.join(' ')}")
     end
     
     def invoke(argv)
