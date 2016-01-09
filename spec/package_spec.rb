@@ -150,6 +150,23 @@ RSpec.describe "Lyp::Package" do
       expect(paths).to eq(['dummy@head'])
       
       expect(Lyp::Package.list('dummy')).to eq(['dummy@head'])
+
+      version = Lyp::Package.install('dummy@0.2.0')
+      expect(version).to eq("0.2.0")
+
+      version = Lyp::Package.install('dummy@~>0.1.0')
+      expect(version).to eq("0.1.0")
+
+      version = Lyp::Package.install('dummy@~>0.2.0')
+      expect(version).to eq("0.2.1")
+
+      version = Lyp::Package.install('dummy@>=0.1.0')
+      expect(version).to eq("0.3.0")
+
+      expect(Lyp::Package.list('dummy')).to eq(%w{
+        dummy@0.1.0 dummy@0.2.0 dummy@0.2.1 dummy@0.3.0 dummy@head
+      })
+
     end
     
   end

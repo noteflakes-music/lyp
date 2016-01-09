@@ -43,7 +43,7 @@ class Lyp::Resolver
   #
   # Since files to be processed are added to a queue, this method loops through
   # the queue until it's empty.
-  def get_dependency_tree
+  def get_dependency_tree(opts = {})
     tree = {
       dependencies: {},
       queue: [],
@@ -56,8 +56,10 @@ class Lyp::Resolver
       process_lilypond_file(job[:path], tree, job[:leaf])
     end
     
-    squash_old_versions(tree)
-    remove_unfulfilled_dependencies(tree)
+    unless opts[:pristine]
+      squash_old_versions(tree)
+      remove_unfulfilled_dependencies(tree)
+    end
     
     tree
   end

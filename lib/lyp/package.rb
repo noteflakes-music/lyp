@@ -19,13 +19,13 @@ module Lyp::Package
         x =~ Lyp::PACKAGE_RE; x_package, x_version = $1, $2
         y =~ Lyp::PACKAGE_RE; y_package, y_version = $1, $2
 
-        x_version = x_version && Gem::Version.new(x_version)
-        y_version = y_version && Gem::Version.new(y_version)
+        x_version = (x_version && Gem::Version.new(x_version) rescue x)
+        y_version = (y_version && Gem::Version.new(y_version) rescue y)
 
-        if x_package == y_package
+        if (x_package == y_package) && (x_version.class == y_version.class)
           x_version <=> y_version
         else
-          x_package <=> y_package
+          x <=> y
         end
       end
     end
@@ -53,8 +53,8 @@ module Lyp::Package
         commit = repo.head.target
         version = 'head'
       else
-        tag = select_git_tag(repo, version_specifier)
-        version = tag.name
+        tag = select_git_tag(repo, version)
+        version = tag_version(tag)
         unless tag
           raise "Could not find tag matching #{version_specifier}"
         end
@@ -67,10 +67,16 @@ module Lyp::Package
       FileUtils.mkdir_p(File.dirname(package_path))
       FileUtils.rm_rf(package_path)
       FileUtils.cp_r(tmp_path, package_path)
-
-      # scan package files for dependencies
-      #   for each dependency, check if it's installed
-      #     if not, install it recursively
+      
+      # Install any missing sub-dependencies
+      sub_deps = []
+      resolver = Lyp::Resolver.new("#{package_path}/package.ly")
+      deps_tree = resolver.get_dependency_tree(pristine: true)
+      deps_tree[:dependencies].each do |package_name, leaf|
+        sub_deps << leaf[:clause] if leaf[:versions].empty?
+      end
+      
+      sub_deps.each {|d| install(d)}
       
       version
     end
