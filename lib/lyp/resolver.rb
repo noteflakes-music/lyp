@@ -53,10 +53,10 @@ class Lyp::Resolver
     queue_file_for_processing(@user_file, tree, tree)
 
     while job = pull_file_from_queue(tree)
-      process_lilypond_file(job[:path], tree, job[:leaf])
+      process_lilypond_file(job[:path], tree, job[:leaf], opts)
     end
     
-    unless opts[:pristine]
+    unless opts[:ignore_missing]
       squash_old_versions(tree)
       remove_unfulfilled_dependencies(tree)
     end
@@ -70,7 +70,7 @@ class Lyp::Resolver
   #
   # The leaf argument is a pointer to the current leaf on the tree on which to
   # add dependencies. This is how transitive dependencies are represented.
-  def process_lilypond_file(path, tree, leaf)
+  def process_lilypond_file(path, tree, leaf, opts)
     # path is expected to be absolute
     return if tree[:processed_files][path]
     
@@ -84,7 +84,7 @@ class Lyp::Resolver
         qualified_path = File.expand_path(path, dir)
         queue_file_for_processing(qualified_path, tree, leaf)
       when REQUIRE
-        find_package_versions(path, tree, leaf)
+        find_package_versions(path, tree, leaf, opts)
       end
     end
     
@@ -103,7 +103,7 @@ class Lyp::Resolver
   
   # Find available packaging matching the package specifier, and queue them for
   # processing any include files or transitive dependencies.
-  def find_package_versions(ref, tree, leaf)
+  def find_package_versions(ref, tree, leaf, opts)
     return {} unless ref =~ Lyp::PACKAGE_RE
     ref_package = $1
     version_clause = $2
@@ -111,7 +111,7 @@ class Lyp::Resolver
     matches = find_matching_packages(ref, tree)
     
     # Raise if no match found and we're at top of the tree
-    if matches.empty? && (tree == leaf)
+    if matches.empty? && (tree == leaf) && !opts[:ignore_missing]
       raise "No package found for requirement #{ref}"
     end
     
@@ -139,9 +139,13 @@ class Lyp::Resolver
     req = Gem::Requirement.new(req_version || '>=0')
 
     available_packages(tree).select do |package, sub_tree|
-      if package =~ Lyp::PACKAGE_RE
-        version = Gem::Version.new($2 || '0')
-        (req_package == $1) && (req =~ version)
+      if (package =~ Lyp::PACKAGE_RE) && (req_package == $1)
+        version = Gem::Version.new($2 || '0') rescue nil
+        if version.nil?
+          req_version.nil? || (req_version == $2)
+        else
+          req =~ version
+        end
       else
         nil
       end

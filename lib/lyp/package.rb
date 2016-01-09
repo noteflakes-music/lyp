@@ -38,7 +38,26 @@ module Lyp::Package
       
       url = package_git_url(package)
       tmp_path = git_url_to_temp_path(url)
-
+      
+      repo = package_repository(url, tmp_path)
+      version = checkout_package_version(repo, version)
+      
+      # Copy files
+      package_path = git_url_to_package_path(
+        package !~ /\// ? package : url, version
+      )
+      
+      FileUtils.mkdir_p(File.dirname(package_path))
+      FileUtils.rm_rf(package_path)
+      FileUtils.cp_r(tmp_path, package_path)
+      
+      install_package_dependencies(package_path)
+      
+      # return the installed version
+      version
+    end
+    
+    def package_repository(url, tmp_path)
       # Create repository
       if File.directory?(tmp_path)
         repo = Rugged::Repository.new(tmp_path)
@@ -47,38 +66,36 @@ module Lyp::Package
         FileUtils.mkdir_p(File.dirname(tmp_path))
         repo = Rugged::Repository.clone_at(url, tmp_path)
       end
-
+      repo
+    end
+    
+    def checkout_package_version(repo, version)
       # Select commit to checkout
       if version.nil? || (version == '')
-        commit = repo.head.target
+        repo.checkout('master', strategy: :force)
         version = 'head'
       else
         tag = select_git_tag(repo, version)
-        version = tag_version(tag)
         unless tag
           raise "Could not find tag matching #{version_specifier}"
         end
-        commit = tag.target
-      end
-      repo.checkout(commit.oid)
 
-      # Copy files
-      package_path = git_url_to_package_path(package !~ /\// ? package : url, version)
-      FileUtils.mkdir_p(File.dirname(package_path))
-      FileUtils.rm_rf(package_path)
-      FileUtils.cp_r(tmp_path, package_path)
-      
+        repo.checkout(tag.name, strategy: :force)
+        version = tag_version(tag)
+      end
+      version
+    end
+    
+    def install_package_dependencies(package_path)
       # Install any missing sub-dependencies
       sub_deps = []
+      
       resolver = Lyp::Resolver.new("#{package_path}/package.ly")
-      deps_tree = resolver.get_dependency_tree(pristine: true)
+      deps_tree = resolver.get_dependency_tree(ignore_missing: true)
       deps_tree[:dependencies].each do |package_name, leaf|
         sub_deps << leaf[:clause] if leaf[:versions].empty?
       end
-      
       sub_deps.each {|d| install(d)}
-      
-      version
     end
     
     def package_git_url(package, search_index = true)

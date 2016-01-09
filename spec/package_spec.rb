@@ -139,8 +139,7 @@ RSpec.describe "Lyp::Package" do
   
   it "installs multiple versions of a package" do
     FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
-    # create a copy of the packages setup
-    FileUtils.cp_r("#{$spec_dir}/package_setups/simple", "#{$spec_dir}/package_setups/simple_copy")
+    FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
 
     with_packages(:simple_copy) do
       version = Lyp::Package.install('dummy')
@@ -166,8 +165,31 @@ RSpec.describe "Lyp::Package" do
       expect(Lyp::Package.list('dummy')).to eq(%w{
         dummy@0.1.0 dummy@0.2.0 dummy@0.2.1 dummy@0.3.0 dummy@head
       })
-
     end
-    
   end
+  
+  it "installs transitive dependencies for the installed package" do
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
+    FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
+
+    with_packages(:simple_copy) do
+      version = Lyp::Package.install('dependency-test@0.1')
+      expect(version).to eq("0.1.0")
+      
+      dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
+      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@head})
+
+      version = Lyp::Package.install('dependency-test@>=0.2.0')
+      expect(version).to eq("0.2.0")
+      
+      dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
+      expect(dirs.sort).to eq(%w{
+        dependency-test@0.1.0
+        dependency-test@0.2.0
+        dummy@0.2.1
+        dummy@head
+      })
+    end
+  end
+  
 end

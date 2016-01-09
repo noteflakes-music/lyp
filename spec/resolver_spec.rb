@@ -132,7 +132,7 @@ RSpec.describe Lyp::Resolver do
     with_packages(:simple) do
       o = {}
       resolver = Lyp::Resolver.new(nil)
-      resolver.find_package_versions('b@>=0.2', o, o)
+      resolver.find_package_versions('b@>=0.2', o, o, {})
       
       expect(o[:dependencies]).to eq({
         'b' => {
