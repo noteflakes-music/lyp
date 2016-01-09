@@ -107,4 +107,29 @@ RSpec.describe "Lyp::Package" do
     end
   end
 
+  it "correctly lists tags for a package repo" do
+    tmp_dir = "/tmp/lyp-dummy-repo"
+    FileUtils.rm_rf(tmp_dir)
+    repo = Rugged::Repository.clone_at('https://github.com/noteflakes/lyp-package-template', tmp_dir)
+    tags = Lyp::Package.repo_tags(repo)
+    versions = tags.map {|t| Lyp::Package.tag_version(t)}
+    expect(versions).to eq(%w{0.1.0 0.2.0 0.2.1})
+  end
+  
+  it "correctly selects the highest versioned tag for a given version specifier" do
+    tmp_dir = "/tmp/lyp-dummy-repo"
+    FileUtils.rm_rf(tmp_dir)
+    repo = Rugged::Repository.clone_at('https://github.com/noteflakes/lyp-package-template', tmp_dir)
+
+    select = lambda do |v|
+      tag = Lyp::Package.select_git_tag(repo, v)
+      tag && tag.name
+    end
+    
+    expect(select[nil]).to be_nil
+    expect(select["0.2.0"]).to eq("v0.2.0")
+    expect(select[">=0.1.0"]).to eq("v0.2.1")
+    expect(select["~>0.1.0"]).to eq("v0.1.0")
+    expect(select["~>0.2.0"]).to eq("v0.2.1")
+  end
 end

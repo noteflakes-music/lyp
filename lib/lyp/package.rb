@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'rugged'
 require 'open-uri'
 require 'yaml'
 
@@ -92,11 +93,13 @@ module Lyp::Package
     TAG_VERSION_RE = /^v?(\d.*)$/
     
     def select_git_tag(repo, version_specifier)
+      return if version_specifier.nil? || (version_specifier == '')
+      
       req = Gem::Requirement.new(version_specifier) rescue nil
       
-      sorted_tags(repo).reverse.find do |t|
-        if req && v = tag_version(t)
-          req =~ v
+      repo_tags(repo).reverse.find do |t|
+        if req && (v = tag_version(t))
+          req =~ Gem::Version.new(v)
         else
           t.name == version_specifier
         end
@@ -113,13 +116,13 @@ module Lyp::Package
         if x_version && y_version
           Gem::Version.new(x_version) <=> Gem::Version.new(y_version)
         else
-          x <=> y
+          x.name <=> y.name
         end
       end
     end
     
     def tag_version(tag)
-      (tag =~ TAG_VERSION_RE) ? $1 : nil
+      (tag.name =~ TAG_VERSION_RE) ? $1 : nil
     end
   end
 end
