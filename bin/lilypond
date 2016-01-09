@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'lyp/version'
-require 'lyp/directories'
-require 'lyp/settings'
-require 'lyp/lilypond'
+require 'lyp'
 
 STDERR.puts "Lyp version #{Lyp::VERSION}"
 
@@ -24,8 +22,8 @@ else
   
   begin
     Lyp::Lilypond.compile(ARGV)
-  rescue => e
-    STDERR.puts e.message
-    exit 1
+  # rescue => e
+  #   STDERR.puts e.message
+  #   exit 1
   end
 end
