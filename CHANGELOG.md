@@ -1,3 +1,10 @@
+## Version 0.0.4 2016-01-10
+
+- Search for simple package name (non-url) in [lyp-index](https://github.com/noteflakes/lyp-index)
+- Add support for `lyp search lilypond@<version|stable|unstable|latest>`
+- Implement package installation
+- Move lyp repository to [noteflakes org](https://github.com/noteflakes/lyp)
+
 ## Version 0.0.3 2016-01-08
 
 - Add uninstall lyp command
