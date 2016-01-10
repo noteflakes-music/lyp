@@ -1,5 +1,6 @@
 require 'httpclient'
 require 'uri'
+require 'open3'
 
 module Lyp::Lilypond
   class << self
@@ -13,7 +14,7 @@ module Lyp::Lilypond
     def invoke(argv)
       lilypond = detect_use_version_argument(argv) || current_lilypond
       
-      exec("#{lilypond} #{argv.join(' ')}")
+      Kernel.exec(lilypond, argv.join(' '))
     end
     
     def detect_use_version_argument(argv)
@@ -406,8 +407,10 @@ module Lyp::Lilypond
     def exec(cmd)
       Open3.popen3(cmd) do |_in, _out, _err, wait_thr|
         exit_value = wait_thr.value
+        $_out = _out.read
+        $_err = _err.read
         if exit_value != 0
-          raise "Error executing cmd #{cmd}: #{_err.read}"
+          raise "Error executing cmd #{cmd}: #{$_err.read}"
         end
       end
       

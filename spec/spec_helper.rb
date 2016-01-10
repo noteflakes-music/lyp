@@ -30,15 +30,10 @@ module Lyp
       "/tmp/lyp.session.#{Process.pid}.yml"
     end
     
-    def self.exec(cmd)
-      Open3.popen3(cmd) do |_in, _out, _err, wait_thr|
-        exit_value = wait_thr.value
-        $_out = _out.read
-        $_err = _err.read
-        if exit_value != 0
-          raise "Error executing cmd #{cmd}: #{$_err}"
-        end
-      end
+    def self.invoke(argv)
+      lilypond = detect_use_version_argument(argv) || current_lilypond
+      
+      exec("#{lilypond} #{argv.join(' ')}")
     end
   end
 end
