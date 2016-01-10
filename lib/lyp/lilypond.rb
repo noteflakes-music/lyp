@@ -404,7 +404,14 @@ module Lyp::Lilypond
     end
     
     def exec(cmd)
-      raise unless system(cmd)
+      Open3.popen3(cmd) do |_in, _out, _err, wait_thr|
+        exit_value = wait_thr.value
+        if exit_value != 0
+          raise "Error executing cmd #{cmd}: #{_err.read}"
+        end
+      end
+      
+      # raise unless system(cmd)
     end
   end
 end
