@@ -74,20 +74,18 @@ module Lyp::Package
     
     def checkout_package_version(repo, version, opts = {})
       # Select commit to checkout
-      if version.nil? || (version == '')
-        puts "Checkout master branch..." unless opts[:silent]
-        repo.checkout('master', strategy: :force)
-        version = 'head'
-      else
-        tag = select_git_tag(repo, version)
-        unless tag
-          raise "Could not find tag matching #{version_specifier}"
-        end
-        puts "Checkout #{tag.name} tag" unless opts[:silent]
-        repo.checkout(tag.name, strategy: :force)
-        version = tag_version(tag)
+      checkout_ref = select_checkout_ref(repo, version)
+      unless checkout_ref
+        raise "Could not find tag matching #{version}"
       end
-      version
+      
+      begin
+        repo.checkout(checkout_ref, strategy: :force)
+      rescue
+        raise "Invalid version specified (#{version})"
+      end
+      
+      tag_version(checkout_ref) || version
     end
     
     def install_package_dependencies(package_path, opts = {})
@@ -194,6 +192,30 @@ module Lyp::Package
       end
     end
     
+    def select_checkout_ref(repo, version_specifier)
+      case version_specifier
+      when nil, '', 'latest'
+        highest_versioned_tag(repo) || 'master'
+      when /^(\>=|~\>|\d)/
+        req = Gem::Requirement.new(version_specifier)
+        tag = repo_tags(repo).reverse.find do |t|
+          (v = tag_version(t.name)) && (req =~ Gem::Version.new(v))
+        end
+        unless tag
+          raise "Could not find a version matching #{version_specifier}"
+        else
+          tag.name
+        end
+      else
+        version_specifier
+      end
+    end
+    
+    def highest_versioned_tag(repo)
+      tag = repo_tags(repo).select {|t| Gem::Version.new(tag_version(t.name)) rescue nil}.last
+      tag && tag.name
+    end
+    
     # Returns a list of tags sorted by version
     def repo_tags(repo)
       tags = []
@@ -210,7 +232,7 @@ module Lyp::Package
     end
     
     def tag_version(tag)
-      (tag.name =~ TAG_VERSION_RE) ? $1 : nil
+      (tag =~ TAG_VERSION_RE) ? $1 : nil
     end
   end
 end

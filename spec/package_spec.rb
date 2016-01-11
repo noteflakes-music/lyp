@@ -116,21 +116,20 @@ RSpec.describe "Lyp::Package" do
     FileUtils.rm_rf(tmp_dir)
     repo = Rugged::Repository.clone_at('https://github.com/noteflakes/lyp-package-template', tmp_dir)
     tags = Lyp::Package.repo_tags(repo)
-    versions = tags.map {|t| Lyp::Package.tag_version(t)}
+    versions = tags.map {|t| Lyp::Package.tag_version(t.name)}
     expect(versions).to eq(%w{0.1.0 0.2.0 0.2.1 0.3.0})
   end
   
-  it "correctly selects the highest versioned tag for a given version specifier" do
+  it "correctly selects the correct checkout ref for a given version specifier" do
     tmp_dir = "/tmp/lyp-dummy-repo"
     FileUtils.rm_rf(tmp_dir)
     repo = Rugged::Repository.clone_at('https://github.com/noteflakes/lyp-package-template', tmp_dir)
 
-    select = lambda do |v|
-      tag = Lyp::Package.select_git_tag(repo, v)
-      tag && tag.name
-    end
+    select = lambda {|v| Lyp::Package.select_checkout_ref(repo, v)}
     
-    expect(select[nil]).to be_nil
+    expect(select[nil]).to eq("v0.3.0")
+    expect(select["latest"]).to eq("v0.3.0")
+    expect(select["master"]).to eq("master")
     expect(select["0.2.0"]).to eq("v0.2.0")
     expect(select[">=0.1.0"]).to eq("v0.3.0")
     expect(select["~>0.1.0"]).to eq("v0.1.0")
@@ -142,13 +141,15 @@ RSpec.describe "Lyp::Package" do
     FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
 
     with_packages(:simple_copy) do
+      # When no version is specified, lyp should install the highest tagged 
+      # version
       version = Lyp::Package.install('dummy', silent: true)
-      expect(version).to eq("head")
-      
+      expect(version).to eq("0.3.0")
+
       paths = Dir["#{$packages_dir}/dummy*"].map {|fn| File.basename(fn)}
-      expect(paths).to eq(['dummy@head'])
-      
-      expect(Lyp::Package.list('dummy')).to eq(['dummy@head'])
+      expect(paths).to eq(['dummy@0.3.0'])
+
+      expect(Lyp::Package.list('dummy')).to eq(['dummy@0.3.0'])
 
       version = Lyp::Package.install('dummy@0.2.0', silent: true)
       expect(version).to eq("0.2.0")
@@ -163,7 +164,7 @@ RSpec.describe "Lyp::Package" do
       expect(version).to eq("0.3.0")
 
       expect(Lyp::Package.list('dummy')).to eq(%w{
-        dummy@0.1.0 dummy@0.2.0 dummy@0.2.1 dummy@0.3.0 dummy@head
+        dummy@0.1.0 dummy@0.2.0 dummy@0.2.1 dummy@0.3.0
       })
     end
   end
@@ -177,7 +178,7 @@ RSpec.describe "Lyp::Package" do
       expect(version).to eq("0.1.0")
       
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
-      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@head})
+      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@0.3.0})
 
       version = Lyp::Package.install('dependency-test@>=0.2.0', silent: true)
       expect(version).to eq("0.2.0")
@@ -187,7 +188,7 @@ RSpec.describe "Lyp::Package" do
         dependency-test@0.1.0
         dependency-test@0.2.0
         dummy@0.2.1
-        dummy@head
+        dummy@0.3.0
       })
     end
   end
