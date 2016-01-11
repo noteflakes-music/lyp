@@ -193,4 +193,30 @@ RSpec.describe "Lyp::Package" do
     end
   end
   
+  it "uninstalls a version" do
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
+    FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
+
+    with_packages(:simple_copy) do
+      Lyp::Package.install('dependency-test@0.1', silent: true)
+      
+      dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
+      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@0.3.0})
+      
+      Lyp::Package.uninstall('dependency-test@0.1.0', silent: true)
+      dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
+      expect(dirs.sort).to eq(%w{dummy@0.3.0})
+      
+      Lyp::Package.install('dependency-test@0.1.0', silent: true)
+      Lyp::Package.install('dependency-test@0.2.0', silent: true)
+      Lyp::Package.uninstall('dependency-test', silent: true, all_versions: true)
+
+      dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
+      expect(dirs.sort).to eq(%w{dummy@0.2.1 dummy@0.3.0})
+
+      expect {Lyp::Package.uninstall('dependency-test@0.1.0', silent: true)}.to \
+        raise_error
+    end
+  end
+  
 end

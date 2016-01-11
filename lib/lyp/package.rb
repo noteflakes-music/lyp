@@ -59,6 +59,23 @@ module Lyp::Package
       version
     end
     
+    def uninstall(package, opts = {})
+      if opts[:all_versions]
+        Dir["#{Lyp.packages_dir}/#{package}@*"].each do |path|
+          puts "Uninstalling #{File.basename(path)}" unless opts[:silent]
+          FileUtils.rm_rf(path)
+        end
+      else
+        path = "#{Lyp.packages_dir}/#{package}"
+        if File.directory?(path)
+          puts "Uninstalling #{package}" unless opts[:silent]
+          FileUtils.rm_rf(path)
+        else
+          raise "Could not find #{package}"
+        end
+      end
+    end
+    
     def package_repository(url, tmp_path, opts = {})
       # Create repository
       if File.directory?(tmp_path)
