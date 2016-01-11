@@ -178,20 +178,6 @@ module Lyp::Package
     
     TAG_VERSION_RE = /^v?(\d.*)$/
     
-    def select_git_tag(repo, version_specifier)
-      return if version_specifier.nil? || (version_specifier == '')
-      
-      req = Gem::Requirement.new(version_specifier) rescue nil
-      
-      repo_tags(repo).reverse.find do |t|
-        if req && (v = tag_version(t))
-          req =~ Gem::Version.new(v)
-        else
-          t.name == version_specifier
-        end
-      end
-    end
-    
     def select_checkout_ref(repo, version_specifier)
       case version_specifier
       when nil, '', 'latest'
