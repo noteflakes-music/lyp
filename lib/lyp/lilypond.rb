@@ -14,7 +14,7 @@ module Lyp::Lilypond
     def invoke(argv)
       lilypond = detect_use_version_argument(argv) || current_lilypond
       
-      Kernel.exec(lilypond, argv.join(' '))
+      Kernel.exec(lilypond, *argv)
     end
     
     def detect_use_version_argument(argv)

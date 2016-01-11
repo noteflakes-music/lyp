@@ -1,7 +1,15 @@
+## DOCS
+
+- 
+
 ## install self
 
-- Check that install self works correctly. Ideally add a spec
-- Refuse to install self if `which lyp` = "~/.lypack/bin/lyp"
+- Check that install self works correctly. Ideally add a spec.
+- Refuse to install self if `which lyp` = `"~/.lypack/bin/lyp"`
+
+## bin/lilypond
+
+- Upon running, check that default/current lilypond is valid. If not, reset the default and current.
 
 ## CLI
 
