@@ -5,6 +5,7 @@ require 'lyp'
 
 STDERR.puts "Lyp version #{Lyp::VERSION}"
 
+Lyp::Lilypond.check_lilypond!
 lilypond_path = Lyp::Lilypond.current_lilypond
 unless lilypond_path && File.file?(lilypond_path)
   STDERR.puts "No version of lilypond found. To install lilypond run 'lyp install lilypond'."

@@ -48,6 +48,25 @@ module Lyp::Lilypond
       set_session_settings(settings)
     end
     
+    def check_lilypond!
+      # check default
+      select_default_lilypond! unless valid_lilypond?(default_lilypond)
+      
+      set_current_lilypond(default_lilypond) unless valid_lilypond?(current_lilypond)
+    end
+    
+    def valid_lilypond?(path)
+      File.file?(path) && (`#{path} -v` =~ /^GNU LilyPond/)
+    end
+    
+    def select_default_lilypond!
+      latest = system_lilyponds.sort(&CMP_VERSION).last || lyp_lilyponds.sort(&CMP_VERSION).last
+      if latest
+        default = latest[:path]
+        set_default_lilypond(default)
+      end
+    end
+    
     def get_session_settings
       YAML.load(IO.read(session_settings_filename)) rescue {}
     end
