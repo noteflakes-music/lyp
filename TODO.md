@@ -1,6 +1,6 @@
 ## DOCS
 
-- 
+- Well, everything!
 
 ## install self
 
@@ -10,10 +10,6 @@
 ## bin/lilypond
 
 - Upon running, check that default/current lilypond is valid. If not, reset the default and current.
-
-## CLI
-
-- Switch from commander to thor or maybe find something better?
 
 ## install <package>
 
@@ -28,5 +24,5 @@
 - `resolve <lilypond file>` - installs all packages found in user's files
 - `uninstall <package>` - 
 - `which <package>` 
-- which lilypond
+- `which lilypond`
 
