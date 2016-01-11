@@ -1,3 +1,12 @@
+## Version 0.0.5 2016-01-11
+
+- Add which command (for both packages and lilypond)
+- Add package uninstall command
+- Check validity of default/current lilypond before invoking it
+- Install highest versioned tag if version is not specified
+- CLI now uses thor for prettier code
+- Fix bin/lilypond to work with multiple arguments
+
 ## Version 0.0.4 2016-01-10
 
 - Search for simple package name (non-url) in [lyp-index](https://github.com/noteflakes/lyp-index)

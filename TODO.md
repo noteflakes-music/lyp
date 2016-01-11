@@ -20,6 +20,12 @@
   Other options:
   `lyp install oll@dev:.`
   
+## Package specifiers
+
+- When using version constraints, allow dropping the ampersand, so `lilypond>=2.19.2` is equivalent to `lilypond@>=2.19.2`. Use this re:
+
+  `/([^@\>~]+)(?:@?((?:\>=|~\>)?.+))?/`
+  
 ## Missing commands:
 
 - `resolve <lilypond file>` - installs all packages found in user's files
