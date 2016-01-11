@@ -50,19 +50,6 @@ class Lyp::CLI < Thor
     $stderr.puts "Lyp #{Lyp::VERSION}"
   end
   
-  desc "list [PATTERN|lilypond]", "List installed packages matching PATTERN or versions of lilypond"
-  def list(pattern = nil)
-    Lyp::System.test_installed_status!
-
-    if pattern == 'lilypond'
-      STDOUT.puts LILYPOND_PREAMBLE
-      Lyp::Lilypond.list.each {|info| puts format_lilypond_entry(info)}
-      STDOUT.puts LILYPOND_LEGEND
-    else
-      Lyp::Package.list(args.first).each {|p| puts p}
-    end
-  end
-  
   desc "search [PATTERN|lilypond]", "List available packages matching PATTERN or versions of lilypond"
   def search(pattern)
     # Lyp::System.test_installed_status!
@@ -165,6 +152,31 @@ class Lyp::CLI < Thor
     lilypond = Lyp::Lilypond.use(version, options)
     puts "Using version #{lilypond[:version]}"
   end
+
+  desc "list [PATTERN|lilypond]", "List installed packages matching PATTERN or versions of lilypond"
+  def list(pattern = nil)
+    Lyp::System.test_installed_status!
+
+    if pattern == 'lilypond'
+      STDOUT.puts LILYPOND_PREAMBLE
+      Lyp::Lilypond.list.each {|info| puts format_lilypond_entry(info)}
+      STDOUT.puts LILYPOND_LEGEND
+    else
+      Lyp::Package.list(args.first).each {|p| puts p}
+    end
+  end
+  
+  desc "which [PATTERN|lilypond]", "List locations of installed packages matching PATTERN or versions of lilypond"
+  def which(pattern = nil)
+    Lyp::System.test_installed_status!
+
+    if pattern == 'lilypond'
+      puts Lyp::Lilypond.current_lilypond
+    else
+      Lyp::Package.which(args.first).each {|p| puts p}
+    end
+  end
+  
 end
 
 Lyp::CLI.start(ARGV)

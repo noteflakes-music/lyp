@@ -12,6 +12,33 @@ RSpec.describe "Lyp::Package" do
         c@0.1
         c@0.3
       })
+
+      expect(Lyp::Package.list('a@>=0.2')).to eq(%w{
+        a@0.2
+      })
+
+      expect(Lyp::Package.list('c')).to eq(%w{
+        c@0.1
+        c@0.3
+      })
+    end
+  end
+
+  it "returns a list of package locations for a given pattern" do
+    with_packages(:simple) do
+      expect(Lyp::Package.which('b@~>0.2')).to eq([
+        "#{$packages_dir}/b@0.2",
+        "#{$packages_dir}/b@0.2.2"
+      ])
+
+      expect(Lyp::Package.which('c')).to eq([
+        "#{$packages_dir}/c@0.1",
+        "#{$packages_dir}/c@0.3"
+      ])
+
+      expect(Lyp::Package.which('a@0.1.0')).to eq([
+        "#{$packages_dir}/a@0.1"
+      ])
     end
   end
 
@@ -40,10 +67,9 @@ RSpec.describe "Lyp::Package" do
     end
 
     with_packages(:simple_with_ly) do
-      expect(Lyp::Package.list('0.1')).to eq(%w{
-        a@0.1
-        b@0.1
+      expect(Lyp::Package.list('c')).to eq(%w{
         c@0.1
+        c@0.3
       })
     end
   end
@@ -218,5 +244,4 @@ RSpec.describe "Lyp::Package" do
         raise_error
     end
   end
-  
 end

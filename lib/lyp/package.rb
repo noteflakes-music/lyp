@@ -12,7 +12,27 @@ module Lyp::Package
       end
       
       if pattern
-        packages.select! {|p| p =~ /#{pattern}/}
+        if (pattern =~ /@/) && (pattern =~ Lyp::PACKAGE_RE)
+          package, version = $1, $2
+          req = Gem::Requirement.new(version) rescue nil
+          packages.select! do |p|
+            p =~ Lyp::PACKAGE_RE
+            p_pack, p_ver = $1, $2
+            
+            next false unless p_pack == package
+            
+            if req && (p_gemver = Gem::Version.new(p_ver) rescue nil)
+              req =~ p_gemver
+            else
+              p_ver == version
+            end
+          end
+        else
+          packages.select! do |p|
+            p =~ Lyp::PACKAGE_RE
+            $1 =~ /#{pattern}/
+          end
+        end
       end
       
       packages.sort do |x, y|
@@ -28,6 +48,10 @@ module Lyp::Package
           x <=> y
         end
       end
+    end
+    
+    def which(pattern = nil)
+      list(pattern).map {|p| "#{Lyp.packages_dir}/#{p}" }
     end
     
     def install(package_specifier, opts = {})

@@ -23,6 +23,4 @@
 ## Missing commands:
 
 - `resolve <lilypond file>` - installs all packages found in user's files
-- `which <package>` 
-- `which lilypond`
 
