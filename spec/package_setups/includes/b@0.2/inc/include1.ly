@@ -1,1 +1,1 @@
-\require "c@>=0.2.0"
+\require "c>=0.2.0"

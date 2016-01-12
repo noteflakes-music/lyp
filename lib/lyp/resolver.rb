@@ -385,6 +385,7 @@ class Lyp::Resolver
 
   # Sort permutations by version numbers
   def sort_permutations(permutations, user_deps)
+    # Cache for versions converted to Gem::Version instances
     versions = {}
     
     map = lambda do |m, p|
@@ -398,7 +399,8 @@ class Lyp::Resolver
       x_versions = x.inject({}, &map)
       y_versions = y.inject({}, &map)
       
-      # Naive implementation - add up the comparison scores for each package
+      # If the dependency is direct (not transitive), just compare its versions.
+      # Otherwise, add the result of comparison to score.
       x_versions.inject(0) do |score, kv|
         package = kv[0]
         cmp = kv[1] <=> y_versions[package]

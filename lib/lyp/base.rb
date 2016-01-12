@@ -3,8 +3,11 @@ require 'fileutils'
 module Lyp
   # A package specifier is of the form <package>@<version specifier>, where
   # the version specifier can be simply a version number, or include an operator
-  # before the version number. Accepted operators: >=, ~>
-  PACKAGE_RE = /^([^@]+)(?:@(.+))?$/
+  # before the version number.
+  # 
+  # Accepted operators: >=, ~>
+  PACKAGE_RE = /^([^@\>~]+)(?:@?((?:\>=|~\>)?.+))?/ #/^([^@]+)(?:@(.+))?$/
+  LILYPOND_RE = /^lilypond(?:@?((?:\>=|~\>)?.+))?/
 
   LYP_DIRECTORY = File.expand_path('~/.lyp')
   LYP_BIN_DIRECTORY = File.join(LYP_DIRECTORY, 'bin')

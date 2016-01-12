@@ -17,7 +17,7 @@ RSpec.describe "Lyp.wrap" do
       expect(code).to include("(hash-set! package-refs \"a\" \"#{$packages_dir}/a@0.1/package.ly\")")
       expect(code).to include("(hash-set! package-refs \"b@>=0.1.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
       expect(code).to include("(hash-set! package-refs \"b@~>0.2.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
-      expect(code).to include("(hash-set! package-refs \"b@~>0.1.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
+      expect(code).to include("(hash-set! package-refs \"b~>0.1.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
       expect(code).to include("(hash-set! package-refs \"c\" \"#{$packages_dir}/c@0.1/package.ly\")")
     end
   end

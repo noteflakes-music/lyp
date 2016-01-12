@@ -111,7 +111,7 @@ class Lyp::CLI < Thor
       case package
       when 'self'
         Lyp::System.install!
-      when /^lilypond(?:@(.+))?$/
+      when Lyp::LILYPOND_RE
         Lyp::System.test_installed_status!
         Lyp::Lilypond.install($1, options)
       else
@@ -130,7 +130,7 @@ class Lyp::CLI < Thor
       case package
       when 'self'
         Lyp::System.uninstall!
-      when /^lilypond(?:@(.+))?$/
+      when Lyp::LILYPOND_RE
         Lyp::System.test_installed_status!
         Lyp::Lilypond.uninstall($1)
       else
@@ -145,7 +145,7 @@ class Lyp::CLI < Thor
   def use(version)
     Lyp::System.test_installed_status!
 
-    if version =~ /^lilypond@(.+)$/
+    if version =~ Lyp::LILYPOND_RE
       version = $1
     end
   

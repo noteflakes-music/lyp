@@ -1,5 +1,5 @@
 %w{
-  directories
+  base
   system
   settings
   

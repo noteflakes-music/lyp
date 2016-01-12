@@ -1,1 +1,1 @@
-\require "b@~>0.1.0"
+\require "b~>0.1.0"

@@ -13,7 +13,12 @@ RSpec.describe "Lyp::Package" do
         c@0.3
       })
 
-      expect(Lyp::Package.list('a@>=0.2')).to eq(%w{
+      expect(Lyp::Package.list('a@>=0.1')).to eq(%w{
+        a@0.1
+        a@0.2
+      })
+
+      expect(Lyp::Package.list('a>=0.2')).to eq(%w{
         a@0.2
       })
 
@@ -27,6 +32,11 @@ RSpec.describe "Lyp::Package" do
   it "returns a list of package locations for a given pattern" do
     with_packages(:simple) do
       expect(Lyp::Package.which('b@~>0.2')).to eq([
+        "#{$packages_dir}/b@0.2",
+        "#{$packages_dir}/b@0.2.2"
+      ])
+
+      expect(Lyp::Package.which('b~>0.2')).to eq([
         "#{$packages_dir}/b@0.2",
         "#{$packages_dir}/b@0.2.2"
       ])
@@ -183,10 +193,13 @@ RSpec.describe "Lyp::Package" do
       version = Lyp::Package.install('dummy@~>0.1.0', silent: true)
       expect(version).to eq("0.1.0")
 
-      version = Lyp::Package.install('dummy@~>0.2.0', silent: true)
+      version = Lyp::Package.install('dummy~>0.2.0', silent: true)
       expect(version).to eq("0.2.1")
 
       version = Lyp::Package.install('dummy@>=0.1.0', silent: true)
+      expect(version).to eq("0.3.0")
+
+      version = Lyp::Package.install('dummy>=0.1.0', silent: true)
       expect(version).to eq("0.3.0")
 
       expect(Lyp::Package.list('dummy')).to eq(%w{
@@ -206,7 +219,7 @@ RSpec.describe "Lyp::Package" do
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
       expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@0.3.0})
 
-      version = Lyp::Package.install('dependency-test@>=0.2.0', silent: true)
+      version = Lyp::Package.install('dependency-test>=0.2.0', silent: true)
       expect(version).to eq("0.2.0")
       
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}

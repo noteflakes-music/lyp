@@ -1,1 +1,1 @@
-\require "b@>=0.3"
+\require "b>=0.3"

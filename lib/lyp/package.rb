@@ -12,7 +12,7 @@ module Lyp::Package
       end
       
       if pattern
-        if (pattern =~ /@/) && (pattern =~ Lyp::PACKAGE_RE)
+        if (pattern =~ /[@\>\<\=\~]/) && (pattern =~ Lyp::PACKAGE_RE)
           package, version = $1, $2
           req = Gem::Requirement.new(version) rescue nil
           packages.select! do |p|

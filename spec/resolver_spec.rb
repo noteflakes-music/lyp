@@ -168,7 +168,7 @@ RSpec.describe Lyp::Resolver do
       r = resolver.resolve_package_dependencies
       expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.1 c@0.1})
       expect(r[:package_paths].keys.sort).to eq(
-        ["a", "b@>=0.1.0", "b@~>0.1.0", "b@~>0.2.0", "c"]
+        ["a", "b@>=0.1.0", "b@~>0.2.0", "b~>0.1.0", "c"]
       )
       expect(r[:package_paths]["a"]).to eq(
         "#{$packages_dir}/a@0.1/package.ly"
@@ -176,7 +176,7 @@ RSpec.describe Lyp::Resolver do
       expect(r[:package_paths]["b@>=0.1.0"]).to eq(
         "#{$packages_dir}/b@0.1/package.ly"
       )
-      expect(r[:package_paths]["b@~>0.1.0"]).to eq(
+      expect(r[:package_paths]["b~>0.1.0"]).to eq(
         "#{$packages_dir}/b@0.1/package.ly"
       )
       expect(r[:package_paths]["b@~>0.2.0"]).to eq(
