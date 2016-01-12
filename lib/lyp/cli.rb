@@ -177,6 +177,31 @@ class Lyp::CLI < Thor
     end
   end
   
+  desc "deps FILE", "Lists dependencies found in user's files"
+  def deps(fn)
+    resolver = Lyp::Resolver.new(fn)
+    tree = resolver.get_dependency_tree(ignore_missing: true)
+    tree[:dependencies].each do |package, leaf|
+      versions = leaf[:versions].keys.map {|k| k =~ Lyp::PACKAGE_RE; $2 }.sort
+      if versions.empty?
+        puts "   #{leaf[:clause]} => (no local version found)"
+      else
+        puts "   #{leaf[:clause]} => #{versions.join(', ')}"
+      end
+    end
+  end
+  
+  desc "resolve FILE", "Resolves and installs missing dependencies found in user's files"
+  method_option :all, aliases: '-a', type: :boolean, desc: 'Install all found dependencies'
+  def resolve(fn)
+    resolver = Lyp::Resolver.new(fn)
+    tree = resolver.get_dependency_tree(ignore_missing: true)
+    tree[:dependencies].each do |package, leaf|
+      if options[:all] || leaf[:versions].empty?
+        Lyp::Package.install(leaf[:clause])
+      end
+    end
+  end
 end
 
 Lyp::CLI.start(ARGV)
