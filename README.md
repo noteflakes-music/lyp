@@ -10,18 +10,18 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 
 ## Table of contents
 
-- [Installation](installation)
-  - [How lyp works](how-lyp-works)
-  - [Uninstalling](uninstalling)
-- [Lilypond packages](lilypond-packages)
-  - [What constitutes a package?](what-constitutes-a-package)
-  - [Installing packages](installing-packages)
-  - [Package references](package-references)
-  - [Version specifiers](version-specifiers)
-  - [Using packages](using-packages)
-  - [Developing packages](developing-packages)
-- [Installing and switching Lilypond versions](installing-and-switching-lilypond-versions)
-- [Contributing](contributing)
+- [Installation](#installation)
+  - [How lyp works](#how-lyp-works)
+  - [Uninstalling](#uninstalling)
+- [Lilypond packages](#lilypond-packages)
+  - [What constitutes a package?](#what-constitutes-a-package)
+  - [Installing packages](#installing-packages)
+  - [Package references](#package-references)
+  - [Version specifiers](#version-specifiers)
+  - [Using packages](#using-packages)
+  - [Developing packages](#developing-packages)
+- [Installing and switching Lilypond versions](#installing-and-switching-lilypond-versions)
+- [Contributing](#contributing)
 
 ## Installation
 
