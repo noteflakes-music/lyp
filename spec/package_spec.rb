@@ -211,6 +211,27 @@ RSpec.describe "Lyp::Package" do
     end
   end
   
+  it "installs package from git url" do
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
+    FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
+
+    with_packages(:simple_copy) do
+      # When no version is specified, lyp should install the highest tagged 
+      # version
+      version = Lyp::Package.install('github.com/noteflakes/lyp-package-template', silent: true)
+      expect(version).to eq("0.3.0")
+
+      paths = Dir["#{$packages_dir}/**/package.ly"].map do |fn|
+        File.dirname(fn).gsub("#{$packages_dir}/", "")
+      end
+      expect(paths).to eq(['github.com/noteflakes/lyp-package-template@0.3.0'])
+
+      expect(Lyp::Package.list('templ')).to eq(
+        ['github.com/noteflakes/lyp-package-template@0.3.0']
+      )
+    end
+  end
+  
   it "installs transitive dependencies for the installed package" do
     FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
     FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
@@ -281,7 +302,7 @@ RSpec.describe "Lyp::Package" do
     end
   end
   
-  it "uninstalls a version" do
+  it "uninstalls a package" do
     FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
     FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
 
@@ -304,6 +325,32 @@ RSpec.describe "Lyp::Package" do
 
       expect {Lyp::Package.uninstall('dependency-test@0.1.0', silent: true)}.to \
         raise_error
+    end
+  end
+
+  it "uninstalls a package from git url" do
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
+    FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
+
+    with_packages(:simple_copy) do
+      expect {Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template@0.3.0', silent: true)}.to \
+        raise_error
+
+      Lyp::Package.install('github.com/noteflakes/lyp-package-template', silent: true)
+      expect(Lyp::Package.list('templ')).to eq(
+        ['github.com/noteflakes/lyp-package-template@0.3.0']
+      )
+      
+      Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template@0.3.0', silent: true)
+      expect(Lyp::Package.list('templ')).to be_empty
+      
+      Lyp::Package.install('github.com/noteflakes/lyp-package-template', silent: true)
+      expect(Lyp::Package.list('templ')).to eq(
+        ['github.com/noteflakes/lyp-package-template@0.3.0']
+      )
+      
+      Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template', silent: true, all_versions: true)
+      expect(Lyp::Package.list('templ')).to be_empty
     end
   end
 end
