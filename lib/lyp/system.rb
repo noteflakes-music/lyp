@@ -4,21 +4,20 @@ module Lyp::System
   class << self
     INSTALL_MSG = <<EOF
 
-lyp is not yet properly installed in your home directory. 
+Warning! Lyp is not yet properly installed in your home directory. 
 
 To install lyp run 'lyp install self'. lyp will then:
   1. Setup ~/.lyp as its base directory.
-  2. Add ~/.lyp/bin to $PATH.
+  2. Add the lyp and lilypond scripts to ~/.lyp/bin.
+  3. Add ~/.lyp/bin to front of $PATH.
   
 You can uninstall lyp at any time by running 'lyp uninstall self'.
 
 EOF
 
     def test_installed_status!
-      return
       unless installed?
         puts INSTALL_MSG
-        exit 1
       end
     end
     
