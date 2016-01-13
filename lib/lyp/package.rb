@@ -7,8 +7,8 @@ module Lyp::Package
   class << self
     
     def list(pattern = nil)
-      packages = Dir["#{Lyp.packages_dir}/*"].map do |p|
-        File.basename(p)
+      packages = Dir["#{Lyp.packages_dir}/**/package.ly"].map do |path|
+        File.dirname(path).gsub("#{Lyp.packages_dir}/", '')
       end
       
       if pattern
@@ -60,6 +60,51 @@ module Lyp::Package
       end
       package, version = $1, $2
       
+      if version =~ /\:/
+        info = install_from_local_files(package, version, opts)
+      else
+        info = install_from_repository(package, version, opts)
+      end
+      
+      install_package_dependencies(info[:path], opts)
+      
+      puts "\nInstalled #{package}@#{info[:version]}\n\n" unless opts[:silent]
+      
+      # important: return the installed version
+      info[:version]
+    end
+    
+    def install_from_local_files(package, version, opts)
+      version =~ /^([^\:]+)\:(.+)$/
+      version, local_path = $1, $2
+      
+      entry_point_path = nil
+      if File.directory?(local_path)
+        ly_path = File.join(local_path, "package.ly")
+        if File.file?(ly_path)
+          entry_point_path = ly_path
+        else
+          raise "Could not find #{ly_path}. Please specify a valid lilypond file."
+        end
+      elsif File.file?(local_path)
+        entry_point_path = local_path
+      else
+        raise "Could not find #{local_path}"
+      end
+      
+      package_path = "#{Lyp.packages_dir}/#{package}@#{version}"
+      package_ly_path = "#{package_path}/package.ly"
+      
+      FileUtils.rm_rf(package_path)
+      FileUtils.mkdir_p(package_path)
+      File.open(package_ly_path, 'w+') do |f|
+        f << "\\include \"#{entry_point_path}\"\n"
+      end
+      
+      {version: version, path: package_path}
+    end
+    
+    def install_from_repository(package, version, opts)
       url = package_git_url(package)
       tmp_path = git_url_to_temp_path(url)
       
@@ -75,25 +120,30 @@ module Lyp::Package
       FileUtils.rm_rf(package_path)
       FileUtils.cp_r(tmp_path, package_path)
       
-      install_package_dependencies(package_path, opts)
-      
-      puts "\nInstalled #{package}@#{version}\n\n" unless opts[:silent]
-      
-      # return the installed version
-      version
+      {version: version, path: package_path}
     end
     
     def uninstall(package, opts = {})
+      unless package =~ Lyp::PACKAGE_RE
+        raise "Invalid package specifier #{package}"
+      end
+      package, version = $1, $2
+      package_path = git_url_to_package_path(
+        package !~ /\// ? package : package_git_url(package), nil
+      )
+      
       if opts[:all_versions]
-        Dir["#{Lyp.packages_dir}/#{package}@*"].each do |path|
-          puts "Uninstalling #{File.basename(path)}" unless opts[:silent]
+        Dir["#{package_path}@*"].each do |path|
+          name = path.gsub("#{Lyp.packages_dir}/", '')
+          puts "Uninstalling #{name}" unless opts[:silent]
           FileUtils.rm_rf(path)
         end
       else
-        path = "#{Lyp.packages_dir}/#{package}"
-        if File.directory?(path)
-          puts "Uninstalling #{package}" unless opts[:silent]
-          FileUtils.rm_rf(path)
+        package_path += "@#{version}"
+        if File.directory?(package_path)
+          name = package_path.gsub("#{Lyp.packages_dir}/", '')
+          puts "Uninstalling #{name}" unless opts[:silent]
+          FileUtils.rm_rf(package_path)
         else
           raise "Could not find #{package}"
         end
@@ -103,14 +153,21 @@ module Lyp::Package
     def package_repository(url, tmp_path, opts = {})
       # Create repository
       if File.directory?(tmp_path)
-        repo = Rugged::Repository.new(tmp_path)
-        repo.fetch('origin', [repo.head.name])
-      else
-        FileUtils.mkdir_p(File.dirname(tmp_path))
-        puts "Cloning #{url}..." unless opts[:silent]
-        repo = Rugged::Repository.clone_at(url, tmp_path)
+        begin
+          repo = Rugged::Repository.new(tmp_path)
+          repo.fetch('origin', [repo.head.name])
+          return repo
+        rescue
+          # ignore and try to clone
+        end
       end
-      repo
+      
+      FileUtils.rm_rf(File.dirname(tmp_path))
+      FileUtils.mkdir_p(File.dirname(tmp_path))
+      puts "Cloning #{url}..." unless opts[:silent]
+      Rugged::Repository.clone_at(url, tmp_path)
+    rescue => e
+      raise "Could not clone repository (please check that the package URL is correct.)"
     end
     
     def checkout_package_version(repo, version, opts = {})
@@ -199,22 +256,25 @@ module Lyp::Package
     end
     
     def git_url_to_package_path(url, version)
-      version = 'head' if version.nil? || (version == '')
+      # version = 'head' if version.nil? || (version == '')
       
-      case url
+      package_path = case url
       when /^(?:http|https)\:(?:\/\/)?(.+)$/
         path = $1.gsub(/\.git$/, '')
-        "#{Lyp::packages_dir}/#{path}@#{version}"
+        "#{Lyp::packages_dir}/#{path}"
       when /^(?:.+@)([^\:]+)\:(?:\/\/)?(.+)$/
         domain, path = $1, $2.gsub(/\.git$/, '')
-        "#{Lyp::packages_dir}/#{domain}/#{path}@#{version}"
+        "#{Lyp::packages_dir}/#{domain}/#{path}"
       else
         if url !~ /\//
-          "#{Lyp::packages_dir}/#{url}@#{version}"
+          "#{Lyp::packages_dir}/#{url}"
         else
           raise "Invalid URL #{url}"
         end
       end
+      
+      package_path += "@#{version}" if version
+      package_path
     end
     
     TAG_VERSION_RE = /^v?(\d.*)$/

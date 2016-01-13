@@ -16,4 +16,13 @@
   Other options:
   `lyp install oll@dev:.`
   
+- In fact, we can generalise this into a way to install packages from local files:
+
+  `lyp install oll@<version>:<file path>`
+    
+  lyp then creates the package directory inside ~/.lyp/packages and creates a `package.ly` containing an include statement referencing the given path.
+  
+  - If the path is a directory, lyp searches for a `package.ly` file, emitting an error if not found.
+  - If the path is a file, lyp considers this file the entry point for the package.
+
 

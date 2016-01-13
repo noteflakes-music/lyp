@@ -52,34 +52,37 @@ RSpec.describe "Lyp::Package" do
     end
   end
 
-  it "list lilypond versions" do
-    with_packages(:simple_with_ly) do
+  it "lists nested packages" do
+    with_packages(:simple_with_nested_packages) do
       expect(Lyp::Package.list).to eq(%w{
         a@0.1
         a@0.2
+        acme.com/mypack@1.4.0
         b@0.1
         b@0.2
         b@0.2.2
         c@0.1
         c@0.3
-        lilypond@2.6.2
-        lilypond@2.19.34
+        github.com/test/dummy@dev
       })
     end
   end
 
   it "lists packages matching given pattern" do
-    with_packages(:simple_with_ly) do
+    with_packages(:simple_with_nested_packages) do
       expect(Lyp::Package.list('a')).to eq(%w{
         a@0.1
         a@0.2
+        acme.com/mypack@1.4.0
       })
     end
 
-    with_packages(:simple_with_ly) do
+    with_packages(:simple_with_nested_packages) do
       expect(Lyp::Package.list('c')).to eq(%w{
+        acme.com/mypack@1.4.0
         c@0.1
         c@0.3
+        github.com/test/dummy@dev
       })
     end
   end
@@ -134,7 +137,7 @@ RSpec.describe "Lyp::Package" do
       )
 
       expect(Lyp::Package.git_url_to_package_path("https://github.com/ciconia/stylush.git", nil)).to eq(
-        "#{Lyp::packages_dir}/github.com/ciconia/stylush@head"
+        "#{Lyp::packages_dir}/github.com/ciconia/stylush"
       )
 
       expect(Lyp::Package.git_url_to_package_path("http://down.load/myrepo.git", "sometag")).to eq(
@@ -229,6 +232,52 @@ RSpec.describe "Lyp::Package" do
         dummy@0.2.1
         dummy@0.3.0
       })
+    end
+  end
+  
+  it "installs a package from local files" do
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
+    FileUtils.mkdir("#{$spec_dir}/package_setups/simple_copy")
+
+    with_packages(:simple_copy) do
+      version = Lyp::Package.install("abc@dev:#{$spec_dir}/user_files/dev_dir1", silent: true)
+      expect(version).to eq("dev")
+      
+      dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
+      expect(dirs.sort).to eq(["abc@dev"])
+      
+      # check that lyp creates a package.ly file in the package dir,
+      # referencing the given directory
+      dir = Dir["#{$packages_dir}/abc@dev/*"]
+      expect(dir.map {|fn| File.basename(fn)}).to eq(['package.ly'])
+      include_statement = "\\include \"#{$spec_dir}/user_files/dev_dir1/package.ly\""
+      expect(IO.read(dir[0])).to match(/#{include_statement}/)
+
+      
+      # 
+      version = Lyp::Package.install("abc@dev2:#{$spec_dir}/user_files/dev_dir2/dev_file.ly", silent: true)
+      expect(version).to eq("dev2")
+      
+      dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
+      expect(dirs.sort).to eq(%w{abc@dev abc@dev2})
+      
+      dir = Dir["#{$packages_dir}/abc@dev2/*"]
+      expect(dir.map {|fn| File.basename(fn)}).to eq(['package.ly'])
+      include_statement = "\\include \"#{$spec_dir}/user_files/dev_dir2/dev_file.ly\""
+      expect(IO.read(dir[0])).to match(/#{include_statement}/)
+
+      # should raise if package.ly is not there
+      expect {
+        Lyp::Package.install("abc@dev3:#{$spec_dir}/user_files/dev_dir2", silent: true)
+      }.to raise_error
+      expect(dirs.sort).to eq(%w{abc@dev abc@dev2})
+
+      # should raise if invalid path
+      expect {
+        Lyp::Package.install("abc@dev4:#{$spec_dir}/user_files/invalid", silent: true)
+      }.to raise_error
+      expect(dirs.sort).to eq(%w{abc@dev abc@dev2})
+
     end
   end
   
