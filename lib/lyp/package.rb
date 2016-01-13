@@ -212,7 +212,7 @@ module Lyp::Package
         if search_index && (url = search_lyp_index(package))
           package_git_url(url, false) # make sure url is qualified
         else
-          raise "Invalid package specified"
+          raise "Could not find package '#{package}' in lyp-index"
         end
       end
     end
