@@ -1,3 +1,16 @@
+## Version 0.1.0 2016-01-13
+
+- Improve output of `lyp list` (group by package).
+- Display warning, do not exit if lyp self installation test fails.
+- Fix install/uninstall using git URL.
+- Add support for installing a package from local files:
+
+    lyp install mypack@dev:~/repo/mypack
+
+- Add resolve command to install all dependencies required for a given .ly file.
+- Add deps command to show required dependencies for a given .ly file.
+- Ampersand can be ommited when specifying version constraints, e.g. lilypond>=2.19.31 etc.
+
 ## Version 0.0.5 2016-01-11
 
 - Add which command (for both packages and lilypond)
