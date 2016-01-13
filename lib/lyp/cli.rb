@@ -204,4 +204,8 @@ class Lyp::CLI < Thor
   end
 end
 
-Lyp::CLI.start(ARGV)
+begin
+  Lyp::CLI.start(ARGV)
+rescue => e
+  puts e.message
+end
