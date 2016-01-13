@@ -51,7 +51,7 @@ class Lyp::CLI < Thor
   end
   
   desc "search [PATTERN|lilypond]", "List available packages matching PATTERN or versions of lilypond"
-  def search(pattern)
+  def search(pattern = '')
     # Lyp::System.test_installed_status!
 
     pattern =~ Lyp::PACKAGE_RE
@@ -85,7 +85,7 @@ class Lyp::CLI < Thor
       if packages.empty?
         puts "\nNo matching package found in lyp-index\n\n"
       else
-        puts "\nAvailable packages:\n\n"
+        puts "\nAvailable packages on lyp-index:\n\n"
         packages.each do |p|
           puts "   #{p[:name]}"
         end
@@ -162,7 +162,24 @@ class Lyp::CLI < Thor
       Lyp::Lilypond.list.each {|info| puts format_lilypond_entry(info)}
       STDOUT.puts LILYPOND_LEGEND
     else
-      Lyp::Package.list(args.first).each {|p| puts p}
+      list = Lyp::Package.list(args.first)
+      if list.empty?
+        if args.first
+          return puts "\nNo installed packages found matching '#{args.first}'\n\n"
+        else
+          return puts "\nNo packages are currently installed\n\n"
+        end
+      end
+      
+      by_package = list.inject({}) do |m, p|
+        p =~ Lyp::PACKAGE_RE; (m[$1] ||= []) << $2; m
+      end
+      
+      puts "\nInstalled packages:\n\n"
+      by_package.keys.sort.each do |p|
+        puts "   #{p} => (#{by_package[p].sort.join(', ')})"
+      end
+      puts "\n\n"
     end
   end
   
