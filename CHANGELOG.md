@@ -1,3 +1,7 @@
+## Version 0.1.1 2016-01-18
+
+- Add stand-alone release using [traveling-ruby](https://github.com/phusion/traveling-ruby).
+
 ## Version 0.1.0 2016-01-13
 
 - Improve output of `lyp list` (group by package).
