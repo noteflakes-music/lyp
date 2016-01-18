@@ -87,8 +87,11 @@ def create_package(target)
   sh "cp -r lib #{package_path}/lib/app/"
   sh "mkdir #{package_path}/lib/ruby"
   sh "tar -xzf #{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz -C #{package_path}/lib/ruby"
-  sh "cp packaging/wrapper_lyp.sh #{package_path}/lyp"
-  sh "cp packaging/wrapper_lilypond.sh #{package_path}/lilypond"
+
+  sh "mkdir -p #{package_path}/bin"
+  sh "cp bin/release_wrapper_lyp.sh #{package_path}/bin/lyp"
+  sh "cp bin/release_wrapper_lilypond.sh #{package_path}/bin/lilypond"
+
   sh "cp -pR packaging/vendor #{package_path}/lib/"
   sh "cp Gemfile Gemfile.lock #{package_path}/lib/vendor/"
   sh "mkdir #{package_path}/lib/vendor/.bundle"

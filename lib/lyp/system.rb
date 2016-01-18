@@ -34,7 +34,7 @@ EOF
       puts "\nInstalling lyp...\n\nAdding ~/.lyp/bin to $PATH..."
       profile_fn = setup_bin_path
       puts "Setting up binary scripts..."
-      setup_bin_scripts
+      setup_files
       
       if installed?(no_path_check: true)
         puts "\nTo finish installation, open a new shell or run 'source ~/#{File.basename(profile_fn)}'.\n\n"
@@ -64,38 +64,47 @@ EOF
       fn
     end
     
-    def setup_bin_scripts
+    def setup_files
       bin_dir = File.expand_path(File.dirname($0))
       
       if is_gem?(bin_dir)
-        setup_gem_bin_scripts(bin_dir)
+        setup_gem_files(bin_dir)
       else
-        setup_release_bin_scripts(bin_dir)
+        setup_release_files(bin_dir)
       end
     end
     
-    RELEASE_BIN_PATH = "lib/app/bin/"
+    RELEASE_BIN_PATH = "lib/app/bin"
     
     def is_gem?(bin_dir)
-      bin_dir !~ /#{RELEASE_BIN_PATH}[a-z]+$/
+      bin_dir !~ /#{RELEASE_BIN_PATH}$/
     end
     
-    def setup_gem_bin_scripts(bin_dir)
+    def setup_gem_files(bin_dir)
+
+      FileUtils.rm_rf(Lyp::LYP_BIN_DIRECTORY)
       FileUtils.mkdir_p(Lyp::LYP_BIN_DIRECTORY)
+
       %w{lyp lilypond}.each do |fn|
         FileUtils.ln_sf("#{bin_dir}/#{fn}", "#{Lyp::LYP_BIN_DIRECTORY}/#{fn}")
       end
     end
     
-    def setup_release_bin_scripts(bin_dir)
+    def setup_release_files(bin_dir)
+      FileUtils.rm_rf(Lyp::LYP_BIN_DIRECTORY)
       FileUtils.mkdir_p(Lyp::LYP_BIN_DIRECTORY)
       
-      lib_dir = File.join(File.basename(bin_dir), 'lib')
+      release_dir = File.expand_path(File.join(bin_dir, '../../../'))
       
+      puts "Copying Ruby runtime & gems..."
+      lib_dir = File.join(release_dir, 'lib')
+      FileUtils.rm_rf(Lyp::LYP_LIB_DIRECTORY)
       FileUtils.cp_r(lib_dir, Lyp::LYP_LIB_DIRECTORY)
       
+      puts "Copying binary scripts..."
+      wrapper_bin_dir = File.join(release_dir, 'bin')
       %w{lyp lilypond}.each do |f|
-        FileUtils.cp("#{bin_dir}/#{f}", "#{Lyp::LYP_BIN_DIRECTORY}/#{f}")
+        FileUtils.cp("#{wrapper_bin_dir}/#{f}", "#{Lyp::LYP_BIN_DIRECTORY}/#{f}")
       end
     end
     

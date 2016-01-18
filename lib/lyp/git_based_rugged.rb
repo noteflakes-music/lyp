@@ -1,6 +1,12 @@
-# A quick-n-dirty rugged swap-in
-
-puts "git_based_rugged"
+# A quick-n-dirty rugged swap-in. Since the rugged gem includes a native 
+# extension (libgit2), and since traveling-ruby does not yet include an updated
+# version of it (the latest is 0.22.0b5 and we need >=0.23.0), we make a 
+# compromise, and make a traveling-ruby-based standalone release without 
+# rugged, but using plain git in order to install packages. So, users will have 
+# to have git installed on their machines.
+#
+# So here's an absolutely minimal replacement for rugged (just for the 
+# functionality we need) wrapping the git command.
 
 module Rugged
   class Repository
