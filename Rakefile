@@ -58,11 +58,17 @@ namespace :package do
     sh "mkdir packaging/tmp"
     sh "cp Gemfile Gemfile.lock packaging/tmp/"
     Bundler.with_clean_env do
-      sh "cd packaging/tmp && env BUNDLE_IGNORE_CONFIG=1 bundle install --path ../vendor --without not_in_release spec"
+      sh "cd packaging/tmp && env BUNDLE_IGNORE_CONFIG=1 bundle install --path ../vendor --without spec:not_in_release"
     end
     sh "rm -rf packaging/tmp"
     sh "rm -f packaging/vendor/*/*/cache/*"
+    sh "rm -f packaging/vendor/*/*/cache/*"
     sh "rm -rf packaging/vendor/ruby/*/extensions"
+
+    # also remove any spec or test dirs
+    sh "rm -rf packaging/vendor/ruby/*/gems/*/test"
+    sh "rm -rf packaging/vendor/ruby/*/gems/*/spec"
+
     sh "find packaging/vendor/ruby/*/gems -name '*.so' | xargs rm -f"
     sh "find packaging/vendor/ruby/*/gems -name '*.bundle' | xargs rm -f"
     sh "find packaging/vendor/ruby/*/gems -name '*.o' | xargs rm -f"
