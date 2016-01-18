@@ -25,7 +25,9 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 
 ## Installation
 
-If you have Ruby on your machine, you can simply install the lyp gem, and run the `install self` command:
+**Note**: lyp is tested to work on Linux and Mac OSX. Installing and using it on Windows might be problematic.
+
+In order to install lyp, you need to have a relatively recent version of Ruby on your machine. You can then install lyp as a Ruby gem, and run the `install self` command:
 
 ```bash
 gem install lyp
