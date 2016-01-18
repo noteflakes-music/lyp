@@ -88,7 +88,15 @@ EOF
     end
     
     def setup_release_bin_scripts(bin_dir)
-      # to be implemented
+      FileUtils.mkdir_p(Lyp::LYP_BIN_DIRECTORY)
+      
+      lib_dir = File.join(File.basename(bin_dir), 'lib')
+      
+      FileUtils.cp_r(lib_dir, Lyp::LYP_LIB_DIRECTORY)
+      
+      %w{lyp lilypond}.each do |f|
+        FileUtils.cp("#{bin_dir}/#{f}", "#{Lyp::LYP_BIN_DIRECTORY}/#{f}")
+      end
     end
     
     def uninstall!
