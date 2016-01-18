@@ -25,18 +25,44 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 
 ## Installation
 
-**Note**: lyp is tested to work on Linux and Mac OSX. Installing and using it on Windows might be problematic.
+**Note**: lyp is tested to work on Linux and Mac OSX. Installing and using it on Windows would probably be problematic.
 
-In order to install lyp, you need to have a relatively recent version of Ruby on your machine. You can then install lyp as a Ruby gem, and run the `install self` command:
+#### Installing lyp as a Ruby gem
+
+If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem:
 
 ```bash
 gem install lyp
 lyp install self
 ```
 
-(For those without Ruby on their machines, a self-contained version of lyp will be released in the near future.)
-
 The `lyp install self` command is needed in order to setup the `~/.lyp` working directory and add the lyp binaries directory to your `PATH` (see below), by adding a line of code to your shell profile file.
+
+#### Installing lyp without Ruby
+
+If you don't have Ruby on your machine you can install lyp as a stand alone package using the [install script](https://raw.githubusercontent.com/noteflakes/lyp/master/bin/install_release.sh):
+
+```bash
+curl -sSL https://git.io/getlyp | bash
+```
+
+or with Wget:
+
+```bash
+wget -qO- https://git.io/getlyp | bash
+```
+
+**Note**: installing the standalone release of lyp requires a having git installed.
+
+#### Uninstalling lyp
+
+To uninstall lyp:
+
+```bash
+lyp uninstall self
+```
+
+This will remove `~/.lyp/bin` from your `PATH` and remove the lyp binary scripts.
 
 ### How lyp works
 
