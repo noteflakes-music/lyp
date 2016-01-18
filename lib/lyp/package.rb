@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'rugged'
 require 'open-uri'
 require 'yaml'
 
@@ -309,7 +308,7 @@ module Lyp::Package
       repo.tags.each {|t| tags << t}
       
       tags.sort do |x, y|
-        x_version, y_version = tag_version(x), tag_version(y)
+        x_version, y_version = tag_version(x.name), tag_version(y.name)
         if x_version && y_version
           Gem::Version.new(x_version) <=> Gem::Version.new(y_version)
         else
