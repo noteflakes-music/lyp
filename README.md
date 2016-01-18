@@ -54,16 +54,6 @@ wget -qO- https://git.io/getlyp | bash
 
 **Note**: installing the standalone release of lyp requires a having git installed.
 
-#### Uninstalling lyp
-
-To uninstall lyp:
-
-```bash
-lyp uninstall self
-```
-
-This will remove `~/.lyp/bin` from your `PATH` and remove the lyp binary scripts.
-
 ### How lyp works
 
 Lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  installed packages, and installed versions of lilypond. Lyp provides a wrapper script for lilypond, which does the following:
