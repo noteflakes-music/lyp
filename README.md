@@ -53,7 +53,7 @@ or with Wget:
 wget -qO- https://git.io/getlyp | bash
 ```
 
-**Note**: installing the standalone release of lyp requires a having git installed.
+**Note**: installing the standalone release of lyp requires having git on your machine.
 
 ### How lyp works
 
@@ -209,10 +209,10 @@ In order to facilitate writing complex packages, lyp defines a few lilypond comm
 
 The following variables are defined:
 
+- `lyp-current-package-dir` - the absolute directory path for the current package
 - `lyp-input-filename` - the absolute path for the user's file being compiled
 - `lyp-input-dirname` - the absolute directory path for the user's file being compiled
 - `lyp-cwd` - the current working directory
-- `current-package-dir` - the absolute directory path for the current package
 
 In addition, lyp provides the `\pinclude` command for including files residing in the current package using relative paths. The `\pinclude` commands loads a given file only once:
 
