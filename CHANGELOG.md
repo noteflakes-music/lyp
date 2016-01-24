@@ -1,3 +1,9 @@
+## Version 0.1.3 2016-01-24
+
+- Do not list lilypond script in Gem bindir (#6).
+- Add lyp-* variables, \pinclude command for including files from within packages.
+- Add [installation script](https://github.com/noteflakes/lyp#installation).
+
 ## Version 0.1.2 2016-01-18
 
 - Add stand-alone release using [traveling-ruby](https://github.com/phusion/traveling-ruby).
