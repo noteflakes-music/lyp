@@ -214,7 +214,7 @@ The following variables are defined:
 - `lyp-cwd` - the current working directory
 - `current-package-dir` - the absolute directory path for the current package
 
-In addition, lyp provides the `pinclude` command for including files residing in the current package using relative paths:
+In addition, lyp provides the `\pinclude` command for including files residing in the current package using relative paths. The `\pinclude` commands loads a given file only once:
 
 ```lilypond
 \pinclude "inc/init.ily"
