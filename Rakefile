@@ -19,6 +19,13 @@ task :default => [:package]
 desc "Package your app"
 task :package => [:download, 'package:linux:x86', 'package:linux:x86_64', 'package:osx']
 
+desc "Push gem to rubygems.org"
+task :push_gem do
+  sh "gem build lyp.gemspec"
+  sh "gem push lyp-#{VERSION}.gem"
+  sh "rm lyp-#{VERSION}.gem"
+end
+
 namespace :package do
   namespace :linux do
     desc "Package your app for Linux x86"
@@ -127,3 +134,9 @@ def download_native_extension(platform, gem_name_and_version)
   url = "#{TRAVELING_RUBY_BASE_URL}/traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{platform}/#{gem_name_and_version}.tar.gz"
   sh "curl -L --fail -o #{fn} #{url}"
 end
+
+# desc "Create a new release"
+# task :release do
+#   sh "git tag v#{VERSION} && git push --tags"
+#   sh "github-release release -u noteflakes -r lyp -t v#{VERSION} -n \"\""
+# end
