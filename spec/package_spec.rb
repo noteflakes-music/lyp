@@ -271,12 +271,16 @@ RSpec.describe "Lyp::Package" do
       # referencing the given directory
       dir = Dir["#{$packages_dir}/abc@dev/*"]
       expect(dir.map {|fn| File.basename(fn)}).to eq(['package.ly'])
-      include_statement = "\\include \"#{$spec_dir}/user_files/dev_dir1/package.ly\""
-      expect(IO.read(dir[0])).to match(/#{include_statement}/)
+
+      package_dir_statement = "#(set! lyp-current-package-dir \"#{$spec_dir}/user_files/dev_dir1\")\n"
+      include_statement = "\\include \"#{$spec_dir}/user_files/dev_dir1/package.ly\"\n"
+      fn = IO.read(dir[0])
+      expect(fn).to include(package_dir_statement)
+      expect(fn).to include(include_statement)
 
       
-      # 
-      version = Lyp::Package.install("abc@dev2:#{$spec_dir}/user_files/dev_dir2/dev_file.ly", silent: true)
+      # reference a specific file (relative path)
+      version = Lyp::Package.install("abc@dev2:spec/user_files/dev_dir2/dev_file.ly", silent: true)
       expect(version).to eq("dev2")
       
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
@@ -284,8 +288,12 @@ RSpec.describe "Lyp::Package" do
       
       dir = Dir["#{$packages_dir}/abc@dev2/*"]
       expect(dir.map {|fn| File.basename(fn)}).to eq(['package.ly'])
+
+      package_dir_statement = "#(set! lyp-current-package-dir \"#{$spec_dir}/user_files/dev_dir2\")\n"
       include_statement = "\\include \"#{$spec_dir}/user_files/dev_dir2/dev_file.ly\""
-      expect(IO.read(dir[0])).to match(/#{include_statement}/)
+      fn = IO.read(dir[0])
+      expect(fn).to include(package_dir_statement)
+      expect(fn).to include(include_statement)
 
       # should raise if package.ly is not there
       expect {
@@ -295,7 +303,7 @@ RSpec.describe "Lyp::Package" do
 
       # should raise if invalid path
       expect {
-        Lyp::Package.install("abc@dev4:#{$spec_dir}/user_files/invalid", silent: true)
+        Lyp::Package.install("abc@dev4:spec/user_files/invalid", silent: true)
       }.to raise_error
       expect(dirs.sort).to eq(%w{abc@dev abc@dev2})
 

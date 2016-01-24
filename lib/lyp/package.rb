@@ -73,11 +73,15 @@ module Lyp::Package
       info[:version]
     end
     
+    LOCAL_PACKAGE_WRAPPER = 
+      "#(set! lyp-current-package-dir \"%s\")\n\\include \"%s\"\n"
+    
     def install_from_local_files(package, version, opts)
       version =~ /^([^\:]+)\:(.+)$/
       version, local_path = $1, $2
       
       entry_point_path = nil
+      local_path = File.expand_path(local_path)
       if File.directory?(local_path)
         ly_path = File.join(local_path, "package.ly")
         if File.file?(ly_path)
@@ -91,13 +95,14 @@ module Lyp::Package
         raise "Could not find #{local_path}"
       end
       
+      entry_point_dirname = File.dirname(entry_point_path)
       package_path = "#{Lyp.packages_dir}/#{package}@#{version}"
       package_ly_path = "#{package_path}/package.ly"
       
       FileUtils.rm_rf(package_path)
       FileUtils.mkdir_p(package_path)
       File.open(package_ly_path, 'w+') do |f|
-        f << "\\include \"#{entry_point_path}\"\n"
+        f << LOCAL_PACKAGE_WRAPPER % [entry_point_dirname, entry_point_path]
       end
       
       {version: version, path: package_path}
