@@ -1,3 +1,7 @@
+## Version 0.1.4 2016-01-24
+
+- Fix lyp-current-package-dir for local (development) packages.
+
 ## Version 0.1.3 2016-01-24
 
 - Do not list lilypond script in Gem bindir (#6).
