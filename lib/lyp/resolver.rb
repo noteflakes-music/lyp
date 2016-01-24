@@ -24,8 +24,9 @@ class Lyp::Resolver
     }
   end
   
-  DEP_RE = /\\(require|include) "([^"]+)"/.freeze
+  DEP_RE = /\\(require|include|pinclude) "([^"]+)"/.freeze
   INCLUDE = "include".freeze
+  PINCLUDE = "pinclude".freeze
   REQUIRE = "require".freeze
   
   # Each "leaf" on the dependency tree is a hash of the following structure:
@@ -64,7 +65,7 @@ class Lyp::Resolver
     tree
   end
   
-  # Scans a lilypond file for \require and \include statements. An included
+  # Scans a lilypond file for \require and \(p)include statements. An included
   # file is queued for processing. For required packages, search for suitable
   # versions of the package and add them to the tree.
   #
@@ -80,7 +81,7 @@ class Lyp::Resolver
     # Parse lilypond file for \include and \require
     ly_content.scan(DEP_RE) do |type, path|
       case type
-      when INCLUDE
+      when INCLUDE, PINCLUDE
         qualified_path = File.expand_path(path, dir)
         queue_file_for_processing(qualified_path, tree, leaf)
       when REQUIRE

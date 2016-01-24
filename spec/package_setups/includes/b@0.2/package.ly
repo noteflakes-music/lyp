@@ -1,1 +1,1 @@
-\include "inc/include1.ly"
+\pinclude "inc/include1.ly"

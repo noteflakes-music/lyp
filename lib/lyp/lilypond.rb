@@ -432,8 +432,6 @@ module Lyp::Lilypond
           raise "Error executing cmd #{cmd}: #{$_err.read}"
         end
       end
-      
-      # raise unless system(cmd)
     end
   end
 end

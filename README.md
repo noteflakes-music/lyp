@@ -20,6 +20,7 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [Version specifiers](#version-specifiers)
   - [Using packages](#using-packages)
   - [Developing packages](#developing-packages)
+  - [Including files from within packages](#including-files-from-within-packages)
 - [Installing and switching Lilypond versions](#installing-and-switching-lilypond-versions)
 - [Contributing](#contributing)
 
@@ -200,6 +201,29 @@ This will create a `mypack@dev` package referencing your local files, which you 
 
 ```lilypond
 \require "mypack@dev"
+```
+
+### Including files from within packages
+
+In order to facilitate writing complex packages, lyp defines a few lilypond commands and scheme variables and commands that allow using relative paths when including files from within packages.
+
+The following variables are defined:
+
+- `lyp-input-filename` - the absolute path for the user's file being compiled
+- `lyp-input-dirname` - the absolute directory path for the user's file being compiled
+- `lyp-cwd` - the current working directory
+- `current-package-dir` - the absolute directory path for the current package
+
+In addition, lyp provides the `pinclude` command for including files residing in the current package using relative paths:
+
+```lilypond
+\pinclude "inc/init.ily"
+```
+
+And a `pload` scheme function for loading scheme files using relative paths without manipulating the `%load-path`:
+
+```lilypond
+#(if (not (defined? 'mypack:init))(pload "scm/init.scm"))
 ```
 
 ### Publishing packages

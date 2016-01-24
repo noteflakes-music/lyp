@@ -211,7 +211,7 @@ RSpec.describe Lyp::Resolver do
       resolver = Lyp::Resolver.new('spec/user_files/circular.ly')
 
       r = resolver.resolve_package_dependencies
-      expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.2 c@0.3})
+      expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.2 c@0.3 d@0.4})
     end
   end
 
