@@ -116,9 +116,11 @@ module Lyp::Lilypond
       Dir["#{Lyp.lilyponds_dir}/*"].each do |path|
         next unless File.directory?(path) && File.basename(path) =~ /^[\d\.]+$/
         
+        root_path = path
         version = File.basename(path)
         path = File.join(path, "bin/lilypond")
         list << {
+          root_path: root_path,
           path: path,
           version: version
         }
@@ -136,6 +138,7 @@ module Lyp::Lilypond
           resp = `#{path} -v`
           if resp.lines.first =~ /LilyPond ([0-9\.]+)/i
             m << {
+              root_path: File.expand_path(File.join(File.dirname(path), '..')),
               path: path,
               version: $1,
               system: true
@@ -265,6 +268,9 @@ module Lyp::Lilypond
 
       download_lilypond(url, fn, opts) unless File.file?(fn)
       install_lilypond_files(fn, platform, version, opts)
+      
+      patch_font_scm(version)
+      copy_fonts_from_all_packages(version, opts)
     end
 
     def lilypond_install_url(platform, version, opts)
@@ -366,6 +372,37 @@ module Lyp::Lilypond
       STDERR.puts exec "#{target_dir}/bin/lilypond -v"  unless opts[:silent]
     rescue => e
       puts e.message
+    end
+    
+    def patch_font_scm(version)
+      return unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(version)
+      
+      target_fn = File.join(Lyp.lilyponds_dir, version, 'share/lilypond/current/scm/font.scm')
+      FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
+    end
+
+    def copy_fonts_from_all_packages(version, opts)
+      return unless Lyp::FONT_COPY_REQ =~ Gem::Version.new(version)
+      
+      ly_fonts_dir = File.join(Lyp.lilyponds_dir, version, 'share/lilypond/current/fonts')
+      
+      Dir["#{Lyp.packages_dir}/**/fonts"].each do |package_fonts_dir|
+
+        Dir["#{package_fonts_dir}/*.otf"].each do |fn|
+          target_fn = File.join(ly_fonts_dir, 'otf', File.basename(fn))
+          FileUtils.cp(fn, target_fn)
+        end
+        
+        Dir["#{package_fonts_dir}/*.svg"].each do |fn|
+          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
+          FileUtils.cp(fn, target_fn)
+        end
+        
+        Dir["#{package_fonts_dir}/*.woff"].each do |fn|
+          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
+          FileUtils.cp(fn, target_fn)
+        end
+      end
     end
     
     def use(version, opts)

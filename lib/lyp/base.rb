@@ -6,7 +6,7 @@ module Lyp
   # before the version number.
   # 
   # Accepted operators: >=, ~>
-  PACKAGE_RE = /^([^@\>~]+)(?:@?((?:\>=|~\>)?.+))?/ #/^([^@]+)(?:@(.+))?$/
+  PACKAGE_RE = /^([^@\>~]+)(?:@?((?:\>=|~\>)?.+))?/
   LILYPOND_RE = /^lilypond(?:@?((?:\>=|~\>)?.+))?/
 
   LYP_DIRECTORY = File.expand_path('~/.lyp')
@@ -14,6 +14,13 @@ module Lyp
   LYP_LIB_DIRECTORY = File.join(LYP_DIRECTORY, 'lib')
   DEFAULT_PACKAGE_DIRECTORY = File.join(LYP_DIRECTORY, 'packages')
   DEFAULT_LILYPONDS_DIRECTORY = File.join(LYP_DIRECTORY, 'lilyponds')
+  
+  # Fonts are installed on lilypond >= 2.18.2
+  FONT_COPY_REQ = Gem::Requirement.new('>=2.18.2')
+  FONT_PATCH_REQ = Gem::Requirement.new('>=2.18.2', '<2.19.12')
+  
+  # Font patch filename (required for 2.18.2 <= lilypond < 2.19.12)
+  FONT_PATCH_FILENAME = File.expand_path('etc/font.scm', File.dirname(__FILE__))
   
   SETTINGS_FILENAME = 'settings.yml'
 

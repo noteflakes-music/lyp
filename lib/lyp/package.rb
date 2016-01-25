@@ -67,6 +67,11 @@ module Lyp::Package
       
       install_package_dependencies(info[:path], opts)
       
+      if File.directory?(File.join(info[:path], 'fonts'))
+        puts "Installing package fonts..." unless opts[:silent]
+        install_package_fonts(info[:path], opts)
+      end
+      
       puts "\nInstalled #{package}@#{info[:version]}\n\n" unless opts[:silent]
       
       # important: return the installed version
@@ -103,6 +108,12 @@ module Lyp::Package
       FileUtils.mkdir_p(package_path)
       File.open(package_ly_path, 'w+') do |f|
         f << LOCAL_PACKAGE_WRAPPER % [entry_point_dirname, entry_point_path]
+      end
+      
+      # create fonts directory symlink if needed
+      fonts_path = File.join(local_path, 'fonts')
+      if File.directory?(fonts_path)
+        FileUtils.ln_sf(fonts_path, File.join(package_path, 'fonts'))
       end
       
       {version: version, path: package_path}
@@ -200,6 +211,32 @@ module Lyp::Package
         sub_deps << leaf[:clause] if leaf[:versions].empty?
       end
       sub_deps.each {|d| install(d, opts)}
+    end
+    
+    def install_package_fonts(package_path, opts = {})
+      req = Lyp::FONT_COPY_REQ
+      
+      Lyp::Lilypond.list.each do |lilypond|
+        next unless req =~ Gem::Version.new(lilypond[:version])
+        
+        ly_fonts_dir = File.join(lilypond[:root_path], 'share/lilypond/current/fonts')
+        package_fonts_dir = File.join(package_path, 'fonts')
+        
+        Dir["#{package_fonts_dir}/*.otf"].each do |fn|
+          target_fn = File.join(ly_fonts_dir, 'otf', File.basename(fn))
+          FileUtils.cp(fn, target_fn)
+        end
+        
+        Dir["#{package_fonts_dir}/*.svg"].each do |fn|
+          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
+          FileUtils.cp(fn, target_fn)
+        end
+        
+        Dir["#{package_fonts_dir}/*.woff"].each do |fn|
+          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
+          FileUtils.cp(fn, target_fn)
+        end
+      end
     end
     
     def package_git_url(package, search_index = true)

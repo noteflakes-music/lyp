@@ -229,9 +229,9 @@ RSpec.describe "Lyp::Lilypond" do
 
   it "uninstalls a local version of lilypond" do
     # create a copy of the lilypond setup
-    FileUtils.cp_r("#{$spec_dir}/lilypond_setups/simple", "#{$spec_dir}/lilypond_setups/simple_copy")
+    FileUtils.cp_r("#{$spec_dir}/lilypond_setups/simple", "#{$spec_dir}/lilypond_setups/tmp")
     
-    with_lilyponds(:simple_copy) do
+    with_lilyponds(:tmp) do
       versions = Lyp::Lilypond.list.map {|l| l[:version]}
       expect(versions).to eq(%w{2.18.1 2.19.15 2.19.21})
       

@@ -87,7 +87,7 @@ end
 # Install hooks to create and delete tmp directory
 RSpec.configure do |config|
   config.after(:all) do
-    FileUtils.rm_rf("#{$spec_dir}/lilypond_setups/simple_copy")
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/simple_copy")
+    FileUtils.rm_rf("#{$spec_dir}/lilypond_setups/tmp")
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
   end
 end
