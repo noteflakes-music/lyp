@@ -6,7 +6,7 @@ module Lyp
   # before the version number.
   # 
   # Accepted operators: >=, ~>
-  PACKAGE_RE = /^([^@\>~]+)(?:@?((?:\>=|~\>)?.+))?/
+  PACKAGE_RE = /^([^@\>~]+)(?:@)?((?:\>=|~\>)?.+)?/
   LILYPOND_RE = /^lilypond(?:@?((?:\>=|~\>)?.+))?/
 
   LYP_DIRECTORY = File.expand_path('~/.lyp')

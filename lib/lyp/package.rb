@@ -147,20 +147,38 @@ module Lyp::Package
         package !~ /\// ? package : package_git_url(package), nil
       )
       
-      if opts[:all_versions]
+      if opts[:all]
         Dir["#{package_path}@*"].each do |path|
           name = path.gsub("#{Lyp.packages_dir}/", '')
           puts "Uninstalling #{name}" unless opts[:silent]
           FileUtils.rm_rf(path)
         end
       else
-        package_path += "@#{version}"
+        if version
+          package_path += "@#{version}"
+        else
+          packages = Dir["#{package_path}@*"] + Dir["#{package_path}"]
+          case packages.size
+          when 0
+            raise "Could not find package #{package}"
+          when 1
+            package_path = packages[0]
+          else
+            packages.each do |path|
+              name = path.gsub("#{Lyp.packages_dir}/", '')
+              puts "Uninstalling #{name}" unless opts[:silent]
+              FileUtils.rm_rf(path)
+            end
+            return
+          end
+        end
+        
         if File.directory?(package_path)
           name = package_path.gsub("#{Lyp.packages_dir}/", '')
           puts "Uninstalling #{name}" unless opts[:silent]
           FileUtils.rm_rf(package_path)
         else
-          raise "Could not find #{package}"
+          raise "Could not find package #{package}"
         end
       end
     end

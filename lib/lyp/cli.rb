@@ -152,6 +152,7 @@ class Lyp::CLI < Thor
   end
 
   desc "uninstall <PACKAGE|lilypond|self>...", "Uninstall a package or a version of lilypond. When 'uninstall self' is invoked, lyp uninstalls itself from ~/.lyp."
+  method_option :all, aliases: '-a', type: :boolean, desc: 'Uninstall all versions'
   def uninstall(*args)
     Lyp::System.test_installed_status!
 
@@ -165,7 +166,7 @@ class Lyp::CLI < Thor
         Lyp::Lilypond.uninstall($1)
       else
         Lyp::System.test_installed_status!
-        Lyp::Package.uninstall(package)
+        Lyp::Package.uninstall(package, options)
       end
     end
   end

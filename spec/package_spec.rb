@@ -326,13 +326,21 @@ RSpec.describe "Lyp::Package" do
       
       Lyp::Package.install('dependency-test@0.1.0', silent: true)
       Lyp::Package.install('dependency-test@0.2.0', silent: true)
-      Lyp::Package.uninstall('dependency-test', silent: true, all_versions: true)
+      Lyp::Package.uninstall('dependency-test', silent: true, all: true)
 
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
       expect(dirs.sort).to eq(%w{dummy@0.2.1 dummy@0.3.0})
 
       expect {Lyp::Package.uninstall('dependency-test@0.1.0', silent: true)}.to \
         raise_error
+    end
+    
+    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
+    FileUtils.cp_r("#{$spec_dir}/package_setups/unversioned", "#{$spec_dir}/package_setups/tmp")
+    
+    with_packages(:tmp) do
+      Lyp::Package.uninstall('b', silent: true)
+      expect(Dir["#{$packages_dir}/*"]).to eq([])
     end
   end
 
@@ -357,7 +365,7 @@ RSpec.describe "Lyp::Package" do
         ['github.com/noteflakes/lyp-package-template@0.3.0']
       )
       
-      Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template', silent: true, all_versions: true)
+      Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template', silent: true, all: true)
       expect(Lyp::Package.list('templ')).to be_empty
     end
   end
