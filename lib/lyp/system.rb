@@ -124,7 +124,9 @@ EOF
       
       puts "Removing binary scripts..."
       # Delete bin scripts
-      FileUtils.rm("#{Lyp::LYP_BIN_DIRECTORY}/*") rescue nil
+      Dir["#{Lyp::LYP_BIN_DIRECTORY}/*"].each do |fn|
+        FileUtils.rm_f(fn) rescue nil
+      end
       
       puts "\nTo completely remove installed packages and lilyponds run 'rm -rf ~/.lyp'.\n\n"
     end
