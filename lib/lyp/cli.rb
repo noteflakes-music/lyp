@@ -241,4 +241,6 @@ begin
   Lyp::CLI.start(ARGV)
 rescue => e
   puts e.message
+  puts e.backtrace.join("\n")
+  exit(1)
 end
