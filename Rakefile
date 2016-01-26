@@ -28,6 +28,7 @@ end
 
 desc "Install gem locally"
 task :install_gem do
+  sh "rm ~/.lyp/bin/*" rescue nil
   sh "gem uninstall -a -x --force lyp"
   sh "gem build lyp.gemspec"
   sh "gem install lyp-#{VERSION}.gem"
