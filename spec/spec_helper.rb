@@ -30,7 +30,7 @@ module Lyp
       "/tmp/lyp.session.#{Process.pid}.yml"
     end
     
-    def self.invoke(argv)
+    def self.invoke(argv, opts = {})
       lilypond = detect_use_version_argument(argv) || current_lilypond
       
       exec("#{lilypond} #{argv.join(' ')}")

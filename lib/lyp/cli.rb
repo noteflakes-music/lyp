@@ -1,5 +1,5 @@
 require 'thor'
-require "lyp/version"
+require 'lyp/version'
 
 def lilypond_prefix(info)
   if info[:current] && info[:default]
@@ -46,7 +46,6 @@ class Lyp::CLI < Thor
   
   desc "version", "show Lyp version"
   def version
-    require 'lyp/version'
     $stderr.puts "Lyp #{Lyp::VERSION}"
   end
   
@@ -98,6 +97,7 @@ class Lyp::CLI < Thor
   method_option :install, aliases: '-i', type: :boolean, desc: 'Install the requested version of lilypond if not present'
   method_option :env, aliases: '-e', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
   def compile(*args)
+    $stderr.puts "Lyp #{Lyp::VERSION}"
     Lyp::System.test_installed_status!
 
     if options[:env]
@@ -110,12 +110,26 @@ class Lyp::CLI < Thor
       Lyp::Lilypond.check_lilypond!
     end
     
-    begin
-      Lyp::Lilypond.compile(args)
-    rescue => e
-      puts e.message
-      puts e.backtrace.join("\n")
+    Lyp::Lilypond.compile(args)
+  end
+  
+  desc "test [<option>...]", "Runs package tests on local directory"
+  method_option :install, aliases: '-i', type: :boolean, desc: 'Install the requested version of lilypond if not present'
+  method_option :env, aliases: '-e', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
+  def test(*args)
+    $stderr.puts "Lyp #{Lyp::VERSION}"
+
+    if options[:env]
+      Lyp::Lilypond.force_env_version!
+      if options[:install] && !Lyp::Lilypond.forced_lilypond
+        Lyp::Lilypond.install(Lyp::Lilypond.forced_version)
+      end
+    else
+      # check lilypond default / current settings
+      Lyp::Lilypond.check_lilypond!
     end
+    
+    Lyp::Package.run_tests('.')
   end
 
   desc "install <PACKAGE|lilypond|self>...", "Install a package or a version of lilypond. When 'install self' is invoked, lyp installs itself in ~/.lyp."

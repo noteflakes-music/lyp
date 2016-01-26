@@ -362,5 +362,28 @@ module Lyp::Package
     def tag_version(tag)
       (tag =~ TAG_VERSION_RE) ? $1 : nil
     end
+    
+    def run_tests(dir, opts = {})
+      t1 = Time.now
+      test_count = 0
+      fail_count = 0
+      
+      Dir["#{dir}/**/*_test.ly"].each do |fn|
+        test_count += 1
+        
+        unless Lyp::Lilypond.compile([fn], mode: :system)
+          fail_count += 1
+        end
+      end
+      
+      if test_count == 0
+        STDERR.puts "No test files found"
+      else
+        puts "\nFinished in %.2g seconds\n%d files, %d failures" % [
+          Time.now - t1, test_count, fail_count
+        ]
+        exit(fail_count > 0 ? 1 : 0)
+      end
+    end
   end
 end
