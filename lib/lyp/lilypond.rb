@@ -32,6 +32,8 @@ module Lyp::Lilypond
     # The current lilypond path is stored in a temporary file named by the 
     # session id. Thus we can persist the version selected by the user
     def current_lilypond
+      return forced_lilypond if @forced_version
+      
       settings = get_session_settings
 
       if !settings[:current]
@@ -47,6 +49,23 @@ module Lyp::Lilypond
       settings[:current] = path
       set_session_settings(settings)
     end
+    
+    def forced_lilypond
+      lilypond = lyp_lilyponds.find do |l|
+        l[:version] == @forced_version
+      end
+      
+      lilypond && lilypond[:path]
+    end
+    
+    def force_env_version!
+      @forced_version = ENV['LILYPOND_VERSION']
+      unless @forced_version
+        raise "LILYPOND_VERSION not set"
+      end
+    end
+    
+    attr_reader :forced_version
     
     def check_lilypond!
       # check default

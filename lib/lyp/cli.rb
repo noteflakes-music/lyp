@@ -95,11 +95,27 @@ class Lyp::CLI < Thor
   end
 
   desc "compile [<option>...] <FILE>", "Invokes lilypond with given file"
+  method_option :install, aliases: '-i', type: :boolean, desc: 'Install the requested version of lilypond if not present'
+  method_option :env, aliases: '-e', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
   def compile(*args)
     Lyp::System.test_installed_status!
-    Lyp::Lilypond.check_lilypond!
 
-    Lyp::Lilypond.compile(*args)
+    if options[:env]
+      Lyp::Lilypond.force_env_version!
+      if options[:install] && !Lyp::Lilypond.forced_lilypond
+        Lyp::Lilypond.install(Lyp::Lilypond.forced_version)
+      end
+    else
+      # check lilypond default / current settings
+      Lyp::Lilypond.check_lilypond!
+    end
+    
+    begin
+      Lyp::Lilypond.compile(args)
+    rescue => e
+      puts e.message
+      puts e.backtrace.join("\n")
+    end
   end
 
   desc "install <PACKAGE|lilypond|self>...", "Install a package or a version of lilypond. When 'install self' is invoked, lyp installs itself in ~/.lyp."
