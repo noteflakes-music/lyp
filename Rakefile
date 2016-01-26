@@ -26,6 +26,16 @@ task :push_gem do
   sh "rm lyp-#{VERSION}.gem"
 end
 
+desc "Install gem locally"
+task :install_gem do
+  sh "gem uninstall -a -x --force lyp"
+  sh "gem build lyp.gemspec"
+  sh "gem install lyp-#{VERSION}.gem"
+  sh "rm lyp-#{VERSION}.gem"
+  puts "Finish installation by running 'lyp install self'"
+end
+
+
 namespace :package do
   namespace :linux do
     desc "Package your app for Linux x86"
