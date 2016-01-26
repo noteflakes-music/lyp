@@ -12,19 +12,11 @@ unless lilypond_path && File.file?(lilypond_path)
   exit 1
 end
 
-if (ARGV == ['-v']) || (ARGV == ['--warranty'])
-  # Show lilypond version and exit
+case ARGV
+when [], ['-v'], ['--warranty'], ['scheme-sandbox']
   exec("#{lilypond_path} #{ARGV.join(' ')}")
-end
-
-if ARGV.size == 0
-  exec(lilypond_path)
 else
-  
   begin
     Lyp::Lilypond.compile(ARGV)
-  # rescue => e
-  #   STDERR.puts e.message
-  #   exit 1
   end
 end
