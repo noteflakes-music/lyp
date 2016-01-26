@@ -1,6 +1,7 @@
 require 'httpclient'
 require 'uri'
 require 'open3'
+require 'ruby-progressbar'
 
 module Lyp::Lilypond
   class << self
