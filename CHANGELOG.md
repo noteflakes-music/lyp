@@ -1,3 +1,15 @@
+## Version 0.2.0 2016-01-27
+
+- Rename `lyp-*` variables to `lyp:*`.
+- Add -t switch to `lyp install` to test a package after installation.
+- Fix uninstalling non-versioned packages.
+- Add `lyp test` command for testing packages.
+- Fix `lyp install` command.
+- Fix and enhance `lyp compile` command.
+- Fix `lyp uninstall self` command.
+- Accept `scheme-sandbox` argument in lilypond wrapper (#8).
+- Add support for installing custom fonts from packages (starting from lilypond 2.18.2), and automatic patching of lilypond versions lower than 2.19.12 in order to support custom fonts.
+
 ## Version 0.1.4 2016-01-24
 
 - Fix lyp-current-package-dir for local (development) packages.
