@@ -387,27 +387,62 @@ module Lyp::Package
       (tag =~ TAG_VERSION_RE) ? $1 : nil
     end
     
-    def run_tests(dir, opts = {})
-      t1 = Time.now
-      test_count = 0
-      fail_count = 0
-      
-      Dir["#{dir}/**/*_test.ly"].each do |fn|
-        test_count += 1
-        
-        unless Lyp::Lilypond.compile([fn], mode: :system)
-          fail_count += 1
+    # Runs all tests found in local directory
+    def run_local_tests(dir, opts = {})
+      package_dir = File.expand_path(dir)
+      test_files = Dir["#{package_dir}/**/*_test.ly"]
+      run_tests(opts) do |stats|
+        test_files.each do |f|
+          perform_test(f, stats)
         end
       end
+    end
+    
+    # This method runs tests by yielding the test statistics.
+    # The caller should then call #perform_test to run each test file.
+    def run_tests(opts = {})
+      stats = {
+        start: Time.now,
+        test_count: 0,
+        fail_count: 0
+      }
       
-      if test_count == 0
+      yield stats
+      
+      if stats[:test_count] == 0
         STDERR.puts "No test files found"
       else
         puts "\nFinished in %.2g seconds\n%d files, %d failures" % [
-          Time.now - t1, test_count, fail_count
+          Time.now - stats[:start], stats[:test_count], stats[:fail_count]
         ]
-        exit(fail_count > 0 ? 1 : 0)
+        exit(stats[:fail_count] > 0 ? 1 : 0)
       end
+    end
+    
+    def perform_test(fn, stats)
+      stats[:test_count] += 1
+      unless Lyp::Lilypond.compile([fn], mode: :system, force_wrap: true)
+        stats[:fail_count] += 1
+      end
+    end
+    
+    
+    def run_package_tests(patterns)
+      patterns = [''] if patterns.empty?
+      packages = patterns.inject([]) do |m, pat|
+        m += Dir["#{Lyp.packages_dir}/#{pat}*"]
+      end.uniq
+      
+      run_tests do |stats|
+        packages.each do |path|
+          files = Dir["#{path}/**/*_test.ly"]
+          next if files.empty?
+
+          FileUtils.cd(path) do
+            files.each {|fn| perform_test(fn, stats)}
+          end
+        end
+      end        
     end
   end
 end

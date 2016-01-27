@@ -113,9 +113,10 @@ class Lyp::CLI < Thor
     Lyp::Lilypond.compile(args)
   end
   
-  desc "test [<option>...]", "Runs package tests on local directory"
+  desc "test [<option>...] [.|PATTERN]", "Runs package tests on installed packages or local directory"
   method_option :install, aliases: '-i', type: :boolean, desc: 'Install the requested version of lilypond if not present'
   method_option :env, aliases: '-e', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
+  method_option :all, aliases: '-a', type: :boolean, desc: ''
   def test(*args)
     $stderr.puts "Lyp #{Lyp::VERSION}"
 
@@ -129,7 +130,12 @@ class Lyp::CLI < Thor
       Lyp::Lilypond.check_lilypond!
     end
     
-    Lyp::Package.run_tests('.')
+    case args
+    when ['.']
+      Lyp::Package.run_local_tests('.')
+    else
+      Lyp::Package.run_package_tests(args)
+    end
   end
 
   desc "install <PACKAGE|lilypond|self>...", "Install a package or a version of lilypond. When 'install self' is invoked, lyp installs itself in ~/.lyp."
