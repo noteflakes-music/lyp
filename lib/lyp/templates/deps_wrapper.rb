@@ -12,6 +12,8 @@ require 'fileutils'
 user_filename = File.expand_path(_[:user_file])
 user_dirname = File.dirname(user_filename)
 
+current_package_dir = _[:current_package_dir] || FileUtils.pwd
+
 # The wrapper defines a few global variables:
 # 
 # lyp-input-filename      - the absolute path to the input file name
@@ -28,7 +30,7 @@ user_dirname = File.dirname(user_filename)
   (define lyp-input-filename "{{user_filename}}")
   (define lyp-input-dirname "{{user_dirname}}")
   (define lyp-cwd "{{FileUtils.pwd}}")
-  (define lyp-current-package-dir "")
+  (define lyp-current-package-dir "{{current_package_dir}}")
   (define lyp-package-refs (make-hash-table))`
 
 _[:package_paths].each do |spec, path|
@@ -107,6 +109,7 @@ pinclude = #(define-void-function (parser location path)(string?)
 
 # load the user's file
 `
+#(ly:set-option 'relative-includes #t)
 #(ly:debug "package loader is ready")
 \include "{{user_filename}}"
 `

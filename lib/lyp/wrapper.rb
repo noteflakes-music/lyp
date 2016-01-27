@@ -8,6 +8,9 @@ module Lyp
   def self.wrap(fn, opts = {})
     r = Lyp::Resolver.new(fn).resolve_package_dependencies
 
+    # copy current_package_dir option
+    r[:current_package_dir] = opts[:current_package_dir]
+
     if !r[:package_paths].empty? || opts[:force_wrap]
       FileUtils.mkdir_p('/tmp/lyp/wrappers')
       fn = "/tmp/lyp/wrappers/#{File.basename(fn)}" 
