@@ -230,6 +230,8 @@ Lyp also defines a `pload` scheme function for loading scheme files using relati
 #(if (not (defined? 'mypack:init))(pload "scm/init.scm"))
 ```
 
+Loading scheme files that way is better, because this way one avoids possible name clashes, which may lead to unexpected behavior.
+
 ### Including fonts
 
 Lyp also supports automatic installation of fonts, based on work by [Abraham Leigh](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
