@@ -13,18 +13,18 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 - [Installation](#installation)
   - [How lyp works](#how-lyp-works)
   - [Uninstalling](#uninstalling)
-- [Lilypond packages](#lilypond-packages)
+- [Working with packages](#working-with-packages)
   - [What constitutes a package?](#what-constitutes-a-package)
   - [Installing packages](#installing-packages)
   - [Package references](#package-references)
   - [Version specifiers](#version-specifiers)
   - [Using packages](#using-packages)
-  - [Developing packages](#developing-packages)
-    - [The package interface](#the-package-interface)
-    - [Including files](#including-files)
-    - [Including fonts](#including-fonts)
-    - [Testing packages](#testing-packages)
-    - [Publishing packages](#publishing-packages)
+- [Developing packages](#developing-packages)
+  - [The package interface](#the-package-interface)
+  - [Including files](#including-files)
+  - [Including fonts](#including-fonts)
+  - [Testing packages](#testing-packages)
+  - [Publishing packages](#publishing-packages)
 - [Installing and switching Lilypond versions](#installing-and-switching-lilypond-versions)
 - [Contributing](#contributing)
 
@@ -85,7 +85,7 @@ In order to completely remove all files in `~/.lyp` you can simply delete the di
 rm -rf ~/.lyp
 ```
 
-## Lilypond packages
+## Working with Packages
 
 A package is a library of lilypond code, containing one or more lilypond files, that provide commonly-used functionality for users. A package can be a library of scheme code to extend lilypond, as in openlilylib; or a stylesheet which contains music fonts and additional lilypond code to change the look of the music: font, spacing, line widths, sizes, etc.
 
@@ -185,7 +185,7 @@ To include a package in your lilypond code, use ther `\require` command:
 
 It is important to note that once you use `\require` in your code, you will have to compile it using the lilypond wrapper provided by lyp. It will not pass compilation using plain lilypond.
 
-### Developing packages
+## Developing packages
 
 To create a lilypond package:
 
@@ -207,7 +207,7 @@ This will create a `mypack@dev` package referencing your local files, which you 
 \require "mypack@dev"
 ```
 
-#### The package interface
+### The package interface
 
 In order to facilitate writing complex packages, lyp defines a few variables and functions:
 
@@ -215,7 +215,7 @@ In order to facilitate writing complex packages, lyp defines a few variables and
 - `lyp:input-filename` - the absolute path for the user's file being compiled
 - `lyp:input-dirname` - the absolute directory path for the user's file being compiled
 
-#### Including files
+### Including files
 
 Lyp provides the `\pinclude` and `\pincludeOnce` commands for including files residing in the current package using relative paths. The `\pincludeOnce` commands loads a given file only once:
 
@@ -230,13 +230,13 @@ Lyp also defines a `pload` scheme function for loading scheme files using relati
 #(if (not (defined? 'mypack:init))(pload "scm/init.scm"))
 ```
 
-#### Including fonts
+### Including fonts
 
 Lyp also supports automatic installation of fonts, based on work by [Abraham Leigh](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
 
 **Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version ower than 2.19.12 in order to support custom fonts. 
 
-#### Testing Packages
+### Testing Packages
 
 Packages can be tested by using the `lyp test` command, which will compile any file found inside the package directory ending in `_test.ly`:
 
@@ -249,7 +249,7 @@ A test file can either be a simple lilypond file which includes the package file
 
 For more information on testing, see the [lyp-assert](https://github.com/noteflakes/lyp-assert) package, which is meant to be used for unit testing lilypond code, and serves as an example of how to test a package.
 
-#### Publishing packages
+### Publishing packages
 
 In order for your package to be available to all users, you'll need to first push your code to a publically accessible git repository (for example on github). Users will then be able to install your package by using the git URL of the public repository.
 
