@@ -91,7 +91,6 @@ RSpec.describe Lyp::Resolver do
       ['a@0.1', 'b@0.2', 'c@0.1'], ['a@0.1', 'b@0.2.3', 'c@0.1']
     ]
     expect(select[opts]).to eq(['a@0.1', 'b@0.2.3', 'c@0.1'])
-    
   end
 
   it "lists all available packages" do
@@ -277,6 +276,54 @@ RSpec.describe Lyp::Resolver do
     end
   end
 
+  it "respects forced package paths" do
+    with_packages(:simple) do
+      b_path = "#{$spec_dir}/user_files/fake_b"
+      
+      resolver = Lyp::Resolver.new('spec/user_files/include1.ly', {
+        forced_package_paths: {
+          'b' => b_path
+        }
+      })
+
+      r = resolver.resolve_package_dependencies
+      
+      b_path += "/package.ly"
+      
+      expect(r[:definite_versions]).to eq(%w{a@0.2 b@forced c@0.3})
+      expect(r[:package_paths]['b@>=0.1.0']).to eq(b_path)
+      expect(r[:package_paths]['b~>0.1.0']).to eq(b_path)
+      expect(r[:package_paths]['b@~>0.2.0']).to eq(b_path)
+    end
+  end
+  
+  it "handles non-numeric versions" do
+    with_packages(:tagged) do
+      resolver = Lyp::Resolver.new('spec/user_files/b_abc.ly')
+      r = resolver.resolve_package_dependencies
+
+      expect(r[:definite_versions]).to eq(%w{b@abc})
+      expect(r[:package_paths]['b@abc']).to eq(
+        "#{$packages_dir}/b@abc/package.ly"
+      )
+
+      resolver = Lyp::Resolver.new('spec/user_files/b.ly')
+      r = resolver.resolve_package_dependencies
+
+      expect(r[:definite_versions]).to eq(%w{b@def c@0.3.0})
+      expect(r[:package_paths]['b']).to eq(
+        "#{$packages_dir}/b@def/package.ly"
+      )
+
+      resolver = Lyp::Resolver.new('spec/user_files/b_def.ly')
+      r = resolver.resolve_package_dependencies
+
+      expect(r[:definite_versions]).to eq(%w{b@def c@0.3.0})
+      expect(r[:package_paths]['b@def']).to eq(
+        "#{$packages_dir}/b@def/package.ly"
+      )
+    end
+  end
 end
 
 

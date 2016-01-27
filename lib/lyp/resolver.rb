@@ -1,6 +1,7 @@
 class Lyp::Resolver
-  def initialize(user_file)
+  def initialize(user_file, opts = {})
     @user_file = user_file
+    @opts = opts
   end
   
   # Resolving package dependencies involves two stages:
@@ -108,7 +109,7 @@ class Lyp::Resolver
     return {} unless ref =~ Lyp::PACKAGE_RE
     ref_package = $1
     version_clause = $2
-
+    
     matches = find_matching_packages(ref, tree)
     
     # Raise if no match found and we're at top of the tree
@@ -137,12 +138,17 @@ class Lyp::Resolver
     
     req_package = $1
     req_version = $2
-    req = Gem::Requirement.new(req_version || '>=0')
 
+    req = nil
+    if @opts[:forced_package_paths] && @opts[:forced_package_paths][req_package]
+      req_version = 'forced'
+    end
+    
+    req = Gem::Requirement.new(req_version || '>=0') rescue nil
     available_packages(tree).select do |package, sub_tree|
       if (package =~ Lyp::PACKAGE_RE) && (req_package == $1)
         version = Gem::Version.new($2 || '0') rescue nil
-        if version.nil?
+        if version.nil? || req.nil?
           req_version.nil? || (req_version == $2)
         else
           req =~ version
@@ -163,14 +169,26 @@ class Lyp::Resolver
   # Return a hash of all packages found in the packages directory, creating a
   # leaf for each package
   def get_available_packages(dir)
-    Dir["#{Lyp.packages_dir}/*"].inject({}) do |m, p|
-      m[File.basename(p)] = {
+    forced_paths = @opts[:forced_package_paths] || {}
+    
+    packages = Dir["#{Lyp.packages_dir}/*"].inject({}) do |m, p|
+      name = File.basename(p)
+      
+      m[name] = {
         path: File.join(p, MAIN_PACKAGE_FILE), 
-        dependencies: {},
-        
+        dependencies: {}
       }
       m
     end
+
+    forced_paths.each do |package, path|
+      packages["#{package}@forced"] = {
+        path: File.join(path, MAIN_PACKAGE_FILE),
+        dependencies: {}
+      }
+    end
+    
+    packages
   end
 
   # Recursively remove any dependency for which no version is locally 
@@ -391,7 +409,7 @@ class Lyp::Resolver
     
     map = lambda do |m, p|
       if p =~ Lyp::PACKAGE_RE
-        m[$1] = versions[p] ||= Gem::Version.new($2 || '0.0')
+        m[$1] = versions[p] ||= (Gem::Version.new($2 || '0.0') rescue nil)
       end
       m
     end
