@@ -85,7 +85,7 @@ module Lyp::Package
     end
     
     LOCAL_PACKAGE_WRAPPER = 
-      "#(set! lyp-current-package-dir \"%s\")\n\\include \"%s\"\n"
+      "#(set! lyp:current-package-dir \"%s\")\n\\include \"%s\"\n"
     
     def install_from_local_files(package, version, opts)
       version =~ /^([^\:]+)\:(.+)$/

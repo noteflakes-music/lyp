@@ -14,15 +14,14 @@ RSpec.describe "Lyp.wrap" do
       
       code = IO.read(fn)
       
-      expect(code).to include("(define lyp-input-filename \"#{orig_fn}\")")
-      expect(code).to include("(define lyp-input-dirname \"#{File.dirname(orig_fn)}\")")
-      expect(code).to include("(define lyp-cwd \"#{FileUtils.pwd}\")")
+      expect(code).to include("(define lyp:input-filename \"#{orig_fn}\")")
+      expect(code).to include("(define lyp:input-dirname \"#{File.dirname(orig_fn)}\")")
 
-      expect(code).to include("(hash-set! lyp-package-refs \"a\" \"#{$packages_dir}/a@0.1/package.ly\")")
-      expect(code).to include("(hash-set! lyp-package-refs \"b@>=0.1.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
-      expect(code).to include("(hash-set! lyp-package-refs \"b@~>0.2.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
-      expect(code).to include("(hash-set! lyp-package-refs \"b~>0.1.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
-      expect(code).to include("(hash-set! lyp-package-refs \"c\" \"#{$packages_dir}/c@0.1/package.ly\")")
+      expect(code).to include("(hash-set! lyp:package-refs \"a\" \"#{$packages_dir}/a@0.1/package.ly\")")
+      expect(code).to include("(hash-set! lyp:package-refs \"b@>=0.1.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
+      expect(code).to include("(hash-set! lyp:package-refs \"b@~>0.2.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
+      expect(code).to include("(hash-set! lyp:package-refs \"b~>0.1.0\" \"#{$packages_dir}/b@0.1/package.ly\")")
+      expect(code).to include("(hash-set! lyp:package-refs \"c\" \"#{$packages_dir}/c@0.1/package.ly\")")
     end
   end
   
@@ -33,9 +32,8 @@ RSpec.describe "Lyp.wrap" do
 
     code = IO.read(fn)
 
-    expect(code).to include("(define lyp-input-filename \"#{orig_fn}\")")
-    expect(code).to include("(define lyp-input-dirname \"#{File.dirname(orig_fn)}\")")
-    expect(code).to include("(define lyp-cwd \"#{FileUtils.pwd}\")")
+    expect(code).to include("(define lyp:input-filename \"#{orig_fn}\")")
+    expect(code).to include("(define lyp:input-dirname \"#{File.dirname(orig_fn)}\")")
   end
 end
 

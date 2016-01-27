@@ -28,7 +28,6 @@ RSpec.describe "Lyp" do
         
         expect($_out).to include("input-filename: #{user_file}")
         expect($_out).to include("input-dirname: #{File.dirname(user_file)}")
-        expect($_out).to include("cwd: #{FileUtils.pwd}")
         expect($_out).to include("current-package-dir: #{$packages_dir}/b@0.2")
         expect($_out).to include("bvar: hello from b/inc/include1.ly")
         
