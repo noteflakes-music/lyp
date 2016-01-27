@@ -20,7 +20,11 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [Version specifiers](#version-specifiers)
   - [Using packages](#using-packages)
   - [Developing packages](#developing-packages)
-  - [Including files from within packages](#including-files-from-within-packages)
+    - [The package interface](#the-package-interface)
+    - [Including files](#including-files)
+    - [Including fonts](#including-fonts)
+    - [Testing packages](#testing-packages)
+    - [Publishing packages](#publishing-packages)
 - [Installing and switching Lilypond versions](#installing-and-switching-lilypond-versions)
 - [Contributing](#contributing)
 
@@ -191,7 +195,7 @@ To create a lilypond package:
 - Test & debug your code (see below).
 - Publish your package (see below).
 
-To test your package code, you can install it from a local path. Suppose your package is at ~/repo/mypack:
+To test your package with an actual input file, you can install it from a local path (for more on testing [see below](#testing)). Suppose your package is at ~/repo/mypack:
 
 ```bash
 lyp install mypack@dev:~/repo/mypack
@@ -203,30 +207,49 @@ This will create a `mypack@dev` package referencing your local files, which you 
 \require "mypack@dev"
 ```
 
-### Including files from within packages
+#### The package interface
 
-In order to facilitate writing complex packages, lyp defines a few lilypond commands and scheme variables and commands that allow using relative paths when including files from within packages.
+In order to facilitate writing complex packages, lyp defines a few variables and functions:
 
-The following variables are defined:
+- `lyp:current-package-dir` - the absolute directory path for the current package (at the time the package is loaded)
+- `lyp:input-filename` - the absolute path for the user's file being compiled
+- `lyp:input-dirname` - the absolute directory path for the user's file being compiled
 
-- `lyp-current-package-dir` - the absolute directory path for the current package
-- `lyp-input-filename` - the absolute path for the user's file being compiled
-- `lyp-input-dirname` - the absolute directory path for the user's file being compiled
-- `lyp-cwd` - the current working directory
+#### Including files
 
-In addition, lyp provides the `\pinclude` command for including files residing in the current package using relative paths. The `\pinclude` commands loads a given file only once:
+Lyp provides the `\pinclude` and `\pincludeOnce` commands for including files residing in the current package using relative paths. The `\pincludeOnce` commands loads a given file only once:
 
 ```lilypond
-\pinclude "inc/init.ily"
+\pincludeOnce "inc/init.ily"
+\pinclude "inc/template.ily"
 ```
 
-And a `pload` scheme function for loading scheme files using relative paths without manipulating the `%load-path`:
+Lyp also defines a `pload` scheme function for loading scheme files using relative paths without adding directories to the `%load-path`:
 
 ```lilypond
 #(if (not (defined? 'mypack:init))(pload "scm/init.scm"))
 ```
 
-### Publishing packages
+#### Including fonts
+
+Lyp also supports automatic installation of fonts, based on work by [Abraham Leigh](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
+
+**Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version ower than 2.19.12 in order to support custom fonts. 
+
+#### Testing Packages
+
+Packages can be tested by using the `lyp test` command, which will compile any file found inside the package directory ending in `_test.ly`:
+
+```bash
+cd mypack
+lyp test .
+```
+
+A test file can either be a simple lilypond file which includes the package files and results in a lilypond score, or a lilypond file that performs unit tests on scheme code.
+
+For more information on testing, see the [lyp-assert](https://github.com/noteflakes/lyp-assert) package, which is meant to be used for unit testing lilypond code, and serves as an example of how to test a package.
+
+#### Publishing packages
 
 In order for your package to be available to all users, you'll need to first push your code to a publically accessible git repository (for example on github). Users will then be able to install your package by using the git URL of the public repository.
 

@@ -1,0 +1,3 @@
+- Testing of packages is still not solid enough
+  - Using \pinclude and \pload (also relates to improving the package interface)
+  - Fix testing of package installed from local files (should redirect to the source directory)
