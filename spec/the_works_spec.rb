@@ -3,11 +3,8 @@ require File.expand_path('spec_helper', File.dirname(__FILE__))
 RSpec.describe "Lyp" do
   it "installs lilypond+package and compiles successfully" do
     with_lilyponds(:empty) do
-      FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-      FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
       with_packages(:tmp) do
-        Lyp::Lilypond.install('2.19.35', {silent: true})
+        Lyp::Lilypond.install('2.19.35', silent: true)
         Lyp::Package.install('dummy', silent: true)
         
         Lyp::Lilypond.compile(["#{$spec_dir}/user_files/the-works.ly"])
@@ -20,7 +17,7 @@ RSpec.describe "Lyp" do
   it "correctly sets global lyp variables" do
     with_lilyponds(:empty) do
       with_packages(:test_vars) do
-        Lyp::Lilypond.install('2.19.35', {silent: true})
+        Lyp::Lilypond.install('2.19.35', silent: true)
         
         user_file = "#{$spec_dir}/user_files/test_vars.ly"
         

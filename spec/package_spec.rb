@@ -176,9 +176,6 @@ RSpec.describe "Lyp::Package" do
   end
   
   it "installs multiple versions of a package" do
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-    FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
     with_packages(:tmp) do
       # When no version is specified, lyp should install the highest tagged 
       # version
@@ -212,9 +209,6 @@ RSpec.describe "Lyp::Package" do
   end
   
   it "installs package from git url" do
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-    FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
     with_packages(:tmp) do
       # When no version is specified, lyp should install the highest tagged 
       # version
@@ -233,9 +227,6 @@ RSpec.describe "Lyp::Package" do
   end
   
   it "installs transitive dependencies for the installed package" do
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-    FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
     with_packages(:tmp) do
       version = Lyp::Package.install('dependency-test@0.1', silent: true)
       expect(version).to eq("0.1.0")
@@ -257,9 +248,6 @@ RSpec.describe "Lyp::Package" do
   end
   
   it "installs a package from local files" do
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-    FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
     with_packages(:tmp) do
       version = Lyp::Package.install("abc@dev:#{$spec_dir}/user_files/dev_dir1", silent: true)
       expect(version).to eq("dev")
@@ -311,9 +299,6 @@ RSpec.describe "Lyp::Package" do
   end
   
   it "uninstalls a package" do
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-    FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
     with_packages(:tmp) do
       Lyp::Package.install('dependency-test@0.1', silent: true)
       
@@ -335,19 +320,13 @@ RSpec.describe "Lyp::Package" do
         raise_error
     end
     
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-    FileUtils.cp_r("#{$spec_dir}/package_setups/unversioned", "#{$spec_dir}/package_setups/tmp")
-    
-    with_packages(:tmp) do
+    with_packages(:tmp, copy_from: :unversioned) do
       Lyp::Package.uninstall('b', silent: true)
       expect(Dir["#{$packages_dir}/*"]).to eq([])
     end
   end
 
   it "uninstalls a package from git url" do
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-    FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
     with_packages(:tmp) do
       expect {Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template@0.3.0', silent: true)}.to \
         raise_error

@@ -3,14 +3,11 @@ require File.expand_path('spec_helper', File.dirname(__FILE__))
 RSpec.describe "Lyp" do
   it "copies font files when installing a package with fonts" do
     with_lilyponds(:empty) do
-      FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-      FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
       with_packages(:tmp) do
-        Lyp::Lilypond.install('2.18.1', {silent: true})
-        Lyp::Lilypond.install('2.18.2', {silent: true})
-        Lyp::Lilypond.install('2.19.11', {silent: true})
-        Lyp::Lilypond.install('2.19.12', {silent: true})
+        Lyp::Lilypond.install('2.18.1', silent: true)
+        Lyp::Lilypond.install('2.18.2', silent: true)
+        Lyp::Lilypond.install('2.19.11', silent: true)
+        Lyp::Lilypond.install('2.19.12', silent: true)
 
         Lyp::Package.install("fonty@dev:#{$spec_dir}/user_files/fonty", silent: true)
         
@@ -29,7 +26,7 @@ RSpec.describe "Lyp" do
           check_font_file[version, 'svg/berta.woff']
         end
         
-        Lyp::Lilypond.install('2.19.35', {silent: true})
+        Lyp::Lilypond.install('2.19.35', silent: true)
         check_font_file['2.19.35', 'otf/berta.otf']
         check_font_file['2.19.35', 'svg/berta.svg']
         check_font_file['2.19.35', 'svg/berta.woff']
@@ -39,14 +36,11 @@ RSpec.describe "Lyp" do
   
   it "patches installed lilypond versions when < 2.19.12" do
     with_lilyponds(:empty) do
-      FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
-      FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
-
       with_packages(:tmp) do
-        Lyp::Lilypond.install('2.18.1', {silent: true})
-        Lyp::Lilypond.install('2.18.2', {silent: true})
-        Lyp::Lilypond.install('2.19.11', {silent: true})
-        Lyp::Lilypond.install('2.19.12', {silent: true})
+        Lyp::Lilypond.install('2.18.1', silent: true)
+        Lyp::Lilypond.install('2.18.2', silent: true)
+        Lyp::Lilypond.install('2.19.11', silent: true)
+        Lyp::Lilypond.install('2.19.12', silent: true)
         
         check_patch = lambda do |version, positive = true|
           fn = "#{$lilyponds_dir}/#{version}/share/lilypond/current/scm/font.scm"

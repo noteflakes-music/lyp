@@ -77,7 +77,7 @@ RSpec.describe "Lyp::Lilypond" do
         "#{$lilyponds_dir}/2.19.21/bin/lilypond"
       )
       
-      Lyp::Lilypond.install("2.18.2", {silent: true})
+      Lyp::Lilypond.install("2.18.2", silent: true)
       
       files = Dir["#{$lilyponds_dir}/2.18.2/bin/*"].map {|fn| File.basename(fn)}
       expect(files).to include('lilypond')
@@ -126,7 +126,7 @@ RSpec.describe "Lyp::Lilypond" do
   it "installs the latest stable version of lilypond" do
     with_lilyponds(:simple) do
       version = Lyp::Lilypond.latest_stable_version
-      Lyp::Lilypond.install('stable', {silent: true})
+      Lyp::Lilypond.install('stable', silent: true)
       
       files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
       expect(files).to include('lilypond')
@@ -140,7 +140,7 @@ RSpec.describe "Lyp::Lilypond" do
   it "installs the latest unstable version of lilypond" do
     with_lilyponds(:simple) do
       version = Lyp::Lilypond.latest_unstable_version
-      Lyp::Lilypond.install('unstable', {silent: true})
+      Lyp::Lilypond.install('unstable', silent: true)
       
       files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
       expect(files).to include('lilypond')
@@ -154,7 +154,7 @@ RSpec.describe "Lyp::Lilypond" do
   it "installs the latest version of lilypond" do
     with_lilyponds(:simple) do
       version = Lyp::Lilypond.latest_version
-      Lyp::Lilypond.install('latest', {silent: true})
+      Lyp::Lilypond.install('latest', silent: true)
       
       files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
       expect(files).to include('lilypond')
@@ -167,7 +167,7 @@ RSpec.describe "Lyp::Lilypond" do
   
   it "supports version specifiers when installing lilypond" do
     with_lilyponds(:simple) do
-      Lyp::Lilypond.install('>=2.18.1', {silent: true})
+      Lyp::Lilypond.install('>=2.18.1', silent: true)
       version = Lyp::Lilypond.latest_version
       
       files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}
@@ -179,7 +179,7 @@ RSpec.describe "Lyp::Lilypond" do
     end
 
     with_lilyponds(:simple) do
-      Lyp::Lilypond.install('~>2.17.30', {silent: true})
+      Lyp::Lilypond.install('~>2.17.30', silent: true)
       version = "2.17.97"
       
       files = Dir["#{$lilyponds_dir}/#{version}/bin/*"].map {|fn| File.basename(fn)}

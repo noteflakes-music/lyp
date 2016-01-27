@@ -38,8 +38,19 @@ module Lyp
   end
 end
 
-def with_packages(setup)
+def with_packages(setup, opts = {})
   begin
+    if setup == :tmp
+      FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
+      
+      if opts[:copy_from]
+        FileUtils.cp_r("#{$spec_dir}/package_setups/#{opts[:copy_from]}", 
+          "#{$spec_dir}/package_setups/tmp")
+      else
+        FileUtils.mkdir("#{$spec_dir}/package_setups/tmp")
+      end
+    end
+    
     old_packages_dir = $packages_dir
     $packages_dir = File.expand_path("package_setups/#{setup}", $spec_dir)
     
