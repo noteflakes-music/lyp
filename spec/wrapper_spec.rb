@@ -25,5 +25,17 @@ RSpec.describe "Lyp.wrap" do
       expect(code).to include("(hash-set! lyp-package-refs \"c\" \"#{$packages_dir}/c@0.1/package.ly\")")
     end
   end
+  
+  it "creates a wrapper if force_wrap is specified" do
+    orig_fn = File.expand_path('user_files/no_require.ly', File.dirname(__FILE__))
+    fn = Lyp.wrap(orig_fn, force_wrap: true)
+    expect(fn).to_not eq(orig_fn)
+
+    code = IO.read(fn)
+
+    expect(code).to include("(define lyp-input-filename \"#{orig_fn}\")")
+    expect(code).to include("(define lyp-input-dirname \"#{File.dirname(orig_fn)}\")")
+    expect(code).to include("(define lyp-cwd \"#{FileUtils.pwd}\")")
+  end
 end
 

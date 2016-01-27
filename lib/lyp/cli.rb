@@ -134,6 +134,7 @@ class Lyp::CLI < Thor
 
   desc "install <PACKAGE|lilypond|self>...", "Install a package or a version of lilypond. When 'install self' is invoked, lyp installs itself in ~/.lyp."
   method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
+  method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
   def install(*args)
     raise "No package specified" if args.empty?
     
@@ -146,7 +147,7 @@ class Lyp::CLI < Thor
         Lyp::Lilypond.install($1, options)
       else
         Lyp::System.test_installed_status!
-        Lyp::Package.install(package)
+        Lyp::Package.install(package, options)
       end
     end
   end

@@ -74,6 +74,12 @@ module Lyp::Package
       
       puts "\nInstalled #{package}@#{info[:version]}\n\n" unless opts[:silent]
       
+      if opts[:test]
+        FileUtils.cd(info[:path]) do
+          run_tests(info[:path])
+        end
+      end
+      
       # important: return the installed version
       info[:version]
     end

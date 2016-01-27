@@ -6,7 +6,7 @@ require 'ruby-progressbar'
 module Lyp::Lilypond
   class << self
     def compile(argv, opts = {})
-      fn = Lyp.wrap(argv.pop)
+      fn = Lyp.wrap(argv.pop, opts)
       argv << fn
       
       invoke(argv, opts)
