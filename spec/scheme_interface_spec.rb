@@ -16,7 +16,7 @@ RSpec.describe "Lyp scheme interface" do
 end
 
 RSpec.describe "assert package" do
-  it "passes tests" do
+  it "passes tests when installed" do
     with_lilyponds(:empty) do
       with_packages(:tmp) do
         Lyp::Lilypond.install('2.18.2', silent: true)
@@ -29,6 +29,27 @@ RSpec.describe "assert package" do
         expect(stats[:fail_count]).to eq(0)
       end
     end    
+  end
+  
+  it "passes tests when cloned locally" do
+    with_lilyponds(:empty) do
+      with_packages(:tmp) do
+        Lyp::Lilypond.install('2.18.2', silent: true)
+        
+        url = "https://github.com/noteflakes/lyp-assert.git"
+        repo_path = "/tmp/lyp-assert-clone"
+        FileUtils.rm_rf(repo_path)
+        Rugged::Repository.clone_at(url, repo_path)
+
+        FileUtils.cd(repo_path) do
+          stats = Lyp::Package.run_local_tests('.', 
+            silent: true, dont_exit: true)
+          
+          expect(stats[:test_count]).to eq(1)
+          expect(stats[:fail_count]).to eq(0)
+        end
+      end
+    end
   end
 end
 
