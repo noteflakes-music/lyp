@@ -33,7 +33,13 @@ module Lyp
     def self.invoke(argv, opts = {})
       lilypond = detect_use_version_argument(argv) || current_lilypond
       
-      exec("#{lilypond} #{argv.join(' ')}")
+      case opts[:mode]
+      when :system
+        exec("#{lilypond} #{argv.join(' ')}", false)
+      else
+        exec("#{lilypond} #{argv.join(' ')}")
+        true
+      end
     end
   end
 end

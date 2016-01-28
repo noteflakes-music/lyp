@@ -348,4 +348,19 @@ RSpec.describe "Lyp::Package" do
       expect(Lyp::Package.list('templ')).to be_empty
     end
   end
+  
+  it "tests a package using lilypond" do
+    with_lilyponds(:empty) do
+      with_packages(:tmp, copy_from: :testing) do
+        Lyp::Package.install("assert", silent: true)
+        Lyp::Lilypond.install('2.18.2', silent: true)
+
+        stats = Lyp::Package.run_local_tests("#{$packages_dir}/b",
+          silent: true, dont_exit: true)
+
+        expect(stats[:test_count]).to eq(2)
+        expect(stats[:fail_count]).to eq(1)
+      end
+    end
+  end
 end

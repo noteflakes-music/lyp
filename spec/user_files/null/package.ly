@@ -1,0 +1,1 @@
+#(set! null:counter0 (+ null:counter0 1))

@@ -21,9 +21,13 @@ module Lyp
   
   # Font patch filename (required for 2.18.2 <= lilypond < 2.19.12)
   FONT_PATCH_FILENAME = File.expand_path('etc/font.scm', File.dirname(__FILE__))
-  
-  SETTINGS_FILENAME = 'settings.yml'
 
+  # etc/lyp.ly contains lyp:* procedure definitions for loading packages and
+  # other support code.
+  LYP_LY_LIB_PATH = File.expand_path('etc/lyp.ly', File.dirname(__FILE__))
+
+  SETTINGS_FILENAME = 'settings.yml'
+  
   def self.packages_dir
     ensure_dir(DEFAULT_PACKAGE_DIRECTORY)
   end

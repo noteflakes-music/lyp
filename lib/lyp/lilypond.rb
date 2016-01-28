@@ -485,15 +485,18 @@ module Lyp::Lilypond
       FileUtils.rm_rf(lilypond_dir)
     end
     
-    def exec(cmd)
+    def exec(cmd, raise_on_failure = true)
+      success = nil
       Open3.popen3(cmd) do |_in, _out, _err, wait_thr|
         exit_value = wait_thr.value
         $_out = _out.read
         $_err = _err.read
-        if exit_value != 0
-          raise "Error executing cmd #{cmd}: #{$_err.read}"
-        end
+        success = exit_value == 0
       end
+      if !success && raise_on_failure
+        raise "Error executing cmd #{cmd}: #{$_err}"
+      end
+      success
     end
   end
 end

@@ -166,23 +166,22 @@ RSpec.describe Lyp::Resolver do
       
       r = resolver.resolve_package_dependencies
       expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.1 c@0.1})
-      expect(r[:package_paths].keys.sort).to eq(
-        ["a", "b@>=0.1.0", "b@~>0.2.0", "b~>0.1.0", "c"]
+      expect(r[:package_refs]).to eq({
+        "a" => "a", 
+        "b@>=0.1.0" => "b",
+        "b@~>0.2.0" => "b",
+        "b~>0.1.0" => "b",
+        "c" => "c"
+      })
+
+      expect(r[:package_dirs]["a"]).to eq(
+        "#{$packages_dir}/a@0.1"
       )
-      expect(r[:package_paths]["a"]).to eq(
-        "#{$packages_dir}/a@0.1/package.ly"
+      expect(r[:package_dirs]["b"]).to eq(
+        "#{$packages_dir}/b@0.1"
       )
-      expect(r[:package_paths]["b@>=0.1.0"]).to eq(
-        "#{$packages_dir}/b@0.1/package.ly"
-      )
-      expect(r[:package_paths]["b~>0.1.0"]).to eq(
-        "#{$packages_dir}/b@0.1/package.ly"
-      )
-      expect(r[:package_paths]["b@~>0.2.0"]).to eq(
-        "#{$packages_dir}/b@0.1/package.ly"
-      )
-      expect(r[:package_paths]["c"]).to eq(
-        "#{$packages_dir}/c@0.1/package.ly"
+      expect(r[:package_dirs]["c"]).to eq(
+        "#{$packages_dir}/c@0.1"
       )
     end
   end
@@ -288,12 +287,8 @@ RSpec.describe Lyp::Resolver do
 
       r = resolver.resolve_package_dependencies
       
-      b_path += "/package.ly"
-      
       expect(r[:definite_versions]).to eq(%w{a@0.2 b@forced c@0.3})
-      expect(r[:package_paths]['b@>=0.1.0']).to eq(b_path)
-      expect(r[:package_paths]['b~>0.1.0']).to eq(b_path)
-      expect(r[:package_paths]['b@~>0.2.0']).to eq(b_path)
+      expect(r[:package_dirs]['b']).to eq(b_path)
     end
   end
   
@@ -303,27 +298,43 @@ RSpec.describe Lyp::Resolver do
       r = resolver.resolve_package_dependencies
 
       expect(r[:definite_versions]).to eq(%w{b@abc})
-      expect(r[:package_paths]['b@abc']).to eq(
-        "#{$packages_dir}/b@abc/package.ly"
+      expect(r[:package_refs]).to eq({"b@abc" => "b"})
+      expect(r[:package_dirs]['b']).to eq(
+        "#{$packages_dir}/b@abc"
       )
 
       resolver = Lyp::Resolver.new('spec/user_files/b.ly')
       r = resolver.resolve_package_dependencies
 
       expect(r[:definite_versions]).to eq(%w{b@def c@0.3.0})
-      expect(r[:package_paths]['b']).to eq(
-        "#{$packages_dir}/b@def/package.ly"
+      expect(r[:package_refs]).to eq({"b" => "b", "c" => "c"})
+      expect(r[:package_dirs]['b']).to eq(
+        "#{$packages_dir}/b@def"
       )
 
       resolver = Lyp::Resolver.new('spec/user_files/b_def.ly')
       r = resolver.resolve_package_dependencies
 
       expect(r[:definite_versions]).to eq(%w{b@def c@0.3.0})
-      expect(r[:package_paths]['b@def']).to eq(
-        "#{$packages_dir}/b@def/package.ly"
+      expect(r[:package_refs]).to eq({"b@def" => "b", "c" => "c"})
+      expect(r[:package_dirs]['b']).to eq(
+        "#{$packages_dir}/b@def"
       )
     end
   end
+  
+  it "supports forcing a package path using from require command" do
+    with_packages(:testing) do
+      resolver = Lyp::Resolver.new("#{$packages_dir}/b/test/require.ly")
+      r = resolver.resolve_package_dependencies
+
+      expect(r[:definite_versions]).to eq(%w{b@forced})
+      expect(r[:package_refs]).to eq({"b" => "b"})
+      expect(r[:package_dirs]['b']).to eq(
+        "#{$packages_dir}/b"
+      )
+    end
+  end
+  
+  
 end
-
-

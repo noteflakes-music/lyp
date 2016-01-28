@@ -410,13 +410,15 @@ module Lyp::Package
       yield stats
       
       if stats[:test_count] == 0
-        STDERR.puts "No test files found"
+        STDERR.puts "No test files found" unless opts[:silent]
       else
         puts "\nFinished in %.2g seconds\n%d files, %d failures" % [
           Time.now - stats[:start], stats[:test_count], stats[:fail_count]
-        ]
-        exit(stats[:fail_count] > 0 ? 1 : 0)
+          ] unless opts[:silent]
+        exit(stats[:fail_count] > 0 ? 1 : 0) unless opts[:dont_exit]
       end
+      
+      stats
     end
     
     def perform_test(fn, stats)
@@ -426,14 +428,13 @@ module Lyp::Package
       end
     end
     
-    
-    def run_package_tests(patterns)
+    def run_package_tests(patterns, opts = {})
       patterns = [''] if patterns.empty?
       packages = patterns.inject([]) do |m, pat|
         m += Dir["#{Lyp.packages_dir}/#{pat}*"]
       end.uniq
       
-      run_tests do |stats|
+      run_tests(opts) do |stats|
         packages.each do |path|
           files = Dir["#{path}/**/*_test.ly"]
           next if files.empty?

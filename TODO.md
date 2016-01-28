@@ -1,9 +1,3 @@
-- refactor pinclude, pload functionality
-
-- Testing of packages is still not solid enough
-  - Using \pinclude and \pload (also relates to improving the package interface)
-  - Fix testing of package installed from local files (should redirect to the source directory)
-
 - Add --install, --env options to `lilypond` wrapper
 
   --env to force version from LILYPOND_VERSION environment variable
@@ -21,3 +15,4 @@
 
 - Check functioning of lyp test, lyp compile, lilypond commands when no version of lilypond is available.
 
+- Check lilypond error on requiring the same package using different version constraints (\require "assert" , \require "assert>=0.1.3") in the same file.

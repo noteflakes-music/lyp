@@ -12,22 +12,27 @@ class Lyp::Resolver
     
     definite_versions = resolve_tree(tree)
     specifier_map = map_specifiers_to_versions(tree)
+    
+    refs, dirs = {}, {}
+    definite_versions.each do |v|
+      package = v =~ Lyp::PACKAGE_RE && $1
 
+      specifier_map[package].each_key {|s| refs[s] = package}
+      dirs[package] = File.dirname(tree[:available_packages][v][:path])
+    end
+    
     {
       user_file: @user_file,
       definite_versions: definite_versions,
-      package_paths: definite_versions.inject({}) do |h, v|
-        package = v =~ Lyp::PACKAGE_RE && $1
-        path = tree[:available_packages][v][:path]
-        specifier_map[package].each_key {|s| h[s] = path}
-        h
-      end
+      package_refs: refs,
+      package_dirs: dirs
     }
   end
   
-  DEP_RE = /\\(require|include|pinclude) "([^"]+)"/.freeze
+  DEP_RE = /\\(require|include|pinclude|pincludeOnce) "([^"]+)"/.freeze
   INCLUDE = "include".freeze
   PINCLUDE = "pinclude".freeze
+  PINCLUDE_ONCE = "pincludeOnce".freeze
   REQUIRE = "require".freeze
   
   # Each "leaf" on the dependency tree is a hash of the following structure:
@@ -80,13 +85,39 @@ class Lyp::Resolver
     dir = File.dirname(path)
     
     # Parse lilypond file for \include and \require
-    ly_content.scan(DEP_RE) do |type, path|
+    ly_content.scan(DEP_RE) do |type, ref|
       case type
-      when INCLUDE, PINCLUDE
-        qualified_path = File.expand_path(path, dir)
+      when INCLUDE, PINCLUDE, PINCLUDE_ONCE
+        # a package would normally use a plain \pinclude or \pincludeOnce
+        # command to include package files, e.g. \pinclude "inc/init.ly".
+        # 
+        # But a package can also qualify the file reference with the package
+        # name, in order to be able to load files after the package has already
+        # been loaded, e.g. \pinclude "mypack:inc/init.ly"
+        if ref =~ /^([^\:]+)\:(.+)$/
+          # ignore null package (used for testing purposes only)
+          next if $1 == 'null'
+          ref = $2
+        end
+        qualified_path = File.expand_path(ref, dir)
         queue_file_for_processing(qualified_path, tree, leaf)
       when REQUIRE
-        find_package_versions(path, tree, leaf, opts)
+        forced_path = nil
+        if ref =~ /^([^\:]+)\:(.+)$/
+          ref = $1
+          forced_path = File.expand_path($2, dir)
+        end
+
+        ref =~ Lyp::PACKAGE_RE
+        package, version = $1, $2
+        next if package == 'null'
+
+        # set forced path if applicable
+        if forced_path
+          set_forced_package_path(tree, package, forced_path)
+        end
+
+        find_package_versions(ref, tree, leaf, opts)
       end
     end
     
@@ -166,11 +197,19 @@ class Lyp::Resolver
     tree[:available_packages] ||= get_available_packages(Lyp.packages_dir)
   end
   
+  def set_forced_package_path(tree, package, path)
+    @opts[:forced_package_paths] ||= {}
+    @opts[:forced_package_paths][package] = path
+    
+    available_packages(tree)["#{package}@forced"] = {
+      path: File.join(path, MAIN_PACKAGE_FILE),
+      dependencies: {}
+    }
+  end
+  
   # Return a hash of all packages found in the packages directory, creating a
   # leaf for each package
   def get_available_packages(dir)
-    forced_paths = @opts[:forced_package_paths] || {}
-    
     packages = Dir["#{Lyp.packages_dir}/*"].inject({}) do |m, p|
       name = File.basename(p)
       
@@ -181,11 +220,15 @@ class Lyp::Resolver
       m
     end
 
-    forced_paths.each do |package, path|
-      packages["#{package}@forced"] = {
-        path: File.join(path, MAIN_PACKAGE_FILE),
-        dependencies: {}
-      }
+    forced_paths = @opts[:forced_package_paths] || {}
+    
+    if @opts[:forced_package_paths]
+      @opts[:forced_package_paths].each do |package, path|
+        packages["#{package}@forced"] = {
+          path: File.join(path, MAIN_PACKAGE_FILE),
+          dependencies: {}
+        }
+      end
     end
     
     packages
