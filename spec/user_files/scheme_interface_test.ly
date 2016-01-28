@@ -1,5 +1,5 @@
 \version "2.18.2"
-\require "assert>=0.1.6"
+\require "assert@0.2.0"
 
 % lyp:input-filename, lyp:input-dirname
 #(assert:string=? (basename lyp:input-filename) "scheme_interface_test.ly")
@@ -12,13 +12,13 @@
 
 % lyp:package-refs
 #(assert (hash-table? lyp:package-refs))
-#(assert:string=? (hash-ref lyp:package-refs "assert>=0.1.6") "assert")
-#(assert:string=? (lyp:ref->name "assert>=0.1.6") "assert")
+#(assert:string=? (hash-ref lyp:package-refs "assert@0.2.0") "assert")
+#(assert:string=? (lyp:ref->name "assert@0.2.0") "assert")
 
 #(assert:throw (lambda () (lyp:ref->name "assert>=0.1.3")))
 
 #(define tmp:assert-dir
-  (string-append (getcwd) "/spec/package_setups/tmp/assert@0.1.7"))
+  (string-append (getcwd) "/spec/package_setups/tmp/assert@0.2.0"))
 
 % lyp:package-dirs
 #(assert (hash-table? lyp:package-dirs))

@@ -5,7 +5,7 @@ RSpec.describe "Lyp scheme interface" do
     with_lilyponds(:empty) do
       with_packages(:tmp) do
         Lyp::Lilypond.install('2.18.2', silent: true)
-        Lyp::Package.install("assert>=0.1.3", silent: true)
+        Lyp::Package.install("assert@0.2.0", silent: true)
         
         test_file = "#{$spec_dir}/user_files/scheme_interface_test.ly"
         ok = Lyp::Lilypond.compile([test_file], force_wrap: true)
@@ -20,7 +20,7 @@ RSpec.describe "assert package" do
     with_lilyponds(:empty) do
       with_packages(:tmp) do
         Lyp::Lilypond.install('2.18.2', silent: true)
-        Lyp::Package.install("assert", silent: true)
+        Lyp::Package.install("assert@0.2.0", silent: true)
         
         stats = Lyp::Package.run_package_tests(['assert'], 
           silent: true, dont_exit: true)
