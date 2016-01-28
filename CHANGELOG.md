@@ -1,3 +1,8 @@
+## Version 0.2.1 2016-01-28
+
+- Packages tests can now use `\require "<package name>:<relative path>"` syntax in tests to make sure tests work anywhere. For an example see the [assert package](https://github.com/noteflakes/lyp-assert).
+- Complete rewrite of package scheme interface, now tested using the assert package.
+
 ## Version 0.2.0 2016-01-27
 
 - Rename `lyp-*` variables to `lyp:*`.
