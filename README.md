@@ -42,8 +42,8 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem:
 
 ```bash
-gem install lyp
-lyp install self
+$ gem install lyp
+$ lyp install self
 ```
 
 The `lyp install self` command is needed in order to setup the `~/.lyp` working directory and add the lyp binaries directory to your `PATH` (see below), by adding a line of code to your shell profile file.
@@ -53,13 +53,13 @@ The `lyp install self` command is needed in order to setup the `~/.lyp` working 
 If you don't have Ruby on your machine you can install lyp as a stand alone package using the [install script](https://raw.githubusercontent.com/noteflakes/lyp/master/bin/install_release.sh):
 
 ```bash
-curl -sSL https://git.io/getlyp | bash
+$ curl -sSL https://git.io/getlyp | bash
 ```
 
 or with Wget:
 
 ```bash
-wget -qO- https://git.io/getlyp | bash
+$ wget -qO- https://git.io/getlyp | bash
 ```
 
 **Note**: installing the standalone release of lyp requires having git on your machine.
@@ -81,7 +81,7 @@ For more information on running lilypond see the section on [Running lilypond](#
 In order to remove lyp from your system use the `uninstall self` command:
 
 ```bash
-lyp uninstall self
+$ lyp uninstall self
 ```
 
 This command will undo the changes made to your shell profile file, and remove any binaries from `~/.lyp/bin`.
@@ -89,7 +89,7 @@ This command will undo the changes made to your shell profile file, and remove a
 In order to completely remove all files in `~/.lyp` you can simply delete the directory:
 
 ```bash
-rm -rf ~/.lyp
+$ rm -rf ~/.lyp
 ```
 
 ## Working with Packages
@@ -109,31 +109,47 @@ Lilypond packages are expected to be published as git repositories. The packages
 In order to install a package, use the `lyp install` command:
 
 ```bash
-lyp install dummy # install latest version of package dummy
-lyp install github.com/ciconia/mypack@0.2.0 # install version 0.2.0
-lyp install mypack>=0.1.0 # install version 0.1.0 or higher
-lyp install mypack@dev:~/repo/mypack # install from local opath
+# install latest version of package dummy
+$ lyp install dummy
+
+# install version 0.2.0
+$ lyp install github.com/ciconia/mypack@0.2.0
+
+# install version 0.1.0 or higher
+$ lyp install mypack>=0.1.0
+
+# install from local path (see below on developing packages)
+$ lyp install mypack@dev:~/repo/mypack
 ```
 
 To uninstall the package, use the `lyp uninstall` command:
 
 ```bash
-lyp uninstall dummy@0.1.0 # uninstall version 0.1.0
-lyp uninstall -a dummy # uninstall all versions of dummy
+# uninstall version 0.1.0
+$ lyp uninstall dummy@0.1.0
+
+# uninstall all versions of dummy
+$ lyp uninstall -a dummy
 ```
 
 To list currently installed packages use `lyp list` command:
 
 ```bash
-lyp list # list all installed packages
-lyp list font # list all installed packages matching the pattern 'font'
+# list all installed packages
+$ lyp list
+
+# list all installed packages matching the pattern 'font'
+$ lyp list font
 ```
 
 To list packages available on the lyp package index use the `lyp search` command:
 
 ```bash
-lyp search # list all packages in index
-lyp search stylesheet # list available packages matching pattern 'stylesheet'
+# list all packages in index
+lyp search
+
+# list available packages matching pattern 'stylesheet'
+lyp search stylesheet
 ```
 
 ### Package references
@@ -141,16 +157,21 @@ lyp search stylesheet # list available packages matching pattern 'stylesheet'
 A package is normally referenced by its git URL. Lyp lets you provide either fully- or partially qualified URLs. A package hosted on github can be also referenced by the user/repository pair. The following are all equivalent:
 
 ```bash
-lyp install https://github.com/noteflakes/lyp-package-template.git
-lyp install https://github.com/noteflakes/lyp-package-template
-lyp install github.com/noteflakes/lyp-package-template
-lyp install noteflakes/lyp-package-template
+# Fully-qualified URLs
+$ lyp install https://github.com/noteflakes/lyp-package-template.git
+$ lyp install https://github.com/noteflakes/lyp-package-template
+
+# Partially-qualified URL
+$ lyp install github.com/noteflakes/lyp-package-template
+
+# Github repository id
+$ lyp install noteflakes/lyp-package-template
 ```
 
 In addition, lyp also provides an [index of publically available package](https://github.com/noteflakes/lyp-index), which maps a package name to its URL (see also below). Using the index, packages are referenced by their published name instead of by their git URL:
 
 ```bash
-lyp install dummy
+$ lyp install dummy
 ```
 
 To get a list of all available packages on the index, use the `lyp search` command.
@@ -176,7 +197,7 @@ Version constraints specify a range of versions to use. Lyp currently supports t
 Version specifiers could be used when installing, listing and requiring packages, and also for specifying versions of lilypond (see below). For example:
 
 ```bash
-lyp install "dummy~>0.2.0"
+$ lyp install "dummy~>0.2.0"
 ```
 
 (__Note__: that when using version constraints you should put the package specifier in quotes)
@@ -202,16 +223,22 @@ To create a lilypond package:
 - Test & debug your code (see below).
 - Publish your package (see below).
 
-To test your package with an actual input file, you can install it from a local path (for more on testing [see below](#testing)). Suppose your package is at ~/repo/mypack:
+To test your package with an actual input file, you can install it from a local path (for more on testing see [below](#testing-packages)). Suppose your package is at ~/repo/mypack:
 
 ```bash
-lyp install mypack@dev:~/repo/mypack
+$ lyp install mypack@dev:~/repo/mypack
 ```
 
-This will create a `mypack@dev` package referencing your local files, which you can then reference from a test file in your package using the `\require` command:
+This will create a `mypack@dev` package referencing your local files, which you can then reference normally from an input file using the `\require` command:
 
 ```lilypond
 \require "mypack@dev"
+```
+
+If the input file is residing inside your package (for example, [test files](#testing-packages)), you can require your package by specifying a relative path. Suppose the input file is at `mypack/test/mypack_test.ly`:
+
+```lilypond
+\require "mypack:.."
 ```
 
 ### The package interface
@@ -231,13 +258,13 @@ Lyp provides the `\pinclude` and `\pincludeOnce` commands for including files re
 \pinclude "inc/template.ily"
 ```
 
-Lyp also defines a `pload` scheme function for loading scheme files using relative paths without adding directories to the `%load-path`:
+Lyp also defines a `lyp:load` scheme function for loading scheme files using relative paths without adding directories to the `%load-path`:
 
 ```lilypond
-#(if (not (defined? 'mypack:init))(pload "scm/init.scm"))
+#(if (not (defined? 'mypack:init))(lyp:load "scm/init.scm"))
 ```
 
-Loading scheme files that way is better, because this way one avoids possible name clashes, which may lead to unexpected behavior.
+Loading scheme files that way is a better technique than adding directorys to `%load-path`, because this way one avoids possible name clashes, which may lead to unexpected behavior.
 
 ### Including fonts
 
@@ -250,8 +277,8 @@ Lyp also supports automatic installation of fonts, based on work by [Abraham Lei
 Packages can be tested by using the `lyp test` command, which will compile any file found inside the package directory ending in `_test.ly`:
 
 ```bash
-cd mypack
-lyp test .
+$ cd mypack
+$ lyp test .
 ```
 
 A test file can either be a simple lilypond file which includes the package files and results in a lilypond score, or a lilypond file that performs unit tests on scheme code.
@@ -271,19 +298,32 @@ You can also add your package to the lyp [public package index](https://github.c
 When installing lilypond, the specific version to download can be specified in different ways:
 
 ```bash
-lyp install lilypond # latest stable version
-lyp install lilypond@stable # latest stable version
-lyp install lilypond@unstable # latest stable version
-lyp install lilypond@latest # latest version
-lyp install lilypond@2.18.1 # version 2.18.1
-lyp install "lilypond>=2.19.27" # highest version higher than 2.19.27
-lyp install "lilypond~>2.18.1" # highest 2.18 version higher than 2.18.1
+# latest stable version
+$ lyp install lilypond
+
+# latest stable version
+$ lyp install lilypond@stable
+
+# latest stable version
+$ lyp install lilypond@unstable
+
+# latest version
+$ lyp install lilypond@latest
+
+# version 2.18.1
+$ lyp install lilypond@2.18.1
+
+# highest version higher than 2.19.27
+$ lyp install "lilypond>=2.19.27"
+
+# highest 2.18 version higher than 2.18.1
+$ lyp install "lilypond~>2.18.1"
 ```
 
 To uninstall a version lilypond use `lyp uninstall`
 
 ```bash
-lyp uninstall lilypond@2.18.2
+$ lyp uninstall lilypond@2.18.2
 ```
 
 ### Showing the list of installed lilypond versions
@@ -291,7 +331,7 @@ lyp uninstall lilypond@2.18.2
 To display all installed versions of lilypond, use the `list` command:
   
 ```bash
-lyp list lilypond
+$ lyp list lilypond
 ```
 
 The output will look as follows:
@@ -317,9 +357,14 @@ This will also list any versions of lilypond found on the user's `$PATH` outside
 You can also list available versions of lilypond by using the `search` command:
 
 ```bash
-lyp search lilypond # display all available versions of lilypond
-lyp search "lilypond>=2.19" # display all available versions higher than 2.19
-lyp search "lilypond@stable" # display all available stable versions
+# display all available versions of lilypond
+$ lyp search lilypond
+
+# display all available versions higher than 2.19
+$ lyp search "lilypond>=2.19"
+
+# display all available stable versions
+$ lyp search "lilypond@stable"
 ````
 
 The output will look as follows:
@@ -349,9 +394,11 @@ Available versions of lilypond@stable:
 To switch between versions use the `lyp use`. The same version specifiers could be used as for the `lyp install` command:
 
 ```bash
-lyp use lilypond@2.18.2 # or without the 'lilypond' identifier:
-lyp use stable # use latest stable version 
-lyp use unstable # use latest unstable version 
+$ lyp use lilypond@2.18.2 # the 'lilypond' identifier is optional
+
+# use latest stable/unstable versions
+$ lyp use stable
+$ lyp use unstable
 ```
 
 **Note**: The setting of the current lilypond version to use will be maintained for the current shell session.
@@ -359,10 +406,17 @@ lyp use unstable # use latest unstable version
 In order to switch the default version of lilypond to use, add the `--default` switch:
 
 ```bash
-lyp use --default 2.19.35
+$ lyp use --default 2.19.35
 ```
 
 The version used can be further controlled using the `--use` and `--env` options passed to `lilypond` (see below).
+
+As discussed [above](#showing-the-list-of-installed-lilypond-versions), the `lyp list lilypond` command displays the current and default settings. You can also display the path to the currently selected version by running `lyp which lilypond`:
+
+```bash
+$ lyp which lilypond
+#=> /Users/sharon/.lyp/lilyponds/2.18.2/bin/lilypond
+```
 
 ### Running lilypond
 
@@ -371,38 +425,40 @@ Once one or more versions of lilypond are installed, the lilypond command may be
 - `--use`, `-u` - use a specific version of lilypond:
 
   ```bash
-  lilypond --use=2.19.12 ...
+  $ lilypond --use=2.19.12 ...
 
   # version constraints can also be used:
-  lilypond --use=">=2.19.12" ...
-  lilypond --use=stable ...
-  lilypond --use=latest ...
+  $ lilypond --use=">=2.19.12" ...
+  $ lilypond --use=stable ...
+  $ lilypond --use=latest ...
   ```
   
 - `--env`, `-E` - use a version set by the `$LILYPOND_VERSION` environment variable:
 
   ```bash
-  LILYPOND_VERSION=2.18.2 lilypond --env ...
+  $ LILYPOND_VERSION=2.18.2 lilypond --env ...
   ```
 
 - `--install`, `-n` - install the specified version of lilypond if not present. This option works only in conjunction with `--env` or `--use`:
 
   ```bash
-  lilypond -u2.19.35 -n ...
+  $ lilypond -u2.19.35 -n ...
   ```
   
 - `--raw`, `-r` - do not pre-process input file (no scanning for dependencies, no wrapping).
 
   ```bash
-  lilypond --raw ...
+  $ lilypond --raw ...
   ```
 
 ## Contributing
 
-Lyp is written in Ruby, and its code is [available on github](https://github.com/noteflakes/lyp). To hack on it, siply clone the repository. To run the specs:
+Lyp is written in Ruby, and its code is [available on github](https://github.com/noteflakes/lyp). To hack on it, simply clone the repository. To run the specs:
 
 ```bash
-rspec
+$ cd lyp
+$ bundle install # needs to be run only once
+$ rspec
 ```
 
 Please feel free to submit issues and pull requests.
