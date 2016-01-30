@@ -72,9 +72,9 @@ class Lyp::CLI < Thor
       versions = Lyp::Lilypond.search(version)
   
       if versions.empty?
-        puts "\nNo versions of lilypond are available for download\n\n"
+        puts "\nNo available versions of lilypond@#{version} found\n\n"
       else
-        puts "\nAvailable versions of lilypond:\n\n"
+        puts "\nAvailable versions of lilypond@#{version}:\n\n"
         versions.each do |v|
           prefix = v[:installed] ? " * " : "   "
           puts "#{prefix}#{v[:version]}"

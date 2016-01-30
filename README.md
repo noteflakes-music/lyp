@@ -294,6 +294,22 @@ To display all installed versions of lilypond, use the `list` command:
 lyp list lilypond
 ```
 
+The output will look as follows:
+
+```
+Lilypond versions:
+
+=> 2.18.2
+   2.19.12
+ * 2.19.35
+
+# => - current
+# =* - current && default
+#  * - default
+```
+
+(For current, default settings see below)
+
 This will also list any versions of lilypond found on the user's `$PATH` outside of the `~/.lyp` directory (these versions will be marked as 'system' versions).
 
 ### Showing available lilypond versions
@@ -306,14 +322,36 @@ lyp search "lilypond>=2.19" # display all available versions higher than 2.19
 lyp search "lilypond@stable" # display all available stable versions
 ````
 
+The output will look as follows:
+
+```
+Available versions of lilypond@stable:
+
+   2.8.8
+   2.10.0
+   2.10.33
+   2.12.0
+   2.12.3
+   2.14.0
+   2.14.2
+   2.16.0
+   2.16.1
+   2.16.2
+   2.18.0
+   2.18.1
+ * 2.18.2
+
+ * Currently installed
+```
+
 ### Switching between lilypond versions
 
 To switch between versions use the `lyp use`. The same version specifiers could be used as for the `lyp install` command:
 
 ```bash
-lyp use lilypond@2.18.2 % or without the 'lilypond' identifier:
-lyp use stable % use latest stable version 
-lyp use unstable % use latest unstable version 
+lyp use lilypond@2.18.2 # or without the 'lilypond' identifier:
+lyp use stable # use latest stable version 
+lyp use unstable # use latest unstable version 
 ```
 
 **Note**: The setting of the current lilypond version to use will be maintained for the current shell session.
@@ -358,7 +396,7 @@ Once one or more versions of lilypond are installed, the lilypond command may be
   ```bash
   lilypond --raw ...
   ```
-  
+
 ## Contributing
 
 Lyp is written in Ruby, and its code is [available on github](https://github.com/noteflakes/lyp). To hack on it, siply clone the repository. To run the specs:
