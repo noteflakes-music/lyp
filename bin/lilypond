@@ -3,20 +3,86 @@
 require 'lyp/version'
 require 'lyp'
 
-STDERR.puts "Lyp version #{Lyp::VERSION}"
+def process_argv
+  options = {}
+  argv = ARGV.dup # copy for iterating
+  argv_clean = []
+  while arg = argv.shift
+    case arg
+    when '-r', '--raw'
+      options[:raw] = true
+    when '-E', '--env'
+      unless ENV['LILYPOND_VERSION']
+        STDERR.puts "$LILYPOND_VERSION not set"
+        exit 1
+      end
+      options[:use_version] = ENV['LILYPOND_VERSION']
+    when '-u', '--use'
+      options[:use_version] = argv.shift
+    when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
+      options[:use_version] = $1
+    when '-n', '--install'
+      options[:install] = true
+    else
+      argv_clean << arg
+    end
+  end
+  
+  [options, argv_clean]
+end
+$options, $argv = process_argv
 
-Lyp::Lilypond.check_lilypond!
-lilypond_path = Lyp::Lilypond.current_lilypond
-unless lilypond_path && File.file?(lilypond_path)
-  STDERR.puts "No version of lilypond found. To install lilypond run 'lyp install lilypond'."
+def get_lilypond_path
+  if $options[:use_version]
+    if $options[:install]
+      Lyp::Lilypond.install_if_missing($options[:use_version])
+    end
+    Lyp::Lilypond.force_version!($options[:use_version])
+  end
+  Lyp::Lilypond.check_lilypond!
+  Lyp::Lilypond.current_lilypond.tap do |path|
+    unless path && File.file?(path)
+      STDERR.puts "No version of lilypond found. To install lilypond run 'lyp install lilypond'."
+      exit 1
+    end
+  end
+rescue => e
+  STDERR.puts e.message
   exit 1
 end
+$lilypond_path = get_lilypond_path
 
-case ARGV
-when [], ['-v'], ['--warranty'], ['scheme-sandbox']
-  exec("#{lilypond_path} #{ARGV.join(' ')}")
+if $options[:raw]
+  exec("#{$lilypond_path} #{$argv[1..-1].join(' ')}")
+end
+
+OVERRIDING_LILYPOND_SWITCHES = %w{
+  -w --warranty
+  -v --version
+  scheme-sandbox
+}
+LILYPOND_HELP_SWITCHES = %w{
+  -h --help
+}
+LYP_LY_HELP = <<EOF
+Lyp-provided options:
+  -r, --raw                           run raw lilypond (no pre-processing)
+  -E, --env                           use version specified in $LILYPOND_VERSION
+  -u, --use=VERSION                   use the given version of lilypond
+  -n, --install                       install the given version if not found
+EOF
+
+case $argv.first
+when nil, *OVERRIDING_LILYPOND_SWITCHES
+  STDERR.puts "Lyp version #{Lyp::VERSION}"
+  exec("#{$lilypond_path} #{$argv.join(' ')}")
+  
+when *LILYPOND_HELP_SWITCHES
+  STDERR.puts "Lyp version #{Lyp::VERSION}"
+  puts `#{$lilypond_path} #{$argv.join(' ')}`
+  puts LYP_LY_HELP
 else
   begin
-    Lyp::Lilypond.compile(ARGV)
+    Lyp::Lilypond.compile($argv, $options)
   end
 end

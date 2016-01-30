@@ -57,11 +57,12 @@ module Lyp::Lilypond
     end
     
     def forced_lilypond
-      lilypond = lyp_lilyponds.find do |l|
-        l[:version] == @forced_version
+      lilypond = filter_installed_list(@forced_version)[0]
+      if lilypond
+        lilypond[:path]
+      else
+        raise "No installed version found matching '#{@forced_version}'"
       end
-      
-      lilypond && lilypond[:path]
     end
     
     def force_env_version!
@@ -69,6 +70,10 @@ module Lyp::Lilypond
       unless @forced_version
         raise "LILYPOND_VERSION not set"
       end
+    end
+    
+    def force_version!(version)
+      @forced_version = version
     end
     
     attr_reader :forced_version
@@ -108,6 +113,11 @@ module Lyp::Lilypond
     
     CMP_VERSION = proc do |x, y|
       Gem::Version.new(x[:version]) <=> Gem::Version.new(y[:version])
+    end
+    
+    def filter_installed_list(version_specifier)
+      list = (system_lilyponds + lyp_lilyponds).sort!(&CMP_VERSION)
+      list.select {|l| version_match(l[:version], version_specifier, list)}
     end
     
     def list
@@ -236,6 +246,12 @@ module Lyp::Lilypond
     
     def latest_version
       search.last[:version]
+    end
+    
+    def install_if_missing(version_specifier, opts = {})
+      if filter_installed_list(version_specifier).empty?
+        install(version_specifier, opts = {})
+      end
     end
     
     def install(version_specifier, opts = {})

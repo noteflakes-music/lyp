@@ -25,7 +25,12 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [Including fonts](#including-fonts)
   - [Testing packages](#testing-packages)
   - [Publishing packages](#publishing-packages)
-- [Installing and switching Lilypond versions](#installing-and-switching-lilypond-versions)
+- [Installing and Using Lilypond](#installing-and-using-lilypond)
+  - [Installing/uninstalling a version of lilypond](#installing-uninstalling a version of lilypond)
+  - [Showing the list of installed lilypond versions](#showing-the-list-of-installed-lilypond-versions)
+  - [Showing available lilypond versions](#Showing-available-lilypond-versions)
+  - [Switching between lilypond versions](#switching-between-lilypond-versions)
+  - [Running lilypond](#running-lilypond)
 - [Contributing](#contributing)
 
 ## Installation
@@ -68,6 +73,8 @@ Lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  instal
 - Resolve the dependency tree and calculate the correct versions to use for each required package.
 - Create a wrapper lilypond file that loads the packages.
 - Invoke the selected version of lilypond.
+
+For more information on running lilypond see the section on [Running lilypond](#running-lilypond).
 
 ### Uninstalling
 
@@ -257,7 +264,9 @@ In order for your package to be available to all users, you'll need to first pus
 
 You can also add your package to the lyp [public package index](https://github.com/noteflakes/lyp-index), by cloning it, editing [index.yaml](https://github.com/noteflakes/lyp-index/blob/master/index.yaml), and creating a pull request.
 
-## Installing and switching Lilypond versions
+## Installing and Using Lilypond
+
+### Installing/uninstalling a version of lilypond
 
 When installing lilypond, the specific version to download can be specified in different ways:
 
@@ -271,13 +280,23 @@ lyp install "lilypond>=2.19.27" % highest version higher than 2.19.27
 lyp install "lilypond~>2.18.1" % highest 2.18 version higher than 2.18.1
 ```
 
+To uninstall a version lilypond use `lyp uninstall`
+
+```bash
+lyp uninstall lilypond@2.18.2
+```
+
+### Showing the list of installed lilypond versions
+
 To display all installed versions of lilypond, use the `list` command:
   
 ```bash
 lyp list lilypond
 ```
 
-This will also list any versions of lilypond found outside of the `~/.lyp` directory.
+This will also list any versions of lilypond found on the user's `$PATH` outside of the `~/.lyp` directory (these versions will be marked as 'system' versions).
+
+### Showing available lilypond versions
 
 You can also list available versions of lilypond by using the `search` command:
 
@@ -287,6 +306,8 @@ lyp search "lilypond>=2.19" # display all available versions higher than 2.19
 lyp search "lilypond@stable" # display all available stable versions
 ````
 
+### Switching between lilypond versions
+
 To switch between versions use the `lyp use`. The same version specifiers could be used as for the `lyp install` command:
 
 ```bash
@@ -295,7 +316,7 @@ lyp use stable % use latest stable version
 lyp use unstable % use latest unstable version 
 ```
 
-The setting of the current lilypond version to use will be maintained for the current shell session.
+**Note**: The setting of the current lilypond version to use will be maintained for the current shell session.
 
 In order to switch the default version of lilypond to use, add the `--default` switch:
 
@@ -303,6 +324,41 @@ In order to switch the default version of lilypond to use, add the `--default` s
 lyp use --default 2.19.35
 ```
 
+The version used can be further controlled using the `--use` and `--env` options passed to `lilypond` (see below).
+
+### Running lilypond
+
+Once one or more versions of lilypond are installed, the lilypond command may be used normally to compile lilypond files. Lyp adds a few extra options:
+
+- `--use`, `-u` - use a specific version of lilypond:
+
+  ```bash
+  lilypond --use=2.19.12 ...
+
+  # version constraints can also be used:
+  lilypond --use=">=2.19.12" ...
+  lilypond --use=stable ...
+  lilypond --use=latest ...
+  ```
+  
+- `--env`, `-E` - use a version set by the `$LILYPOND_VERSION` environment variable:
+
+  ```bash
+  LILYPOND_VERSION=2.18.2 lilypond --env ...
+  ```
+
+- `--install`, `-n` - install the specified version of lilypond if not present. This option works only in conjunction with `--env` or `--use`:
+
+  ```bash
+  lilypond -u2.19.35 -n ...
+  ```
+  
+- `--raw`, `-r` - do not pre-process input file (no scanning for dependencies, no wrapping).
+
+  ```bash
+  lilypond --raw ...
+  ```
+  
 ## Contributing
 
 Lyp is written in Ruby, and its code is [available on github](https://github.com/noteflakes/lyp). To hack on it, siply clone the repository. To run the specs:
