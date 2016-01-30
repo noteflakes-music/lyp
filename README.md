@@ -16,6 +16,7 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 - [Working with packages](#working-with-packages)
   - [What constitutes a package?](#what-constitutes-a-package)
   - [Installing packages](#installing-packages)
+  - [Automatic package installation](#automatic-package-installation)
   - [Package references](#package-references)
   - [Version specifiers](#version-specifiers)
   - [Using packages](#using-packages)
@@ -50,7 +51,7 @@ The `lyp install self` command is needed in order to setup the `~/.lyp` working 
 
 #### Installing lyp without Ruby
 
-If you don't have Ruby on your machine you can install lyp as a stand alone package using the [install script](https://raw.githubusercontent.com/noteflakes/lyp/master/bin/install_release.sh):
+If you don't have Ruby on your machine you can install lyp as a stand alone package using the install script ([view source](https://raw.githubusercontent.com/noteflakes/lyp/master/bin/install_release.sh)):
 
 ```bash
 $ curl -sSL https://git.io/getlyp | bash
@@ -62,7 +63,18 @@ or with Wget:
 $ wget -qO- https://git.io/getlyp | bash
 ```
 
-**Note**: installing the standalone release of lyp requires having git on your machine.
+If you feel uneasy about piping curl output to bash, you can install lyp yourself by downloading a [release](https://github.com/noteflakes/lyp/releases), untarring it, and running `lyp install self`:
+
+```bash
+$ cd /Downloads
+# assuming linux-64 platform
+$ tar -xzf lyp-0.2.1-linux-x86_64.tar.gz
+$ lyp-0.2.1-linux-x86_64/lyp install self
+```
+
+https://github.com/noteflakes/lyp/releases/download/v0.2.1/lyp-0.2.1-linux-x86_64.tar.gz
+
+**Note**: using the standalone release of lyp requires having git on your machine.
 
 ### How lyp works
 
@@ -152,6 +164,36 @@ lyp search
 lyp search stylesheet
 ```
 
+### Automatic package installation
+
+An easier way to install packages is by using the `lyp resolve` command, which installs all packages required for a given input file. Suppose a lilypond called `test.ly` with the following content:
+
+```lilypond
+\version "2.19.35"
+\require "assert"
+
+#(assert-eq? 1 1)
+#(assert:summary)
+```
+
+To install the `assert` package required in the file we run:
+
+```bash
+$ lyp resolve test.ly
+#=>
+Cloning https://github.com/noteflakes/lyp-assert.git...
+
+Installed assert@0.2.0
+```
+
+Package dependencies for a given input file can be shown using the `lyp deps` command:
+
+```bash
+$ lyp deps test.ly
+#=>
+  assert => 0.2.0
+```
+
 ### Package references
 
 A package is normally referenced by its git URL. Lyp lets you provide either fully- or partially qualified URLs. A package hosted on github can be also referenced by the user/repository pair. The following are all equivalent:
@@ -200,9 +242,9 @@ Version specifiers could be used when installing, listing and requiring packages
 $ lyp install "dummy~>0.2.0"
 ```
 
-(__Note__: that when using version constraints you should put the package specifier in quotes)
+**Note**: when using version constraints you should put the package specifier in quotes for bash properly parse the command.
 
-### Using packages
+### Requiring packages
 
 To include a package in your lilypond code, use the `\require` command:
 
@@ -211,7 +253,9 @@ To include a package in your lilypond code, use the `\require` command:
 \require "github.com/lulu/mypack>=0.4.0"
 ```
 
-It is important to note that once you use `\require` in your code, you will have to compile it using the lilypond wrapper provided by lyp. It will not pass compilation using plain lilypond.
+**Note**: once you use `\require` in your code, you will have to compile it using the lilypond wrapper provided by lyp. It will not pass compilation using plain lilypond.
+
+Once the package requirements are defined, you can either install packages manually using [`lyp install`](#installing-packages), or automatically using [`lyp resolve`](#automatic-package-installation) as described above.
 
 ## Developing packages
 
