@@ -116,9 +116,9 @@ $ lyp install dummy
 $ lyp install github.com/ciconia/mypack@0.2.0
 
 # install version 0.1.0 or higher
-$ lyp install mypack>=0.1.0
+$ lyp install "mypack>=0.1.0"
 
-# install from local path (see below on developing packages)
+# install from local path (see section below on developing packages)
 $ lyp install mypack@dev:~/repo/mypack
 ```
 
@@ -204,7 +204,7 @@ $ lyp install "dummy~>0.2.0"
 
 ### Using packages
 
-To include a package in your lilypond code, use ther `\require` command:
+To include a package in your lilypond code, use the `\require` command:
 
 ```lilypond
 \require "dummy"
