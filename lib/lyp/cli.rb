@@ -39,10 +39,13 @@ LILYPOND_LEGEND = <<EOF
 
 EOF
 
+$cmd_options = {}
+
 class Lyp::CLI < Thor
   package_name "lyp"
   map "-v" => :version
   check_unknown_options! :except => :compile
+  class_option :verbose, aliases: '-V', :type => :boolean
   
   desc "version", "show Lyp version"
   def version
@@ -51,6 +54,7 @@ class Lyp::CLI < Thor
   
   desc "search [PATTERN|lilypond]", "List available packages matching PATTERN or versions of lilypond"
   def search(pattern = '')
+    $cmd_options = options
     # Lyp::System.test_installed_status!
 
     pattern =~ Lyp::PACKAGE_RE
@@ -97,6 +101,8 @@ class Lyp::CLI < Thor
   method_option :install, aliases: '-i', type: :boolean, desc: 'Install the requested version of lilypond if not present'
   method_option :env, aliases: '-e', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
   def compile(*args)
+    $cmd_options = options
+
     $stderr.puts "Lyp #{Lyp::VERSION}"
     Lyp::System.test_installed_status!
 
@@ -118,6 +124,8 @@ class Lyp::CLI < Thor
   method_option :env, aliases: '-e', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
   method_option :all, aliases: '-a', type: :boolean, desc: ''
   def test(*args)
+    $cmd_options = options
+
     $stderr.puts "Lyp #{Lyp::VERSION}"
 
     if options[:env]
@@ -142,6 +150,8 @@ class Lyp::CLI < Thor
   method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
   method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
   def install(*args)
+    $cmd_options = options
+
     raise "No package specified" if args.empty?
     
     args.each do |package|
@@ -161,6 +171,8 @@ class Lyp::CLI < Thor
   desc "uninstall <PACKAGE|lilypond|self>...", "Uninstall a package or a version of lilypond. When 'uninstall self' is invoked, lyp uninstalls itself from ~/.lyp."
   method_option :all, aliases: '-a', type: :boolean, desc: 'Uninstall all versions'
   def uninstall(*args)
+    $cmd_options = options
+
     Lyp::System.test_installed_status!
 
     raise "No package specified" if args.empty?
@@ -181,6 +193,8 @@ class Lyp::CLI < Thor
   desc "use [lilypond@]<VERSION>", "Switch version of lilypond"
   method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
   def use(version)
+    $cmd_options = options
+
     Lyp::System.test_installed_status!
 
     if version =~ Lyp::LILYPOND_RE
@@ -193,6 +207,8 @@ class Lyp::CLI < Thor
 
   desc "list [PATTERN|lilypond]", "List installed packages matching PATTERN or versions of lilypond"
   def list(pattern = nil)
+    $cmd_options = options
+
     Lyp::System.test_installed_status!
 
     if pattern == 'lilypond'
@@ -223,6 +239,8 @@ class Lyp::CLI < Thor
   
   desc "which [PATTERN|lilypond]", "List locations of installed packages matching PATTERN or versions of lilypond"
   def which(pattern = nil)
+    $cmd_options = options
+
     Lyp::System.test_installed_status!
 
     if pattern == 'lilypond'
@@ -234,6 +252,8 @@ class Lyp::CLI < Thor
   
   desc "deps FILE", "Lists dependencies found in user's files"
   def deps(fn)
+    $cmd_options = options
+
     resolver = Lyp::Resolver.new(fn)
     tree = resolver.get_dependency_tree(ignore_missing: true)
     tree[:dependencies].each do |package, leaf|
@@ -249,6 +269,8 @@ class Lyp::CLI < Thor
   desc "resolve FILE", "Resolves and installs missing dependencies found in user's files"
   method_option :all, aliases: '-a', type: :boolean, desc: 'Install all found dependencies'
   def resolve(fn)
+    $cmd_options = options
+
     resolver = Lyp::Resolver.new(fn)
     tree = resolver.get_dependency_tree(ignore_missing: true)
     tree[:dependencies].each do |package, leaf|
@@ -263,6 +285,6 @@ begin
   Lyp::CLI.start(ARGV)
 rescue => e
   puts e.message
-  puts e.backtrace.join("\n")
+  puts e.backtrace.join("\n") if $cmd_options[:verbose]
   exit(1)
 end
