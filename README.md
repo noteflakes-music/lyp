@@ -271,13 +271,13 @@ You can also add your package to the lyp [public package index](https://github.c
 When installing lilypond, the specific version to download can be specified in different ways:
 
 ```bash
-lyp install lilypond % latest stable version
-lyp install lilypond@stable % latest stable version
-lyp install lilypond@unstable % latest stable version
-lyp install lilypond@latest % latest version
-lyp install lilypond@2.18.1 % version 2.18.1
-lyp install "lilypond>=2.19.27" % highest version higher than 2.19.27
-lyp install "lilypond~>2.18.1" % highest 2.18 version higher than 2.18.1
+lyp install lilypond # latest stable version
+lyp install lilypond@stable # latest stable version
+lyp install lilypond@unstable # latest stable version
+lyp install lilypond@latest # latest version
+lyp install lilypond@2.18.1 # version 2.18.1
+lyp install "lilypond>=2.19.27" # highest version higher than 2.19.27
+lyp install "lilypond~>2.18.1" # highest 2.18 version higher than 2.18.1
 ```
 
 To uninstall a version lilypond use `lyp uninstall`
