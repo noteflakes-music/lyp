@@ -248,7 +248,7 @@ module Lyp::Lilypond
     
     def install_if_missing(version_specifier, opts = {})
       if filter_installed_list(version_specifier).empty?
-        install(version_specifier, opts = {})
+        install(version_specifier, opts)
       end
     end
     
@@ -408,7 +408,8 @@ module Lyp::Lilypond
         FileUtils.cp_r(dir, target_dir, remove_destination: true) if File.directory?(dir)
       end
       
-      STDERR.puts exec "#{target_dir}/bin/lilypond -v"  unless opts[:silent]
+      # Show lilypond versions
+      STDERR.puts `#{target_dir}/bin/lilypond -v` unless opts[:silent] || opts[:no_version_test]
     rescue => e
       puts e.message
     end

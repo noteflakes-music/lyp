@@ -55,7 +55,6 @@ class Lyp::CLI < Thor
   desc "search [PATTERN|lilypond]", "List available packages matching PATTERN or versions of lilypond"
   def search(pattern = '')
     $cmd_options = options
-    # Lyp::System.test_installed_status!
 
     pattern =~ Lyp::PACKAGE_RE
     package, version = $1, $2
@@ -120,23 +119,31 @@ class Lyp::CLI < Thor
   end
   
   desc "test [<option>...] [.|PATTERN]", "Runs package tests on installed packages or local directory"
-  method_option :install, aliases: '-i', type: :boolean, desc: 'Install the requested version of lilypond if not present'
-  method_option :env, aliases: '-e', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
-  method_option :all, aliases: '-a', type: :boolean, desc: ''
+  method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of lilypond if not present'
+  method_option :env, aliases: '-E', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
+  method_option :use, aliases: '-u', type: :string, desc: 'Use specified version'
   def test(*args)
     $cmd_options = options
 
     $stderr.puts "Lyp #{Lyp::VERSION}"
 
     if options[:env]
-      Lyp::Lilypond.force_env_version!
-      if options[:install] && !Lyp::Lilypond.forced_lilypond
-        Lyp::Lilypond.install(Lyp::Lilypond.forced_version)
+      unless ENV['LILYPOND_VERSION']
+        STDERR.puts "$LILYPOND_VERSION not set"
+        exit 1
       end
-    else
-      # check lilypond default / current settings
-      Lyp::Lilypond.check_lilypond!
+      options[:use] = ENV['LILYPOND_VERSION']
     end
+    
+    if options[:use]
+      if options[:install]
+        Lyp::Lilypond.install_if_missing(options[:use], no_version_test: true)
+      end
+      Lyp::Lilypond.force_version!(options[:use])
+    end
+
+    # check lilypond default / current settings
+    Lyp::Lilypond.check_lilypond!
     
     case args
     when ['.']
