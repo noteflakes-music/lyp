@@ -1,3 +1,5 @@
+$WINDOWS = Gem.win_platform?
+
 # test for existence of 
 $rugged_available = begin
   gem 'rugged', '>=0.23.0'
@@ -16,6 +18,12 @@ unless $rugged_available
   require 'lyp/git_based_rugged'
 end
 
+require 'tmpdir'
+require 'fileutils'
+$TMP_DIR = $WINDOWS ? "#{Dir.home}/AppData/Local/Temp" : "/tmp"
+$TMP_ROOT = "#{$TMP_DIR}/lyp"
+FileUtils.mkdir_p($TMP_ROOT)
+
 %w{
   base
   system
@@ -31,3 +39,4 @@ end
   require File.expand_path("lyp/#{f}", File.dirname(__FILE__))
 end
 
+require File.expand_path("lyp/windows", File.dirname(__FILE__)) if $WINDOWS

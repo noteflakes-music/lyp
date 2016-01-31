@@ -118,15 +118,15 @@ RSpec.describe "Lyp::Package" do
   
   it "correctly converts a git URL to a local temp path" do
     expect(Lyp::Package.git_url_to_temp_path("https://github.com/ciconia/stylush.git")).to eq(
-      "/tmp/lyp/repos/github.com/ciconia/stylush"
+      "#{$TMP_ROOT}/repos/github.com/ciconia/stylush"
     )
 
     expect(Lyp::Package.git_url_to_temp_path("http://down.load/myrepo.git")).to eq(
-      "/tmp/lyp/repos/down.load/myrepo"
+      "#{$TMP_ROOT}/repos/down.load/myrepo"
     )
     
     expect(Lyp::Package.git_url_to_temp_path("git@github.com:e/f.git")).to eq(
-      "/tmp/lyp/repos/github.com/e/f"
+      "#{$TMP_ROOT}/repos/github.com/e/f"
     )
   end
 
@@ -151,26 +151,26 @@ RSpec.describe "Lyp::Package" do
   end
 
   it "correctly lists tags for a package repo" do
-    tmp_dir = "/tmp/lyp-dummy-repo"
+    tmp_dir = "#{$TMP_ROOT}/dummy-repo"
     FileUtils.rm_rf(tmp_dir)
     repo = Rugged::Repository.clone_at('https://github.com/noteflakes/lyp-package-template.git', tmp_dir)
     tags = Lyp::Package.repo_tags(repo)
     versions = tags.map {|t| Lyp::Package.tag_version(t.name)}
-    expect(versions).to eq(%w{0.1.0 0.2.0 0.2.1 0.3.0})
+    expect(versions).to eq(%w{0.1.0 0.2.0 0.2.1 0.3.0 0.3.1})
   end
   
   it "correctly selects the correct checkout ref for a given version specifier" do
-    tmp_dir = "/tmp/lyp-dummy-repo"
+    tmp_dir = "#{$TMP_ROOT}/dummy-repo"
     FileUtils.rm_rf(tmp_dir)
     repo = Rugged::Repository.clone_at('https://github.com/noteflakes/lyp-package-template', tmp_dir)
 
     select = lambda {|v| Lyp::Package.select_checkout_ref(repo, v)}
     
-    expect(select[nil]).to eq("v0.3.0")
-    expect(select["latest"]).to eq("v0.3.0")
+    expect(select[nil]).to eq("v0.3.1")
+    expect(select["latest"]).to eq("v0.3.1")
     expect(select["master"]).to eq("master")
     expect(select["0.2.0"]).to eq("v0.2.0")
-    expect(select[">=0.1.0"]).to eq("v0.3.0")
+    expect(select[">=0.1.0"]).to eq("v0.3.1")
     expect(select["~>0.1.0"]).to eq("v0.1.0")
     expect(select["~>0.2.0"]).to eq("v0.2.1")
   end
@@ -180,12 +180,12 @@ RSpec.describe "Lyp::Package" do
       # When no version is specified, lyp should install the highest tagged 
       # version
       version = Lyp::Package.install('dummy', silent: true)
-      expect(version).to eq("0.3.0")
+      expect(version).to eq("0.3.1")
 
       paths = Dir["#{$packages_dir}/dummy*"].map {|fn| File.basename(fn)}
-      expect(paths).to eq(['dummy@0.3.0'])
+      expect(paths).to eq(['dummy@0.3.1'])
 
-      expect(Lyp::Package.list('dummy')).to eq(['dummy@0.3.0'])
+      expect(Lyp::Package.list('dummy')).to eq(['dummy@0.3.1'])
 
       version = Lyp::Package.install('dummy@0.2.0', silent: true)
       expect(version).to eq("0.2.0")
@@ -197,13 +197,13 @@ RSpec.describe "Lyp::Package" do
       expect(version).to eq("0.2.1")
 
       version = Lyp::Package.install('dummy@>=0.1.0', silent: true)
-      expect(version).to eq("0.3.0")
+      expect(version).to eq("0.3.1")
 
       version = Lyp::Package.install('dummy>=0.1.0', silent: true)
-      expect(version).to eq("0.3.0")
+      expect(version).to eq("0.3.1")
 
       expect(Lyp::Package.list('dummy')).to eq(%w{
-        dummy@0.1.0 dummy@0.2.0 dummy@0.2.1 dummy@0.3.0
+        dummy@0.1.0 dummy@0.2.0 dummy@0.2.1 dummy@0.3.1
       })
     end
   end
@@ -213,15 +213,15 @@ RSpec.describe "Lyp::Package" do
       # When no version is specified, lyp should install the highest tagged 
       # version
       version = Lyp::Package.install('github.com/noteflakes/lyp-package-template', silent: true)
-      expect(version).to eq("0.3.0")
+      expect(version).to eq("0.3.1")
 
       paths = Dir["#{$packages_dir}/**/package.ly"].map do |fn|
         File.dirname(fn).gsub("#{$packages_dir}/", "")
       end
-      expect(paths).to eq(['github.com/noteflakes/lyp-package-template@0.3.0'])
+      expect(paths).to eq(['github.com/noteflakes/lyp-package-template@0.3.1'])
 
       expect(Lyp::Package.list('templ')).to eq(
-        ['github.com/noteflakes/lyp-package-template@0.3.0']
+        ['github.com/noteflakes/lyp-package-template@0.3.1']
       )
     end
   end
@@ -232,7 +232,7 @@ RSpec.describe "Lyp::Package" do
       expect(version).to eq("0.1.0")
       
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
-      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@0.3.0})
+      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@0.3.1})
 
       version = Lyp::Package.install('dependency-test>=0.2.0', silent: true)
       expect(version).to eq("0.2.0")
@@ -242,7 +242,7 @@ RSpec.describe "Lyp::Package" do
         dependency-test@0.1.0
         dependency-test@0.2.0
         dummy@0.2.1
-        dummy@0.3.0
+        dummy@0.3.1
       })
     end
   end
@@ -303,18 +303,18 @@ RSpec.describe "Lyp::Package" do
       Lyp::Package.install('dependency-test@0.1', silent: true)
       
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
-      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@0.3.0})
+      expect(dirs.sort).to eq(%w{dependency-test@0.1.0 dummy@0.3.1})
       
       Lyp::Package.uninstall('dependency-test@0.1.0', silent: true)
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
-      expect(dirs.sort).to eq(%w{dummy@0.3.0})
+      expect(dirs.sort).to eq(%w{dummy@0.3.1})
       
       Lyp::Package.install('dependency-test@0.1.0', silent: true)
       Lyp::Package.install('dependency-test@0.2.0', silent: true)
       Lyp::Package.uninstall('dependency-test', silent: true, all: true)
 
       dirs = Dir["#{$packages_dir}/*"].map {|fn| File.basename(fn)}
-      expect(dirs.sort).to eq(%w{dummy@0.2.1 dummy@0.3.0})
+      expect(dirs.sort).to eq(%w{dummy@0.2.1 dummy@0.3.1})
 
       expect {Lyp::Package.uninstall('dependency-test@0.1.0', silent: true)}.to \
         raise_error
@@ -328,20 +328,20 @@ RSpec.describe "Lyp::Package" do
 
   it "uninstalls a package from git url" do
     with_packages(:tmp) do
-      expect {Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template@0.3.0', silent: true)}.to \
+      expect {Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template@0.3.1', silent: true)}.to \
         raise_error
 
       Lyp::Package.install('github.com/noteflakes/lyp-package-template', silent: true)
       expect(Lyp::Package.list('templ')).to eq(
-        ['github.com/noteflakes/lyp-package-template@0.3.0']
+        ['github.com/noteflakes/lyp-package-template@0.3.1']
       )
       
-      Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template@0.3.0', silent: true)
+      Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template@0.3.1', silent: true)
       expect(Lyp::Package.list('templ')).to be_empty
       
       Lyp::Package.install('github.com/noteflakes/lyp-package-template', silent: true)
       expect(Lyp::Package.list('templ')).to eq(
-        ['github.com/noteflakes/lyp-package-template@0.3.0']
+        ['github.com/noteflakes/lyp-package-template@0.3.1']
       )
       
       Lyp::Package.uninstall('github.com/noteflakes/lyp-package-template', silent: true, all: true)

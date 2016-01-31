@@ -12,7 +12,10 @@ RSpec.describe "Lyp" do
         Lyp::Package.install("fonty@dev:#{$spec_dir}/user_files/fonty", silent: true)
         
         check_font_file = lambda do |version, path, positive = true|
-          exists = File.file?("#{$lilyponds_dir}/#{version}/share/lilypond/current/fonts/#{path}")
+          path = $WINDOWS ? 
+            "#{$lilyponds_dir}/#{version}/usr/share/lilypond/current/fonts/#{path}" :
+            "#{$lilyponds_dir}/#{version}/share/lilypond/current/fonts/#{path}"
+          exists = File.file?(path)
           expect(exists).to eq(positive)
         end
         
@@ -43,7 +46,9 @@ RSpec.describe "Lyp" do
         Lyp::Lilypond.install('2.19.12', silent: true)
         
         check_patch = lambda do |version, positive = true|
-          fn = "#{$lilyponds_dir}/#{version}/share/lilypond/current/scm/font.scm"
+          fn = $WINDOWS ? 
+            "#{$lilyponds_dir}/#{version}/usr/share/lilypond/current/scm/font.scm" :
+            "#{$lilyponds_dir}/#{version}/share/lilypond/current/scm/font.scm"
           identical = IO.read(fn) == IO.read(Lyp::FONT_PATCH_FILENAME)
           
           expect(identical).to eq(positive)

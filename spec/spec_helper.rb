@@ -1,4 +1,4 @@
-Bundler.setup(:default, :spec)
+# Bundler.setup(:default, :spec)
 
 $spec_dir = File.dirname(__FILE__)
 require File.join(File.expand_path($spec_dir), '../lib/lyp')
@@ -18,7 +18,7 @@ module Lyp
   end
   
   def self.settings_file
-    "/tmp/#{Lyp::SETTINGS_FILENAME}"
+    "#{$TMP_ROOT}/#{Lyp::SETTINGS_FILENAME}"
   end
   
   module Lilypond
@@ -27,7 +27,7 @@ module Lyp
     end
 
     def self.session_settings_filename
-      "/tmp/lyp.session.#{Process.pid}.yml"
+      "#{$TMP_ROOT}/session.#{Process.pid}.yml"
     end
     
     def self.invoke(argv, opts = {})
@@ -117,5 +117,10 @@ RSpec.configure do |config|
   config.after(:all) do
     FileUtils.rm_rf("#{$spec_dir}/lilypond_setups/tmp")
     FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
+  end
+  
+  config.before(:each) do
+    FileUtils.rm_f(Lyp.settings_file)
+    FileUtils.rm_f(Lyp::Lilypond.session_settings_filename)
   end
 end
