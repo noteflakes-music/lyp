@@ -95,7 +95,7 @@ module Lyp::Lilypond
         default = latest[:path]
         set_default_lilypond(default)
       else
-        raise LILYPOND_NOT_FOUND_MSG
+        raise Lyp::LILYPOND_NOT_FOUND_MSG
       end
     end
     

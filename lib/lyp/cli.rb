@@ -228,7 +228,7 @@ class Lyp::CLI < Thor
     if pattern == 'lilypond'
       list = Lyp::Lilypond.list
       if list.empty?
-        puts LILYPOND_NOT_FOUND_MSG
+        puts Lyp::LILYPOND_NOT_FOUND_MSG
       else
         puts LILYPOND_PREAMBLE
         list.each {|info| puts format_lilypond_entry(info)}
@@ -267,7 +267,7 @@ class Lyp::CLI < Thor
       if current
         puts Lyp::Lilypond.current_lilypond
       else
-        puts LILYPOND_NOT_FOUND_MSG
+        puts Lyp::LILYPOND_NOT_FOUND_MSG
       end
     else
       Lyp::Package.which(args.first).each {|p| puts p}
