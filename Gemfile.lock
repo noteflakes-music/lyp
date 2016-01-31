@@ -2,6 +2,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.2.5)
+    httpclient (2.7.1)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
       rspec-expectations (~> 3.2.0)
@@ -23,6 +24,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  httpclient (~> 2.7.1)
   rspec (= 3.2.0)
   ruby-progressbar (~> 1.7.5)
   rugged (= 0.23.0)

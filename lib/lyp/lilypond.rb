@@ -1,4 +1,5 @@
 require 'uri'
+require 'httpclient'
 require 'open3'
 require 'ruby-progressbar'
 

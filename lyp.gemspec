@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
 
   s.executables   = ['lyp', 'lilypond']
 
+  s.add_dependency "httpclient", "~>2.7", ">=2.7.1"
   s.add_dependency "ruby-progressbar", "~>1.7", ">=1.7.5"
   s.add_dependency "thor", "~>0.19", ">=0.19.1"
   s.add_dependency "rugged", "0.23.0"
