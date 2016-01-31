@@ -25,6 +25,8 @@ module Lyp
   # etc/lyp.ly contains lyp:* procedure definitions for loading packages and
   # other support code.
   LYP_LY_LIB_PATH = File.expand_path('etc/lyp.ly', File.dirname(__FILE__))
+  
+  LILYPOND_NOT_FOUND_MSG = "No version of lilypond found.\nTo install lilypond run 'lyp install lilypond'"
 
   SETTINGS_FILENAME = 'settings.yml'
   

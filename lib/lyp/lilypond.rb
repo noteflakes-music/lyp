@@ -86,7 +86,7 @@ module Lyp::Lilypond
     end
     
     def valid_lilypond?(path)
-      File.file?(path) && (`#{path} -v` =~ /^GNU LilyPond/)
+      (File.file?(path) rescue nil) && (`#{path} -v` =~ /^GNU LilyPond/)
     end
     
     def select_default_lilypond!
@@ -94,6 +94,8 @@ module Lyp::Lilypond
       if latest
         default = latest[:path]
         set_default_lilypond(default)
+      else
+        raise LILYPOND_NOT_FOUND_MSG
       end
     end
     
@@ -484,6 +486,9 @@ module Lyp::Lilypond
       list = list(lyp_only: true)
       if version_specifier
         list.select! {|l| version_match(l[:version], version_specifier, list)}
+      elsif !opts[:all]
+        # if no version is specified
+        raise "No version specifier given.\nTo uninstall all versions run 'lyp uninstall lilypond -a'.\n"
       end
       
       if list.empty?
@@ -495,6 +500,7 @@ module Lyp::Lilypond
       end
       
       list.each do |l|
+        puts "Uninstalling lilypond #{l[:version]}" unless opts[:silent]
         set_current_lilypond(nil) if l[:current]
         set_default_lilypond(nil) if l[:default]
         FileUtils.rm_rf(l[:root_path])

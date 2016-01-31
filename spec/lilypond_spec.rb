@@ -236,18 +236,19 @@ RSpec.describe "Lyp::Lilypond" do
       expect(Lyp::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.21/bin/lilypond")
 
       # invalid versions
-      expect {Lyp::Lilypond.uninstall("~>2.17.0")}.to raise_error
-      expect {Lyp::Lilypond.uninstall("abc")}.to raise_error
+      expect {Lyp::Lilypond.uninstall(nil, silent: true)}.to raise_error
+      expect {Lyp::Lilypond.uninstall("~>2.17.0", silent: true)}.to raise_error
+      expect {Lyp::Lilypond.uninstall("abc", silent: true)}.to raise_error
       
-      Lyp::Lilypond.uninstall("2.19.21")
+      Lyp::Lilypond.uninstall("2.19.21", silent: true)
       versions = Lyp::Lilypond.list.map {|l| l[:version]}
       expect(versions).to eq(%w{2.18.1 2.19.15})
 
       expect(Lyp::Lilypond.default_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
       expect(Lyp::Lilypond.current_lilypond).to eq("#{$lilyponds_dir}/2.19.15/bin/lilypond")
 
-      Lyp::Lilypond.uninstall("2.18.1")
-      Lyp::Lilypond.uninstall("2.19.15")
+      Lyp::Lilypond.uninstall("2.18.1", silent: true)
+      Lyp::Lilypond.uninstall("2.19.15", silent: true)
       versions = Lyp::Lilypond.list.map {|l| l[:version]}
       expect(versions).to eq([])
 
