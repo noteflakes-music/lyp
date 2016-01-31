@@ -74,8 +74,19 @@ def with_packages(setup, opts = {})
   end
 end
 
-def with_lilyponds(setup)
+def with_lilyponds(setup, opts = {})
   begin
+    if setup == :tmp
+      FileUtils.rm_rf("#{$spec_dir}/lilypond_setups/tmp")
+      
+      if opts[:copy_from]
+        FileUtils.cp_r("#{$spec_dir}/lilypond_setups/#{opts[:copy_from]}", 
+          "#{$spec_dir}/lilypond_setups/tmp")
+      else
+        FileUtils.mkdir("#{$spec_dir}/lilypond_setups/tmp")
+      end
+    end
+
     old_lilyponds_dir = $lilyponds_dir
     $lilyponds_dir = File.expand_path("lilypond_setups/#{setup}", $spec_dir)
 

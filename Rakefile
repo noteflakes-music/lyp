@@ -5,10 +5,8 @@ require File.expand_path("./lib/lyp/version", File.dirname(__FILE__))
 PACKAGE_NAME = "lyp"
 VERSION = Lyp::VERSION
 TRAVELING_RUBY_VERSION = "20150715-2.2.2"
-NOKOGIRI_VERSION = "1.6.6.2"
 RUGGED_VERSION = "0.21.4"
 
-NOKOGIRI_POSTFIX = "nokogiri-#{NOKOGIRI_VERSION}"
 RUGGED_POSTFIX = "rugged-#{RUGGED_VERSION}"
 
 TRAVELING_RUBY_BASE_URL = "http://d6r77u77i8pq3.cloudfront.net/releases"
@@ -42,7 +40,6 @@ namespace :package do
     desc "Package your app for Linux x86"
     task :x86 => [:bundle_install, 
       "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86.tar.gz",
-      "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86-#{NOKOGIRI_POSTFIX}.tar.gz"
       # "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86-#{RUGGED_POSTFIX}.tar.gz"
     ] do
       create_package("linux-x86")
@@ -51,7 +48,6 @@ namespace :package do
     desc "Package your app for Linux x86_64"
     task :x86_64 => [:bundle_install, 
       "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86_64.tar.gz",
-      "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86_64-#{NOKOGIRI_POSTFIX}.tar.gz"
       # "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86_64-#{RUGGED_POSTFIX}.tar.gz"
     ] do
       create_package("linux-x86_64")
@@ -61,7 +57,6 @@ namespace :package do
   desc "Package your app for OS X"
   task :osx => [:bundle_install, 
     "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-osx.tar.gz",
-    "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-osx-#{NOKOGIRI_POSTFIX}.tar.gz"
     # "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-osx-#{RUGGED_POSTFIX}.tar.gz"
   ] do
     create_package("osx")
@@ -97,7 +92,6 @@ desc "Download rubys & native extensions"
 task :download do
   %w{linux-x86 linux-x86_64 osx}.each do |platform|
     download_runtime(platform)
-    download_native_extension(platform, NOKOGIRI_POSTFIX)
     # download_native_extension(platform, RUGGED_POSTFIX)
   end
 end
@@ -120,8 +114,6 @@ def create_package(target)
   sh "cp Gemfile Gemfile.lock #{package_path}/lib/vendor/"
   sh "mkdir #{package_path}/lib/vendor/.bundle"
   sh "cp packaging/bundler-config #{package_path}/lib/vendor/.bundle/config"
-  sh "tar -xzf #{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-#{target}-#{NOKOGIRI_POSTFIX}.tar.gz " +
-      "-C #{package_path}/lib/vendor/ruby"
   # sh "tar -xzf #{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-#{target}-#{RUGGED_POSTFIX}.tar.gz " +
   #     "-C #{package_path}/lib/vendor/ruby"
   if !ENV['DIR_ONLY']

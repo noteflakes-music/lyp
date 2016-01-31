@@ -1,4 +1,3 @@
-require 'httpclient'
 require 'uri'
 require 'open3'
 require 'ruby-progressbar'
@@ -201,21 +200,19 @@ module Lyp::Lilypond
     # Returns a list of versions of lilyponds available for download
     def search(version_specifier = nil)
       require 'open-uri'
-      require 'nokogiri'
 
       platform = detect_lilypond_platform
       url = "#{BASE_URL}/#{platform}/"
-      doc = Nokogiri::HTML(open(url))
       
       versions = []
-      doc.xpath("//td//a").each do |a|
-        if a[:href] =~ /^lilypond-([0-9\.]+)/
-          versions << $1
-        end
+      
+      open(url).read.scan(/a href=\"lilypond-([0-9\.]+)[^>]+\"/) do |m|        
+        versions << $1
       end
-
+      
       installed_versions = list.map {|l| l[:version]}
-      versions.select {|v| version_match(v, version_specifier, versions)}.map do |v|
+      versions.select! {|v| version_match(v, version_specifier, versions)}
+      versions.map do |v|
         {
           version: v,
           installed: installed_versions.include?(v)

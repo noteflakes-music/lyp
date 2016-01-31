@@ -228,10 +228,7 @@ RSpec.describe "Lyp::Lilypond" do
   end
 
   it "uninstalls a local version of lilypond" do
-    # create a copy of the lilypond setup
-    FileUtils.cp_r("#{$spec_dir}/lilypond_setups/simple", "#{$spec_dir}/lilypond_setups/tmp")
-    
-    with_lilyponds(:tmp) do
+    with_lilyponds(:tmp, copy_from: :simple) do
       versions = Lyp::Lilypond.list.map {|l| l[:version]}
       expect(versions).to eq(%w{2.18.1 2.19.15 2.19.21})
       
@@ -258,6 +255,24 @@ RSpec.describe "Lyp::Lilypond" do
 
       expect(Lyp::Lilypond.default_lilypond).to be_nil
       expect(Lyp::Lilypond.current_lilypond).to be_nil
+    end
+  end
+  
+  it "provides a list of versions available for download" do
+    with_lilyponds(:tmp, copy_from: :simple) do
+      versions = Lyp::Lilypond.list.map {|l| l[:version]}
+      expect(versions).to eq(%w{2.18.1 2.19.15 2.19.21})
+      
+      versions = Lyp::Lilypond.search
+      
+      v = versions.find {|l| l[:version] == "2.19.15"}
+      expect(v[:installed]).to eq(true)
+      
+      v = versions.find {|l| l[:version] == "2.19.30"}
+      expect(v[:installed]).to eq(false)
+      
+      versions = Lyp::Lilypond.search('~>2.18.0')
+      expect(versions.map{|l| l[:version]}).to eq(%w{2.18.0 2.18.1 2.18.2})
     end
   end
 end
