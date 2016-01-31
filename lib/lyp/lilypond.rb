@@ -120,9 +120,9 @@ module Lyp::Lilypond
       list.select {|l| version_match(l[:version], version_specifier, list)}
     end
     
-    def list
-      system_list = system_lilyponds
-      lyp_list = lyp_lilyponds
+    def list(opts = {})
+      system_list = opts[:lyp_only] ? [] : system_lilyponds
+      lyp_list = opts[:system_only] ? [] : lyp_lilyponds
       
       default = default_lilypond
       unless default
@@ -480,24 +480,25 @@ module Lyp::Lilypond
       lilypond
     end
     
-    def uninstall(version)
-      lilyponds = list.reverse
-      lilypond = lilyponds.find {|l| l[:version] == version && !l[:system]}
-      unless lilypond
-        raise "Invalid version specified: #{version}"
-      end
-      lilyponds.delete(lilypond)
-      latest = lilyponds.first
-      
-      if lilypond[:default]
-        set_default_lilypond(latest && latest[:path])
-      end
-      if lilypond[:current]
-        set_current_lilypond(latest && latest[:path])
+    def uninstall(version_specifier, opts = {})
+      list = list(lyp_only: true)
+      if version_specifier
+        list.select! {|l| version_match(l[:version], version_specifier, list)}
       end
       
-      lilypond_dir = File.expand_path('../..', lilypond[:path])
-      FileUtils.rm_rf(lilypond_dir)
+      if list.empty?
+        if version_specifier
+          raise "No lilypond found matching #{version_specifier}"
+        else
+          raise "No lilypond found"
+        end
+      end
+      
+      list.each do |l|
+        set_current_lilypond(nil) if l[:current]
+        set_default_lilypond(nil) if l[:default]
+        FileUtils.rm_rf(l[:root_path])
+      end
     end
     
     def exec(cmd, raise_on_failure = true)

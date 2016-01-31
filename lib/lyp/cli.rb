@@ -189,7 +189,7 @@ class Lyp::CLI < Thor
         Lyp::System.uninstall!
       when Lyp::LILYPOND_RE
         Lyp::System.test_installed_status!
-        Lyp::Lilypond.uninstall($1)
+        Lyp::Lilypond.uninstall($1, options)
       else
         Lyp::System.test_installed_status!
         Lyp::Package.uninstall(package, options)
