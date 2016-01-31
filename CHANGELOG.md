@@ -1,3 +1,12 @@
+## Version 0.2.2 2016-01-31
+
+- Improve README documentation.
+- Fix lilypond wrapper to not eat stock lilypond options (#10).
+- Add --env, --use, --install options to lilypond wrapper, lyp test, lyp compile commands. 
+- Remove nokogiri dependency.
+- Fix behaviour when no version of lilypond is installed.
+- Various improvements to command line interface.
+
 ## Version 0.2.1 2016-01-28
 
 - Packages tests can now use `\require "<package name>:<relative path>"` syntax in tests to make sure tests work anywhere. For an example see the [assert package](https://github.com/noteflakes/lyp-assert).

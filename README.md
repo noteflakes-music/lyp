@@ -51,7 +51,7 @@ The `lyp install self` command is needed in order to setup the `~/.lyp` working 
 
 #### Installing lyp without Ruby
 
-If you don't have Ruby on your machine you can install lyp as a stand alone package using the install script ([view source](https://raw.githubusercontent.com/noteflakes/lyp/master/bin/install_release.sh)):
+If you don't have Ruby on your machine you can install lyp as a stand alone package using the install script ([view source](https://git.io/getlyp)):
 
 ```bash
 $ curl -sSL https://git.io/getlyp | bash
