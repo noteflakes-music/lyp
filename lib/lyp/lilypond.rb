@@ -110,7 +110,7 @@ module Lyp::Lilypond
     end
     
     def session_settings_filename
-      "/tmp/lyp.session.#{Process.getsid}.yml"
+      "#{Lyp::TMP_ROOT}/session.#{Process.getsid}.yml"
     end
     
     CMP_VERSION = proc do |x, y|
@@ -261,9 +261,13 @@ module Lyp::Lilypond
       STDERR.puts "Installing version #{version}" unless opts[:silent]
       install_version(version, opts)
 
-      lilypond_path = "#{Lyp.lilyponds_dir}/#{version}/bin/lilypond"
+      lilypond_path = lyp_lilypond_path(version)
       set_current_lilypond(lilypond_path)
       set_default_lilypond(lilypond_path) if opts[:default]
+    end
+    
+    def lyp_lilypond_path(version)
+      "#{Lyp.lilyponds_dir}/#{version}/bin/lilypond"
     end
     
     def detect_version_from_specifier(version_specifier)
@@ -299,6 +303,8 @@ module Lyp::Lilypond
         "linux-64"
       when "ppc-linux"
         "linux-ppc"
+      when "x64-mingw32"
+        "mingw"
       end
     end
   
@@ -315,7 +321,14 @@ module Lyp::Lilypond
     end
 
     def lilypond_install_url(platform, version, opts)
-      ext = platform =~ /darwin/ ? ".tar.bz2" : ".sh"
+      ext = case platform
+      when /darwin/
+        ".tar.bz2"
+      when /linux/
+        ".sh"
+      when /mingw/
+        ".exe"
+      end
       filename = "lilypond-#{version}-1.#{platform}"
     
       "#{BASE_URL}/#{platform}/#{filename}#{ext}"
@@ -323,7 +336,7 @@ module Lyp::Lilypond
     
     def temp_install_filename(url)
       u = URI(url)
-      "/tmp/lyp-installer-#{File.basename(u.path)}"
+      "#{Lyp::TMP_ROOT}/#{File.basename(u.path)}"
     end
   
     def download_lilypond(url, fn, opts)
@@ -352,7 +365,7 @@ module Lyp::Lilypond
     end
   
     def install_lilypond_files(fn, platform, version, opts)
-      tmp_target = "/tmp/lyp-lilypond-#{version}"
+      tmp_target = "#{Lyp::TMP_ROOT}/lilypond-#{version}"
       FileUtils.mkdir_p(tmp_target)
 
       case platform
@@ -360,6 +373,8 @@ module Lyp::Lilypond
         install_lilypond_files_osx(fn, tmp_target, platform, version, opts)
       when /linux/
         install_lilypond_files_linux(fn, tmp_target, platform, version, opts)
+      when /mingw/
+        install_lilypond_files_windows(fn, tmp_target, platform, version, opts)
       end
       
     ensure
@@ -379,7 +394,7 @@ module Lyp::Lilypond
       STDERR.puts "Extracting..." unless opts[:silent]
 
       # create temp directory in which to extract .sh file
-      tmp_dir = "/tmp/lyp-#{Time.now.to_f}"
+      tmp_dir = "#{Lyp::TMP_ROOT}/#{Time.now.to_f}"
       FileUtils.mkdir_p(tmp_dir)
     
       FileUtils.cd(tmp_dir) do
@@ -393,6 +408,27 @@ module Lyp::Lilypond
       copy_lilypond_files("#{target}/usr", version, opts)
     ensure
       FileUtils.rm_rf(tmp_dir)
+    end
+    
+    def install_lilypond_files_windows(fn, target, platform, version, opts)
+      STDERR.puts "Running NSIS Installer..." unless opts[:silent]
+      
+      target_dir = File.join(Lyp.lilyponds_dir, version)
+      FileUtils.mkdir_p(target_dir)
+      
+      # run installer
+      cmd = "#{fn} /S /D=#{target_dir.gsub('/', '\\')}"
+      `#{cmd}`
+      
+      # wait for installer to finish
+      t1 = Time.now
+      while !File.file?("#{target_dir}/usr/bin/lilypond.exe")
+        sleep 0.5
+        raise "Windows installation failed" if Time.now - t1 >= 60
+      end
+
+      # Show lilypond versions
+      STDERR.puts `#{target_dir}/usr/bin/lilypond -v` unless opts[:silent] || opts[:no_version_test]
     end
 
     def copy_lilypond_files(base_path, version, opts)
@@ -419,14 +455,14 @@ module Lyp::Lilypond
     def patch_font_scm(version)
       return unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(version)
       
-      target_fn = File.join(Lyp.lilyponds_dir, version, 'share/lilypond/current/scm/font.scm')
+      target_fn = File.join(lyp_lilypond_share_dir(version), 'lilypond/current/scm/font.scm')
       FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
     end
 
     def copy_fonts_from_all_packages(version, opts)
       return unless Lyp::FONT_COPY_REQ =~ Gem::Version.new(version)
       
-      ly_fonts_dir = File.join(Lyp.lilyponds_dir, version, 'share/lilypond/current/fonts')
+      ly_fonts_dir = File.join(lyp_lilypond_share_dir(version), 'lilypond/current/fonts')
       
       Dir["#{Lyp.packages_dir}/**/fonts"].each do |package_fonts_dir|
 
@@ -445,6 +481,10 @@ module Lyp::Lilypond
           FileUtils.cp(fn, target_fn)
         end
       end
+    end
+    
+    def lyp_lilypond_share_dir(version)
+      File.join(Lyp.lilyponds_dir, version, 'share')
     end
     
     def use(version, opts)
@@ -503,11 +543,17 @@ module Lyp::Lilypond
         puts "Uninstalling lilypond #{l[:version]}" unless opts[:silent]
         set_current_lilypond(nil) if l[:current]
         set_default_lilypond(nil) if l[:default]
-        FileUtils.rm_rf(l[:root_path])
+        uninstall_lilypond_version(l[:root_path])
       end
     end
     
+    def uninstall_lilypond_version(path)
+      FileUtils.rm_rf(path)
+    end
+    
     def exec(cmd, raise_on_failure = true)
+      $_out = ""
+      $_err = ""
       success = nil
       Open3.popen3(cmd) do |_in, _out, _err, wait_thr|
         exit_value = wait_thr.value

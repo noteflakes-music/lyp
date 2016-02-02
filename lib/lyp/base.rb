@@ -1,6 +1,11 @@
 require 'fileutils'
 
 module Lyp
+  WINDOWS = Gem.win_platform?
+  TMP_DIR = WINDOWS ? "#{Dir.home}/AppData/Local/Temp" : "/tmp"
+  TMP_ROOT = "#{TMP_DIR}/lyp"
+  FileUtils.mkdir_p(TMP_ROOT)
+
   # A package specifier is of the form <package>@<version specifier>, where
   # the version specifier can be simply a version number, or include an operator
   # before the version number.

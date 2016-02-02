@@ -1,4 +1,10 @@
 #(begin
+  (define lyp:path-separator "/")
+  ;(define lyp:path-separator (list->string (list
+  ;  (if (eq? PLATFORM 'windows) #\\ #\/ ))))
+  
+  (define (lyp:file-join . ls) (string-join ls lyp:path-separator))
+
   ; hash table mapping package refs to package names
   (define lyp:package-refs (make-hash-table))
   
@@ -34,7 +40,7 @@
       (base-path (if (null? package) 
         lyp:current-package-dir (lyp:name->dir package)))
     )
-    (string-append base-path "/" path)
+    (lyp:file-join base-path path)
   ))
   
   ; converts a package file reference to absolute path
@@ -70,7 +76,7 @@
   (define (lyp:require ref) (let* (
       (name (lyp:ref->name ref))
       (package-dir (lyp:name->dir name))
-      (entry-point-path (string-append package-dir "/package.ly"))
+      (entry-point-path (lyp:file-join package-dir "package.ly"))
       (loaded? (hash-ref lyp:package-loaded? name))
       (prev-package-dir lyp:current-package-dir)
     )

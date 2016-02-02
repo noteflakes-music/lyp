@@ -9,7 +9,8 @@ RSpec.describe "Lyp" do
         
         Lyp::Lilypond.compile(["#{$spec_dir}/user_files/the-works.ly"])
         
-        expect($_out).to match(/Hello from package/)
+        output = "#{$_out}\n#{$_err}"
+        expect(output).to match(/Hello from package/)
       end
     end
   end
@@ -23,10 +24,11 @@ RSpec.describe "Lyp" do
         
         Lyp::Lilypond.compile([user_file])
         
-        expect($_out).to include("input-filename: #{user_file}")
-        expect($_out).to include("input-dirname: #{File.dirname(user_file)}")
-        expect($_out).to include("current-package-dir: #{$packages_dir}/b@0.2")
-        expect($_out).to include("bvar: hello from b/inc/include1.ly")
+        output = "#{$_out}\n#{$_err}"
+        expect(output).to include("input-filename: #{user_file}")
+        expect(output).to include("input-dirname: #{File.dirname(user_file)}")
+        expect(output).to include("current-package-dir: #{$packages_dir}/b@0.2")
+        expect(output).to include("bvar: hello from b/inc/include1.ly")
         
       end
     end

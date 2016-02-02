@@ -12,8 +12,8 @@ module Lyp
     r[:current_package_dir] = opts[:current_package_dir]
 
     if !r[:package_dirs].empty? || opts[:force_wrap]
-      FileUtils.mkdir_p('/tmp/lyp/wrappers')
-      fn = "/tmp/lyp/wrappers/#{File.basename(fn)}" 
+      FileUtils.mkdir_p("#{Lyp::TMP_ROOT}/wrappers")
+      fn = "#{Lyp::TMP_ROOT}/wrappers/#{File.basename(fn)}" 
   
       File.open(fn, 'w+') {|f| f << WRAPPER_TEMPLATE.render(r)}
     end

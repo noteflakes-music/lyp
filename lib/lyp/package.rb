@@ -115,14 +115,18 @@ module Lyp::Package
       File.open(package_ly_path, 'w+') do |f|
         f << LOCAL_PACKAGE_WRAPPER % [entry_point_dirname, entry_point_path]
       end
+
+      prepare_local_package_fonts(local_path, package_path)
       
+      {version: version, path: package_path}
+    end
+    
+    def prepare_local_package_fonts(local_path, package_path)
       # create fonts directory symlink if needed
       fonts_path = File.join(local_path, 'fonts')
       if File.directory?(fonts_path)
         FileUtils.ln_sf(fonts_path, File.join(package_path, 'fonts'))
       end
-      
-      {version: version, path: package_path}
     end
     
     def install_from_repository(package, version, opts)
@@ -243,7 +247,7 @@ module Lyp::Package
       Lyp::Lilypond.list.each do |lilypond|
         next unless req =~ Gem::Version.new(lilypond[:version])
         
-        ly_fonts_dir = File.join(lilypond[:root_path], 'share/lilypond/current/fonts')
+        ly_fonts_dir = File.join(lilypond[:root_path], lilypond_fonts_path)
         package_fonts_dir = File.join(package_path, 'fonts')
         
         Dir["#{package_fonts_dir}/*.otf"].each do |fn|
@@ -261,6 +265,10 @@ module Lyp::Package
           FileUtils.cp(fn, target_fn)
         end
       end
+    end
+    
+    def lilypond_fonts_path
+      'share/lilypond/current/fonts'
     end
     
     def package_git_url(package, search_index = true)
@@ -305,7 +313,7 @@ module Lyp::Package
       @lyp_index ||= YAML.load(open(LYP_INDEX_URL))
     end
     
-    TEMP_REPO_ROOT_PATH = "/tmp/lyp/repos"
+    TEMP_REPO_ROOT_PATH = "#{Lyp::TMP_ROOT}/repos"
 
     def git_url_to_temp_path(url)
       case url

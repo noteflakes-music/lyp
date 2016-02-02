@@ -11,3 +11,5 @@ req 'resolver'
 req 'wrapper'
 req 'package'
 req 'lilypond'
+
+req 'windows' if Lyp::WINDOWS

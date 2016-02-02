@@ -8,7 +8,7 @@
   (string-append lyp:input-dirname "/" "scheme_interface_test.ly"))
 
 %lyp:current-package-dir defaults to working directory
-#(assert:string=? lyp:current-package-dir (getcwd))
+#(assert:string=? lyp:current-package-dir lyp:cwd)
 
 % lyp:package-refs
 #(assert (hash-table? lyp:package-refs))
@@ -18,7 +18,7 @@
 #(assert:throw (lambda () (lyp:ref->name "assert>=0.1.3")))
 
 #(define tmp:assert-dir
-  (string-append (getcwd) "/spec/package_setups/tmp/assert@0.2.0"))
+  (string-append lyp:cwd "/spec/package_setups/tmp/assert@0.2.0"))
 
 % lyp:package-dirs
 #(assert (hash-table? lyp:package-dirs))
@@ -49,7 +49,7 @@
 
 #(hash-set! lyp:package-refs "null" "null")
 #(hash-set! lyp:package-refs "null@0.1.2" "null")
-#(hash-set! lyp:package-dirs "null" (string-append (getcwd) "/spec/user_files/null"))
+#(hash-set! lyp:package-dirs "null" (string-append lyp:cwd "/spec/user_files/null"))
 
 
 
@@ -91,7 +91,7 @@
 
 #(assert:eq? null:counter2 2)
 
-#(set! lyp:current-package-dir (string-append (getcwd) "/spec/user_files"))
+#(set! lyp:current-package-dir (string-append lyp:cwd "/spec/user_files"))
 
 \pinclude "./counter3.ly"
 \pinclude "./counter3.ly"

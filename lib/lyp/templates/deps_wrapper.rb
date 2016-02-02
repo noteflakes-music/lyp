@@ -12,6 +12,11 @@ require 'fileutils'
 user_filename = File.expand_path(_[:user_file])
 user_dirname = File.dirname(user_filename)
 
+quote_path = lambda do |path|
+  path = path.gsub("\\", "/") if Lyp::WINDOWS
+  path.inspect
+end
+
 current_package_dir = _[:current_package_dir] || FileUtils.pwd
 
 # The wrapper defines a few global variables:
@@ -29,19 +34,20 @@ current_package_dir = _[:current_package_dir] || FileUtils.pwd
 \include "{{Lyp::LYP_LY_LIB_PATH}}"
 
 #(begin
-  (define lyp:input-filename "{{user_filename}}")
-  (define lyp:input-dirname "{{user_dirname}}")
-  (define lyp:current-package-dir "{{current_package_dir}}")
+  (define lyp:cwd {{quote_path[FileUtils.pwd]}})
+  (define lyp:input-filename {{quote_path[user_filename]}})
+  (define lyp:input-dirname {{quote_path[user_dirname]}})
+  (define lyp:current-package-dir {{quote_path[current_package_dir]}})
 `
 
-_[:package_refs].each do |spec, path|
+_[:package_refs].each do |spec, name|
 `
-  (hash-set! lyp:package-refs "{{spec}}" "{{path}}")`
+  (hash-set! lyp:package-refs "{{spec}}" "{{name}}")`
 end
 
 _[:package_dirs].each do |package, path|
 `
-  (hash-set! lyp:package-dirs "{{package}}" "{{path}}")`
+  (hash-set! lyp:package-dirs "{{package}}" {{quote_path[path]}})`
 end
 
 
@@ -49,5 +55,5 @@ end
 )
 
 #(ly:debug "package loader is ready")
-\include "{{user_filename}}"
+\include {{quote_path[user_filename]}}
 `
