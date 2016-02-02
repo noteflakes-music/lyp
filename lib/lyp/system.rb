@@ -2,6 +2,30 @@ require 'fileutils'
 
 module Lyp::System
   class << self
+    RUGGED_REQ = Gem::Requirement.new('>=0.23.0')
+    
+    def test_rugged_gem!
+      git_available = `git --version` rescue nil
+      return if find_rugged_gem || git_available
+      
+      STDERR.puts "Lyp needs git in order to be able to install packages. Please install git and then try again."
+      exit 1
+    end
+    
+    def find_rugged_gem
+      found = Gem::Specification.find_all_by_name('rugged').find do |s|
+        RUGGED_REQ =~ s.version
+      end
+      
+      require_rugged_gem if found
+      found
+    end
+    
+    def require_rugged_gem
+      gem 'rugged', RUGGED_REQ.to_s
+      require 'rugged'
+    end
+    
     INSTALL_MSG = <<EOF
 
 Warning! Lyp is not yet properly installed in your home directory. 
@@ -17,7 +41,7 @@ EOF
 
     def test_installed_status!
       unless installed?
-        puts INSTALL_MSG
+        STDERR.puts INSTALL_MSG
       end
     end
     
