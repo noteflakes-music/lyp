@@ -5,9 +5,6 @@ require File.expand_path("./lib/lyp/version", File.dirname(__FILE__))
 PACKAGE_NAME = "lyp"
 VERSION = Lyp::VERSION
 TRAVELING_RUBY_VERSION = "20150715-2.2.2"
-RUGGED_VERSION = "0.21.4"
-
-RUGGED_POSTFIX = "rugged-#{RUGGED_VERSION}"
 
 TRAVELING_RUBY_BASE_URL = "http://d6r77u77i8pq3.cloudfront.net/releases"
 PACKAGING_BASE_PATH = "packaging/traveling-ruby"
@@ -15,7 +12,13 @@ PACKAGING_BASE_PATH = "packaging/traveling-ruby"
 task :default => [:package]
 
 desc "Package your app"
-task :package => [:download, 'package:linux:x86', 'package:linux:x86_64', 'package:osx']
+task :package => %w{
+  download
+  package:linux:x86
+  package:linux:x86_64
+  package:osx
+  package:win32
+}
 
 desc "Push gem to rubygems.org"
 task :push_gem do
@@ -42,7 +45,6 @@ namespace :package do
     desc "Package your app for Linux x86"
     task :x86 => [:bundle_install, 
       "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86.tar.gz",
-      # "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86-#{RUGGED_POSTFIX}.tar.gz"
     ] do
       create_package("linux-x86")
     end
@@ -50,7 +52,6 @@ namespace :package do
     desc "Package your app for Linux x86_64"
     task :x86_64 => [:bundle_install, 
       "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86_64.tar.gz",
-      # "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-linux-x86_64-#{RUGGED_POSTFIX}.tar.gz"
     ] do
       create_package("linux-x86_64")
     end
@@ -59,9 +60,14 @@ namespace :package do
   desc "Package your app for OS X"
   task :osx => [:bundle_install, 
     "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-osx.tar.gz",
-    # "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-osx-#{RUGGED_POSTFIX}.tar.gz"
   ] do
     create_package("osx")
+  end
+  
+  desc "Package your app for Windows x86"
+  task :win32 => [:bundle_install, "#{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-win32.tar.gz"] do
+    puts "create_package win32"
+    create_package("win32", :windows)
   end
 
   desc "Install gems to local directory"
@@ -92,13 +98,12 @@ end
 
 desc "Download rubys & native extensions"
 task :download do
-  %w{linux-x86 linux-x86_64 osx}.each do |platform|
+  %w{linux-x86 linux-x86_64 osx win32}.each do |platform|
     download_runtime(platform)
-    # download_native_extension(platform, RUGGED_POSTFIX)
   end
 end
 
-def create_package(target)
+def create_package(target, os_type = :unix)
   package_path = "#{PACKAGE_NAME}-#{VERSION}-#{target}"
   sh "rm -rf #{package_path}"
   sh "mkdir #{package_path}"
@@ -109,18 +114,26 @@ def create_package(target)
   sh "tar -xzf #{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz -C #{package_path}/lib/ruby"
 
   sh "mkdir -p #{package_path}/bin"
-  sh "cp bin/release_wrapper_lyp.sh #{package_path}/bin/lyp"
-  sh "cp bin/release_wrapper_lilypond.sh #{package_path}/bin/lilypond"
+  
+  if os_type == :unix
+    sh "cp packaging/release_wrapper_lyp.sh #{package_path}/bin/lyp"
+    sh "cp packaging/release_wrapper_lilypond.sh #{package_path}/bin/lilypond"
+  else
+    sh "cp packaging/release_wrapper_lyp.bat #{package_path}/bin/lyp.bat"
+    sh "cp packaging/release_wrapper_lilypond.bat #{package_path}/bin/lilypond.bat"
+  end
 
   sh "cp -pR packaging/vendor #{package_path}/lib/"
   sh "cp Gemfile Gemfile.lock #{package_path}/lib/vendor/"
   sh "mkdir #{package_path}/lib/vendor/.bundle"
   sh "cp packaging/bundler-config #{package_path}/lib/vendor/.bundle/config"
-  # sh "tar -xzf #{PACKAGING_BASE_PATH}-#{TRAVELING_RUBY_VERSION}-#{target}-#{RUGGED_POSTFIX}.tar.gz " +
-  #     "-C #{package_path}/lib/vendor/ruby"
   if !ENV['DIR_ONLY']
     sh "mkdir -p releases"
-    sh "tar -czf releases/#{package_path}.tar.gz #{package_path}"
+    if os_type == :unix
+      sh "tar -czf releases/#{package_path}.tar.gz #{package_path}"
+    else
+      sh "zip -9r releases/#{package_path}.zip #{package_path}"
+    end
     sh "rm -rf #{package_path}"
   end
 end
@@ -139,9 +152,3 @@ def download_native_extension(platform, gem_name_and_version)
   url = "#{TRAVELING_RUBY_BASE_URL}/traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{platform}/#{gem_name_and_version}.tar.gz"
   sh "curl -L --fail -o #{fn} #{url}"
 end
-
-# desc "Create a new release"
-# task :release do
-#   sh "git tag v#{VERSION} && git push --tags"
-#   sh "github-release release -u noteflakes -r lyp -t v#{VERSION} -n \"\""
-# end

@@ -99,10 +99,35 @@ module Lyp::System
       true
     end
     
+    # - Copy the entire directory to ~/.lyp
+    # - Create wrappers in Windows/System32 that call ~/.lyp/bin
     def install!
-      puts "\ninstall self curently not supported on Windows.\n\n"
+      return if is_gem?
+      
+      puts "\nInstalling lyp...\n\nCopying files..."
+      copy_package_files
+      create_wrapper_batch_files
     end
     
+    def copy_package_files
+      package_root = File.expand_path('../../../..', File.dirname(__FILE__))
+      FileUtils.rm_rf("#{Lyp::LYP_DIRECTORY}/lib")
+      FileUtils.rm_rf("#{Lyp::LYP_DIRECTORY}/bin")
+      FileUtils.cp_r("#{package_root}/lib", "#{Lyp::LYP_DIRECTORY}/lib")
+      FileUtils.cp_r("#{package_root}/bin", "#{Lyp::LYP_DIRECTORY}/bin")
+    end
+    
+    def create_wrapper_batch_files
+      system32_dir = File.join(ENV["SystemRoot"], "System32")
+      bin_dir = "#{Lyp::LYP_DIRECTORY}/bin"
+      
+      %w{lyp lilypond}.each do |name|
+        File.open("#{system32_dir}/#{name}.bat", "w+") do |f|
+          f << "@#{bin_dir}\\#{name}.bat %*"
+        end
+      end
+    end
+
     def uninstall!
       puts "\nuninstall self curently not supported on Windows.\n\n"
     end

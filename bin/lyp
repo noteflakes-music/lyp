@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
-require "lyp"
-require "lyp/cli"
+$LOAD_PATH.unshift File.expand_path("../lib", File.dirname(__FILE__))
 
+require 'lyp'
+require 'lyp/cli'
