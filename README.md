@@ -11,8 +11,11 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 ## Table of contents
 
 - [Installation](#installation)
-  - [How lyp works](#how-lyp-works)
-  - [Uninstalling](#uninstalling)
+  - [System requirements](#system-requirements)
+  - [Installing lyp as a Ruby gem](#installing-lyp-as-a-ruby-gem)
+  - [Installing lyp as a standalone release](#installing-lyp-as-a-standalone-release)
+  - [Uninstalling lyp](#uninstalling-lyp)
+- [How lyp works](#how-lyp-works)
 - [Working with packages](#working-with-packages)
   - [What constitutes a package?](#what-constitutes-a-package)
   - [Installing packages](#installing-packages)
@@ -36,20 +39,33 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 
 ## Installation
 
-**Note**: lyp is tested to work on Linux and Mac OSX. Installing and using it on Windows would probably be problematic.
+### System requirements
 
-#### Installing lyp as a Ruby gem
+Lyp is tested to work on Linux, Mac OSX and Windows 7+.
 
-If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem:
+**Note**: Windows users will currently need to install lyp as a Ruby gem, and will also need to have git installed in order to be able to install packages.
+
+### Installing lyp as a Ruby gem
+
+If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem.
 
 ```bash
+# Linux/OSX only
 $ gem install lyp
 $ lyp install self
 ```
 
 The `lyp install self` command is needed in order to setup the `~/.lyp` working directory and add the lyp binaries directory to your `PATH` (see below), by adding a line of code to your shell profile file.
 
-#### Installing lyp without Ruby
+Windows users should install the lyp-win gem:
+
+```bash
+> gem install lyp-win
+```
+
+On Windows, there's no need to run the `lyp install self` command.
+
+### Installing lyp as a standalone release
 
 If you don't have Ruby on your machine you can install lyp as a stand alone package using the install script ([view source](https://git.io/getlyp)):
 
@@ -76,19 +92,7 @@ https://github.com/noteflakes/lyp/releases/download/v0.2.1/lyp-0.2.1-linux-x86_6
 
 **Note**: using the standalone release of lyp requires having git on your machine.
 
-### How lyp works
-
-Lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  installed packages, and installed versions of lilypond. Lyp provides a wrapper script for lilypond, which does the following:
-
-- Select the correct version of lilypond to use (see below).
-- Scan the given lilypond file for any dependencies (specified using `\require`), and also recursively scan any include files for dependencies
-- Resolve the dependency tree and calculate the correct versions to use for each required package.
-- Create a wrapper lilypond file that loads the packages.
-- Invoke the selected version of lilypond.
-
-For more information on running lilypond see the section on [Running lilypond](#running-lilypond).
-
-### Uninstalling
+### Uninstalling lyp
 
 In order to remove lyp from your system use the `uninstall self` command:
 
@@ -103,6 +107,18 @@ In order to completely remove all files in `~/.lyp` you can simply delete the di
 ```bash
 $ rm -rf ~/.lyp
 ```
+
+## How lyp works
+
+Lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  installed packages, and installed versions of lilypond. Lyp provides a wrapper script for lilypond, which does the following:
+
+- Select the correct version of lilypond to use (see below).
+- Scan the given lilypond file for any dependencies (specified using `\require`), and also recursively scan any include files for dependencies
+- Resolve the dependency tree and calculate the correct versions to use for each required package.
+- Create a wrapper lilypond file that loads the packages.
+- Invoke the selected version of lilypond.
+
+For more information on running lilypond see the section on [Running lilypond](#running-lilypond).
 
 ## Working with Packages
 

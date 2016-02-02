@@ -20,8 +20,10 @@ task :package => [:download, 'package:linux:x86', 'package:linux:x86_64', 'packa
 desc "Push gem to rubygems.org"
 task :push_gem do
   sh "gem build lyp.gemspec"
+  sh "gem build lyp-win.gemspec"
   sh "gem push lyp-#{VERSION}.gem"
-  sh "rm lyp-#{VERSION}.gem"
+  sh "gem push lyp-win-#{VERSION}.gem"
+  sh "rm *.gem"
 end
 
 desc "Install gem locally"

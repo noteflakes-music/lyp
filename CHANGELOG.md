@@ -1,3 +1,7 @@
+## Version 0.2.3 2016-02-02
+
+- Windows support!
+
 ## Version 0.2.2 2016-01-31
 
 - Improve README documentation.
