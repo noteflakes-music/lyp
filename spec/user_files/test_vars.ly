@@ -3,4 +3,4 @@
 
 \require "b"
 
-#(display (format "bvar: ~a\n" bvar))
+#(ly:message (format "bvar: ~a\n" bvar))

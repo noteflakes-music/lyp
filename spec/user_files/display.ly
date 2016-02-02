@@ -1,1 +1,1 @@
-#(display "\nHello from Lilypond!\n")
+#(ly:message "\nHello from Lilypond!\n")

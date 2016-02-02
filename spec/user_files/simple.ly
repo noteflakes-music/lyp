@@ -1,3 +1,3 @@
 \require "a"
-#(display "simple\n")
+#(ly:message "simple\n")
 \require "c"

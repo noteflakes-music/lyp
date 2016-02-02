@@ -1,1 +1,1 @@
-#(display "hello from dev_dir1")
+#(ly:message "hello from dev_dir1")
