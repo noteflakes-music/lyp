@@ -46,7 +46,7 @@ You can uninstall lyp at any time by running 'lyp uninstall self'.
 EOF
 
     def test_installed_status!
-      unless installed?
+      unless !is_gem? && installed?
         STDERR.puts INSTALL_MSG
       end
     end
@@ -95,36 +95,34 @@ EOF
     end
     
     def setup_files
-      bin_dir = File.expand_path(File.dirname($0))
-      
-      if is_gem?(bin_dir)
-        setup_gem_files(bin_dir)
+      if is_gem?
+        setup_gem_files
       else
-        setup_release_files(bin_dir)
+        setup_release_files
       end
     end
     
     RELEASE_BIN_PATH = "lib/app/bin"
+    SELF_DIR = File.expand_path(File.dirname($0))
     
-    def is_gem?(bin_dir)
-      bin_dir !~ /#{RELEASE_BIN_PATH}$/
+    def is_gem?
+      SELF_DIR !~ /#{RELEASE_BIN_PATH}$/
     end
     
-    def setup_gem_files(bin_dir)
-
+    def setup_gem_files
       FileUtils.rm_rf(Lyp::LYP_BIN_DIRECTORY)
       FileUtils.mkdir_p(Lyp::LYP_BIN_DIRECTORY)
 
       %w{lyp lilypond}.each do |fn|
-        FileUtils.ln_sf("#{bin_dir}/#{fn}", "#{Lyp::LYP_BIN_DIRECTORY}/#{fn}")
+        FileUtils.ln_sf("#{SELF_DIR}/#{fn}", "#{Lyp::LYP_BIN_DIRECTORY}/#{fn}")
       end
     end
     
-    def setup_release_files(bin_dir)
+    def setup_release_files
       FileUtils.rm_rf(Lyp::LYP_BIN_DIRECTORY)
       FileUtils.mkdir_p(Lyp::LYP_BIN_DIRECTORY)
       
-      release_dir = File.expand_path(File.join(bin_dir, '../../../'))
+      release_dir = File.expand_path(File.join(SELF_DIR, '../../../'))
       
       puts "Copying Ruby runtime & gems..."
       lib_dir = File.join(release_dir, 'lib')

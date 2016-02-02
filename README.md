@@ -52,18 +52,13 @@ If you have a recent (>=1.9.3) version of Ruby on your machine, you can install 
 ```bash
 # Linux/OSX only
 $ gem install lyp
-$ lyp install self
 ```
-
-The `lyp install self` command is needed in order to setup the `~/.lyp` working directory and add the lyp binaries directory to your `PATH` (see below), by adding a line of code to your shell profile file.
 
 Windows users should install the lyp-win gem:
 
 ```bash
 > gem install lyp-win
 ```
-
-On Windows, there's no need to run the `lyp install self` command.
 
 ### Installing lyp as a standalone release
 
@@ -87,8 +82,6 @@ $ cd /Downloads
 $ tar -xzf lyp-0.2.1-linux-x86_64.tar.gz
 $ lyp-0.2.1-linux-x86_64/lyp install self
 ```
-
-https://github.com/noteflakes/lyp/releases/download/v0.2.1/lyp-0.2.1-linux-x86_64.tar.gz
 
 **Note**: using the standalone release of lyp requires having git on your machine.
 
