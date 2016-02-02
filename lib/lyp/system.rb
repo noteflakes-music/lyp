@@ -5,8 +5,7 @@ module Lyp::System
     RUGGED_REQ = Gem::Requirement.new('>=0.23.0')
     
     def test_rugged_gem!
-      git_available = `git --version` rescue nil
-      return if find_rugged_gem || git_available
+      return if find_rugged_gem || use_git_based_rugged_gem
       
       STDERR.puts "Lyp needs git in order to be able to install packages. Please install git and then try again."
       exit 1
@@ -24,6 +23,13 @@ module Lyp::System
     def require_rugged_gem
       gem 'rugged', RUGGED_REQ.to_s
       require 'rugged'
+    end
+    
+    def use_git_based_rugged_gem
+      git_available = `git --version` rescue nil
+      return false unless git_available
+      
+      require File.expand_path('git_based_rugged', File.dirname(__FILE__))
     end
     
     INSTALL_MSG = <<EOF

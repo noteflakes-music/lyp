@@ -114,6 +114,11 @@ end
 
 # Install hooks to create and delete tmp directory
 RSpec.configure do |config|
+  config.before(:all) do
+    FileUtils.rm_f(Lyp.settings_file)
+    FileUtils.rm_f(Lyp::Lilypond.session_settings_filename)
+  end
+  
   config.after(:all) do
     FileUtils.rm_rf("#{$spec_dir}/lilypond_setups/tmp")
     FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
