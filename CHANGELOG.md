@@ -1,3 +1,8 @@
+## Version 0.3.0 2016-02-03
+
+- Improve `lyp install self` behavior on all platforms.
+- Add standalone package for Windows.
+
 ## Version 0.2.3 2016-02-02
 
 - Windows support!

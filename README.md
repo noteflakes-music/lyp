@@ -14,6 +14,7 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [System requirements](#system-requirements)
   - [Installing lyp as a Ruby gem](#installing-lyp-as-a-ruby-gem)
   - [Installing lyp as a standalone release](#installing-lyp-as-a-standalone-release)
+  - [Manually installing releases](manually-installing-releases)
   - [Uninstalling lyp](#uninstalling-lyp)
 - [How lyp works](#how-lyp-works)
 - [Working with packages](#working-with-packages)
@@ -41,22 +42,17 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 
 ### System requirements
 
-Lyp is tested to work on Linux, Mac OSX and Windows 7+.
-
-**Note**: Windows users will currently need to install lyp as a Ruby gem, and will also need to have git installed in order to be able to install packages.
+Lyp is tested to work on Linux, Mac OS X and Windows 7+.
 
 ### Installing lyp as a Ruby gem
 
 If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem.
 
 ```bash
-# Linux/OSX only
+# Linux/Mac OS X:
 $ gem install lyp
-```
 
-Windows users should install the lyp-win gem:
-
-```bash
+# Windows:
 > gem install lyp-win
 ```
 
@@ -73,6 +69,17 @@ or with Wget:
 ```bash
 $ wget -qO- https://git.io/getlyp | bash
 ```
+
+Windows users can simply download the latest Windows [release](https://github.com/noteflakes/lyp/releases), unzip it and run `lyp install self`:
+
+```bash
+> unzip lyp-0.2.3-win32.zip
+> lyp-0.2.3-win32/bin/lyp install self
+```
+
+### Manually installing releases
+
+(This section is for Linux / Mac OS X users.)
 
 If you feel uneasy about piping curl output to bash, you can install lyp yourself by downloading a [release](https://github.com/noteflakes/lyp/releases), untarring it, and running `lyp install self`:
 

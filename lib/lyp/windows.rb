@@ -104,7 +104,7 @@ module Lyp::System
     def install!
       return if is_gem?
       
-      puts "\nInstalling lyp...\n\nCopying files..."
+      puts "\nInstalling lyp...\n\n"
       copy_package_files
       create_wrapper_batch_files
     end
