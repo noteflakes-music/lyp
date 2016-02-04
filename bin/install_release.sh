@@ -18,7 +18,7 @@ download() {
 }
     
 WORKDIR="/tmp/lyp-release-installer"
-LYP_VERSION="0.3.0"
+LYP_VERSION="0.3.1"
 URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
 
 PLATFORM=`uname -sp`

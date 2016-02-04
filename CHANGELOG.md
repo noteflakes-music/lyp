@@ -1,3 +1,8 @@
+## Version 0.3.1 2016-02-04
+
+- Accept stdin input for lilypond.
+- Show `install self` warning only for standalone releases.
+
 ## Version 0.3.0 2016-02-03
 
 - Improve `lyp install self` behavior on all platforms.
