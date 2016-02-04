@@ -6,14 +6,16 @@ require 'ruby-progressbar'
 module Lyp::Lilypond
   class << self
     def compile(argv, opts = {})
-      fn = Lyp.wrap(argv.pop, opts)
-      argv << fn
+      unless argv.last == '-'
+        fn = Lyp.wrap(argv.pop, opts)
+        argv << fn
+      end
       
       invoke(argv, opts)
     end
     
     def invoke(argv, opts = {})
-      lilypond = detect_use_version_argument(argv) || current_lilypond
+      lilypond = current_lilypond
 
       case opts[:mode]
       when :system
@@ -21,10 +23,6 @@ module Lyp::Lilypond
       else
         Kernel.exec(lilypond, *argv)
       end
-    end
-    
-    def detect_use_version_argument(argv)
-      nil
     end
     
     def default_lilypond

@@ -31,7 +31,7 @@ module Lyp
     end
     
     def self.invoke(argv, opts = {})
-      lilypond = detect_use_version_argument(argv) || current_lilypond
+      lilypond = current_lilypond
       
       case opts[:mode]
       when :system

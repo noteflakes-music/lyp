@@ -9,5 +9,5 @@
 
   ```bash
   # automatically 
-  $ lilypond -Anustable myfile.ly
+  $ lilypond -Anu "stable" myfile.ly
   ```
