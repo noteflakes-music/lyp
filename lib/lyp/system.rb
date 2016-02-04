@@ -46,7 +46,7 @@ You can uninstall lyp at any time by running 'lyp uninstall self'.
 EOF
 
     def test_installed_status!
-      unless !is_gem? && installed?
+      if !is_gem? && !installed?
         STDERR.puts INSTALL_MSG
       end
     end
