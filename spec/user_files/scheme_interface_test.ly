@@ -45,13 +45,9 @@
 #(assert:throw (lambda () (lyp:load "blah.scm")))
 #(assert:throw (lambda () (lyp:load "assert:blah.scm")))
 
-
-
 #(hash-set! lyp:package-refs "null" "null")
 #(hash-set! lyp:package-refs "null@0.1.2" "null")
 #(hash-set! lyp:package-dirs "null" (string-append lyp:cwd "/spec/user_files/null"))
-
-
 
 % lyp:load
 #(lyp:load "null:inc.scm")
@@ -59,7 +55,6 @@
 #(assert:throw (lambda () (lyp:load "null:ff.scm")))
 #(assert:throw (lambda () (lyp:load "abc:ff.scm")))
 
-%
 #(define null:counter0 0)
 #(define null:counter1 0)
 #(define null:counter2 0)

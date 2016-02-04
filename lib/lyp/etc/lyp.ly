@@ -1,8 +1,5 @@
 #(begin
   (define lyp:path-separator "/")
-  ;(define lyp:path-separator (list->string (list
-  ;  (if (eq? PLATFORM 'windows) #\\ #\/ ))))
-  
   (define (lyp:file-join . ls) (string-join ls lyp:path-separator))
 
   ; hash table mapping package refs to package names
