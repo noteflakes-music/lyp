@@ -29,7 +29,7 @@ def process_argv
       argv_clean << arg
     end
   end
-  
+
   [options, argv_clean]
 end
 $options, $argv = process_argv
@@ -55,7 +55,7 @@ end
 $lilypond_path = get_lilypond_path
 
 if $options[:raw]
-  exec("#{$lilypond_path} #{$argv[1..-1].join(' ')}")
+  exec("#{$lilypond_path} #{$argv.join(' ')}")
 end
 
 OVERRIDING_LILYPOND_SWITCHES = %w{
@@ -78,7 +78,7 @@ case $argv.first
 when nil, *OVERRIDING_LILYPOND_SWITCHES
   STDERR.puts "Lyp version #{Lyp::VERSION}"
   exec("#{$lilypond_path} #{$argv.join(' ')}")
-  
+
 when *LILYPOND_HELP_SWITCHES
   STDERR.puts "Lyp version #{Lyp::VERSION}"
   puts `#{$lilypond_path} #{$argv.join(' ')}`
