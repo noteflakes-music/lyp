@@ -431,7 +431,7 @@ module Lyp::Package
     
     def perform_test(fn, stats)
       stats[:test_count] += 1
-      unless Lyp::Lilypond.compile([fn], mode: :system, force_wrap: true)
+      unless Lyp::Lilypond.compile([fn], mode: :system)
         stats[:fail_count] += 1
       end
     end

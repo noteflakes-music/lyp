@@ -48,6 +48,19 @@ module Lyp::Lilypond
       settings[:current]
     end
     
+    def current_lilypond_version
+      path = current_lilypond
+      version = File.basename(File.expand_path("#{File.dirname(path)}/../.."))
+
+      unless (Gem::Version.new(version) rescue nil)
+        resp = `#{path} -v`
+        if resp.lines.first =~ /LilyPond ([0-9\.]+)/i
+          version = $1
+        end
+      end
+      version
+    end
+    
     def set_current_lilypond(path)
       settings = get_session_settings
       settings[:current] = path
@@ -560,9 +573,14 @@ module Lyp::Lilypond
         success = exit_value == 0
       end
       if !success && raise_on_failure
-        raise "Error executing cmd #{cmd}: #{$_err}"
+        raise "Error executing cmd #{cmd}:\n#{parse_error_msg($_err)}"
       end
       success
+    end
+    
+    def parse_error_msg(msg)
+      (msg =~ /[^\n]+: error.+failed files: ".+"/m) ?
+        $& : msg
     end
   end
 end
