@@ -1,16 +1,64 @@
 #(begin
+  (display "\nlyp.ly\n")
+
+  ; file/path procedures based on code from oll-core:
+  ;   https://github.com/openlilylib/oll-core/
+
+  (use-modules
+    (lily)
+    (ice-9 regex))
+
   (define lyp:path-separator "/")
-  (define (lyp:file-join . ls) (string-join ls lyp:path-separator))
+  (define (lyp:join-path . ls) (string-join ls lyp:path-separator))
+
+  ; convert back-slashes to forward slashes (for use in lyp:split-path)
+  (define (lyp:normalize-path path)
+    (regexp-substitute/global #f "[\\]+" path 'pre "/" 'post)
+  )
+
+  (define (lyp:split-path path)
+    (string-split (lyp:normalize-path path) #\/))
+
+  (define lyp:absolute-path-pattern
+    (if (eq? PLATFORM 'windows) "^[a-zA-Z]:" "^/"))
+
+  (define (lyp:absolute-path? path)
+    (string-match lyp:absolute-path-pattern path))
+
+  ; return an absolute path, resolving any . or .. parts
+  (define (lyp:expand-path path) (let* (
+      ; create a path list by joining the current directory
+      (tmp-path (if (lyp:absolute-path? path)
+                    path (lyp:join-path (ly-getcwd) path)))
+      (src-list (lyp:split-path tmp-path))
+      (dst-list '())
+    )
+    (for-each
+      (lambda (p)
+        (cond
+          ((eq? (length dst-list) 0) ; start of path
+            (set! dst-list (list p)))
+          ((or (string=? p "") (string=? p ".")) ; ignore empty part
+            #f)
+          ((string=? p "..") ; go up a level (remove last part from list)
+            (set! dst-list (reverse (cdr (reverse dst-list)))))
+          (else
+            (set! dst-list (append dst-list (list p))))))
+      src-list)
+    (apply lyp:join-path dst-list)
+  ))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ; hash table mapping package refs to package names
   (define lyp:package-refs (make-hash-table))
-  
+
   ; hash table mapping package names to package directories
   (define lyp:package-dirs (make-hash-table))
-  
+
   ; hash table mapping package names to loaded state
   (define lyp:package-loaded? (make-hash-table))
-  
+
   ; hash table mapping file paths to included state
   (define lyp:file-included? (make-hash-table))
 
@@ -22,7 +70,7 @@
     (or name (throw 'lyp:failure "lyp:ref->name"
       (format "Invalid package ref ~a" ref) #f))
   ))
-  
+
   ; convert package reef to directory
   (define (lyp:name->dir name) (let (
       (dir (hash-ref lyp:package-dirs name))
@@ -30,50 +78,58 @@
     (or dir (throw 'lyp-failure "lyp:name->dir"
       (format "Invalid package name ~a" ref) #f))
   ))
-  
-  ; converts a package-relative path to absolute path. If the package is null,
-  ; uses lyp:current-package-dir (which value is valid only on package loading)
-  (define (lyp:package-file-path package path) (let* (
-      (base-path (if (null? package) 
-        lyp:current-package-dir (lyp:name->dir package)))
+
+  ; Because the *location* in lilypond is kinda broken (it becomes unusable 
+  ; when using nested includes, even in > 2.19.22, we provide an alternative 
+  ; for keeping track of the current file, and thus be able to include files
+  ; using relative path names (relative to the current file).
+  (define lyp:last-this-file #f)
+  (define (lyp:this-file) (or lyp:last-this-file lyp:input-filename))
+  (define (lyp:this-dir) (dirname (lyp:this-file)))
+
+  (define (lyp:load path) (let* (
+      (current-file (lyp:this-file))
+      (current-dir  (dirname current-file))
+      (abs-path     (if (lyp:absolute-path? path)
+                        path
+                        (lyp:expand-path (lyp:join-path current-dir path))))
     )
-    (lyp:file-join base-path path)
-  ))
-  
-  ; converts a package file reference to absolute path
-  (define (lyp:fileref->path ref) (let* (
-      (split (string-split ref #\:))
-      (qualified? (eq? (length split) 2))
-      (package (if qualified? (list-ref split 0) %nil))
-      (path (if qualified? (list-ref split 1) (list-ref split 0)))
+    (if (not (file-exists? abs-path))
+      (throw 'lyp:failure "lyp:load"
+        (format "File not found ~a" abs-path) #f)
     )
-    (lyp:package-file-path package path)
+    (set! lyp:last-this-file abs-path)
+    (load abs-path)
+    (set! lyp:last-this-file current-file)
   ))
-  
-  (define (lyp:load ref) (load (lyp:fileref->path ref)))
-  
+
   (define (lyp:include-ly-file path once-only?) (let* (
-      (included? (and once-only? (hash-ref lyp:file-included? path)))
+      (current-file (lyp:this-file))
+      (current-dir  (dirname current-file))
+      (abs-path     (if (lyp:absolute-path? path)
+                        path
+                        (lyp:expand-path (lyp:join-path current-dir path))))
+      (included?    (and once-only? (hash-ref lyp:file-included? abs-path)))
     )
-    (if (not (file-exists? path))
+    (ly:debug (format "lyp:include ~a\n" abs-path))
+    (if (not (file-exists? abs-path))
       (throw 'lyp:failure "lyp:include-ly-file"
-        (format "File not found ~a" path) #f)
+        (format "File not found ~a" abs-path) #f)
     )
     (if (not included?) (begin
-      (hash-set! lyp:file-included? path #t)
-      #{ \include #path #}
-    ))
-  ))
-  
-  (define (lyp:include ref)
-    (lyp:include-ly-file (lyp:fileref->path ref) #f))
-  (define (lyp:include-once ref)
-    (lyp:include-ly-file (lyp:fileref->path ref) #t))
-  
+      (hash-set! lyp:file-included? abs-path #t)
+      (set! lyp:last-this-file abs-path)
+      #{ \include #abs-path #}
+      (set! lyp:last-this-file current-file)
+    ))))
+
+  (define (lyp:include      path) (lyp:include-ly-file path #f))
+  (define (lyp:include-once path) (lyp:include-ly-file path #t))
+
   (define (lyp:require ref) (let* (
       (name (lyp:ref->name ref))
       (package-dir (lyp:name->dir name))
-      (entry-point-path (lyp:file-join package-dir "package.ly"))
+      (entry-point-path (lyp:join-path package-dir "package.ly"))
       (loaded? (hash-ref lyp:package-loaded? name))
       (prev-package-dir lyp:current-package-dir)
     )
@@ -81,20 +137,17 @@
       (ly:debug "Loading package ~a at ~a" name package-dir)
       (set! lyp:current-package-dir package-dir)
       (hash-set! lyp:package-loaded? name #t)
-      #{ \include #entry-point-path #}
+      (lyp:include entry-point-path)
       (set! lyp:current-package-dir prev-package-dir)
-    ))
-  ))
+    ))))
 )
 
 % command form
 require = #(define-void-function (parser location ref)(string?)
   (lyp:require ref))
 
-
 pinclude = #(define-void-function (parser location ref)(string?)
   (lyp:include ref))
 
 pincludeOnce = #(define-void-function (parser location ref)(string?)
   (lyp:include-once ref))
-

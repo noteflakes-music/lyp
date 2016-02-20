@@ -4,11 +4,12 @@ RSpec.describe "Lyp scheme interface" do
   it "passes scheme assertions" do
     with_lilyponds(:empty) do
       with_packages(:tmp) do
-        Lyp::Lilypond.install('2.18.2', silent: true)
+        # Lyp::Lilypond.install('2.18.2', silent: true)
+        Lyp::Lilypond.install('2.19.36', silent: true)
         Lyp::Package.install("assert@0.2.0", silent: true)
-        
+
         test_file = "#{$spec_dir}/user_files/scheme_interface_test.ly"
-        ok = Lyp::Lilypond.compile([test_file], force_wrap: true)
+        ok = Lyp::Lilypond.compile([test_file])
         expect(ok).to eq(true)
       end
     end
