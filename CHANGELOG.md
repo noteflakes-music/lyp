@@ -1,3 +1,9 @@
+## Version 0.3.2 2016-02-20
+
+- Fix --raw command line option in lilypond binary script.
+- Rewrite package scheme interface, \pinclude now properly supports relative paths when doing nested includes.
+- Wrap also files without package dependencies, in order to provide the \pinclude, etc. functionality. This can be overriden using the --raw command line option.
+
 ## Version 0.3.1 2016-02-04
 
 - Accept stdin input for lilypond.

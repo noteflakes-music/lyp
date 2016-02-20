@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+LYP_VERSION="0.3.2"
+WORKDIR="/tmp/lyp-release-installer"
+URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
+
 shopt -s extglob
 set -o errtrace
 set -o errexit
@@ -17,10 +21,6 @@ download() {
   fi
 }
     
-WORKDIR="/tmp/lyp-release-installer"
-LYP_VERSION="0.3.1"
-URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
-
 PLATFORM=`uname -sp`
 case $PLATFORM in
   "Linux x86_64")
