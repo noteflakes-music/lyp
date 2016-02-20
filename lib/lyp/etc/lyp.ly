@@ -1,6 +1,4 @@
 #(begin
-  (display "\nlyp.ly\n")
-
   ; file/path procedures based on code from oll-core:
   ;   https://github.com/openlilylib/oll-core/
 
