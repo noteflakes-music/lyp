@@ -11,3 +11,5 @@
   # automatically 
   $ lilypond -Anu "stable" myfile.ly
   ```
+
+- Add support for running ext.rb extensions

@@ -261,7 +261,7 @@ RSpec.describe "Lyp::Package" do
       expect(dir.map {|fn| File.basename(fn)}).to eq(['package.ly'])
 
       package_dir_statement = "#(set! lyp:current-package-dir \"#{$spec_dir}/user_files/dev_dir1\")\n"
-      include_statement = "\\include \"#{$spec_dir}/user_files/dev_dir1/package.ly\"\n"
+      include_statement = "\\pinclude \"#{$spec_dir}/user_files/dev_dir1/package.ly\"\n"
       fn = IO.read(dir[0])
       expect(fn).to include(package_dir_statement)
       expect(fn).to include(include_statement)
@@ -278,7 +278,7 @@ RSpec.describe "Lyp::Package" do
       expect(dir.map {|fn| File.basename(fn)}).to eq(['package.ly'])
 
       package_dir_statement = "#(set! lyp:current-package-dir \"#{$spec_dir}/user_files/dev_dir2\")\n"
-      include_statement = "\\include \"#{$spec_dir}/user_files/dev_dir2/dev_file.ly\""
+      include_statement = "\\pinclude \"#{$spec_dir}/user_files/dev_dir2/dev_file.ly\""
       fn = IO.read(dir[0])
       expect(fn).to include(package_dir_statement)
       expect(fn).to include(include_statement)

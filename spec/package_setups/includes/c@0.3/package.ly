@@ -1,1 +1,1 @@
-\include "includes/include2.ly"
+\pinclude "includes/include2.ly"

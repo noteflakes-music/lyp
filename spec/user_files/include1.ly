@@ -1,2 +1,2 @@
 \require "a"
-\include "inc/include2.ly"
+\pinclude "inc/include2.ly"

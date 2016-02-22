@@ -44,19 +44,19 @@
 #(define null:counter2 0)
 #(define null:counter3 0)
 
-% lyp:include
-#(lyp:include "null/include.ly")
-#(lyp:include "null/include.ly")
+% \pinclude
+\pinclude "null/include.ly"
+\pinclude "null/include.ly"
 #(assert:eq? null:counter1 2)
-#(assert:throw (lambda () (lyp:include "null/abc.ly")))
-#(assert:throw (lambda () (lyp:include "abc/def.ly")))
+#(assert:throw (lambda () (pinclude "null/abc.ly")))
+#(assert:throw (lambda () (pinclude "abc/def.ly")))
 
-% lyp:include-once
-#(lyp:include-once "null/include_once.ly")
-#(lyp:include-once "null/include_once.ly")
+% \pincludeOnce
+\pincludeOnce "null/include_once.ly"
+\pincludeOnce "null/include_once.ly"
 #(assert:eq? null:counter2 1)
-#(assert:throw (lambda () (lyp:include-once "null/abc.ly")))
-#(assert:throw (lambda () (lyp:include-once "abc/def.ly")))
+#(assert:throw (lambda () (pincludeOnce "null/abc.ly")))
+#(assert:throw (lambda () (pincludeOnce "abc/def.ly")))
 
 #(hash-clear! lyp:file-included?)
 
@@ -78,14 +78,14 @@
 #(hash-set! lyp:package-refs "null@0.1.2" "null")
 #(hash-set! lyp:package-dirs "null" (string-append lyp:cwd "/spec/user_files/null"))
 
-% % lyp:require
-#(lyp:require "null@0.1.2")
+% \require
+\require "null@0.1.2"
 
 % form used for package testing, providing a relative path for the package
-#(lyp:require "null:..")
+\require "null:.."
 #(assert:eq? null:counter0 1)
-#(assert:throw (lambda () (lyp:require "null>=0.1.2"))) % invalid ref
-#(assert:throw (lambda () (lyp:require "abc"))) % invalid ref
+#(assert:throw (lambda () (require "null>=0.1.2"))) % invalid ref
+#(assert:throw (lambda () (require "abc"))) % invalid ref
 
 #(hash-clear! lyp:package-loaded?)
 
