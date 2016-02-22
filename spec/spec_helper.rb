@@ -17,6 +17,10 @@ module Lyp
     $lilyponds_dir
   end
   
+  def self.ext_dir
+    ensure_dir("#{Lyp::TMP_ROOT}/ext")
+  end
+  
   def self.settings_file
     "#{Lyp::TMP_ROOT}/#{Lyp::SETTINGS_FILENAME}"
   end
@@ -69,6 +73,7 @@ def with_packages(setup, opts = {})
     # remove settings file
     FileUtils.rm_f(Lyp.settings_file)
     FileUtils.rm_f(Lyp::Lilypond.session_settings_filename)
+    FileUtils.rm_rf(Lyp.ext_dir)
 
     $packages_dir = old_packages_dir
   end

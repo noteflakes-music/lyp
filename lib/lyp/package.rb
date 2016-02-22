@@ -72,7 +72,13 @@ module Lyp::Package
         install_package_fonts(info[:path], opts)
       end
       
-      puts "\nInstalled #{package}@#{info[:version]}\n\n" unless opts[:silent]
+      unless opts[:silent]
+        if info[:local_path]
+          puts "\nInstalled #{package}@#{info[:version]} => #{info[:local_path]}\n\n"
+        else
+          puts "\nInstalled #{package}@#{info[:version]}\n\n"
+        end
+      end
       
       if opts[:test]
         FileUtils.cd(info[:path]) do
@@ -118,7 +124,9 @@ module Lyp::Package
 
       prepare_local_package_fonts(local_path, package_path)
       
-      {version: version, path: package_path}
+      load_package_ext_file("#{package}@#{version}", local_path)
+      
+      {version: version, path: package_path, local_path: local_path}
     end
     
     def prepare_local_package_fonts(local_path, package_path)
@@ -145,7 +153,18 @@ module Lyp::Package
       FileUtils.rm_rf(package_path)
       FileUtils.cp_r(tmp_path, package_path)
       
+      load_package_ext_file("#{package}@#{version}", package_path)
+      
       {version: version, path: package_path}
+    end
+    
+    def load_package_ext_file(package, path)
+      ext_path = File.join(path, 'ext.rb')
+      if File.file?(ext_path)
+        $installed_package = package
+        $installed_package_path = path
+        load_extension(ext_path)
+      end
     end
     
     def uninstall(package, opts = {})
@@ -162,6 +181,10 @@ module Lyp::Package
           name = path.gsub("#{Lyp.packages_dir}/", '')
           puts "Uninstalling #{name}" unless opts[:silent]
           FileUtils.rm_rf(path)
+        end
+        
+        Dir["#{Lyp.ext_dir}/#{File.basename(package_path)}*.rb"].each do |path|
+          FileUtils.rm_f(path)
         end
       else
         if version
@@ -187,6 +210,10 @@ module Lyp::Package
           name = package_path.gsub("#{Lyp.packages_dir}/", '')
           puts "Uninstalling #{name}" unless opts[:silent]
           FileUtils.rm_rf(package_path)
+          
+          Dir["#{Lyp.ext_dir}/#{File.basename(package_path)}.rb"].each do |path|
+            FileUtils.rm_f(path)
+          end
         else
           raise "Could not find package #{package}"
         end
@@ -453,5 +480,25 @@ module Lyp::Package
         end
       end        
     end
+    
+    def load_all_extensions
+      Dir["#{Lyp.ext_dir}/*.rb"].each {|f| load_extension(f)}
+    end
+    
+    def load_extension(path)
+      load(path)
+    rescue => e
+      STDERR.puts "Error while loading extension #{path}"
+      STDERR.puts "  #{e.message}"
+    end
+  end
+end
+
+module Lyp
+  def self.install_extension(path)
+    # install extension only when installing the package
+    return unless $installed_package
+
+    FileUtils.cp(path, "#{Lyp.ext_dir}/#{$installed_package}.rb")
   end
 end

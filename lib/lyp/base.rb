@@ -17,6 +17,7 @@ module Lyp
   LYP_DIRECTORY = File.expand_path('~/.lyp')
   LYP_BIN_DIRECTORY = File.join(LYP_DIRECTORY, 'bin')
   LYP_LIB_DIRECTORY = File.join(LYP_DIRECTORY, 'lib')
+  LYP_EXT_DIRECTORY = File.join(LYP_DIRECTORY, 'ext')
   DEFAULT_PACKAGE_DIRECTORY = File.join(LYP_DIRECTORY, 'packages')
   DEFAULT_LILYPONDS_DIRECTORY = File.join(LYP_DIRECTORY, 'lilyponds')
   
@@ -41,6 +42,10 @@ module Lyp
   
   def self.lilyponds_dir
     ensure_dir(DEFAULT_LILYPONDS_DIRECTORY)
+  end
+  
+  def self.ext_dir
+    ensure_dir(LYP_EXT_DIRECTORY)
   end
 
   def self.settings_file

@@ -64,7 +64,7 @@ class Lyp::CLI < Thor
     else
       search_package(pattern)
     end
-  end  
+  end
   
   no_commands do
     def search_lilypond(version)
@@ -303,12 +303,13 @@ class Lyp::CLI < Thor
       end
     end
   end
+  
+  def self.run
+    start(ARGV)
+  rescue => e
+    puts e.message
+    puts e.backtrace.join("\n") if $cmd_options[:verbose]
+    exit(1)
+  end
 end
 
-begin
-  Lyp::CLI.start(ARGV)
-rescue => e
-  puts e.message
-  puts e.backtrace.join("\n") if $cmd_options[:verbose]
-  exit(1)
-end

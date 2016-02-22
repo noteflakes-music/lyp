@@ -4,3 +4,6 @@ $LOAD_PATH.unshift File.expand_path("../lib", File.dirname(__FILE__))
 
 require 'lyp'
 require 'lyp/cli'
+
+Lyp::Package.load_all_extensions
+Lyp::CLI.run

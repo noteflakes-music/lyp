@@ -298,6 +298,37 @@ RSpec.describe "Lyp::Package" do
     end
   end
   
+  it "executes ext.rb icluded in package" do
+    with_packages(:tmp) do
+      version = Lyp::Package.install("abc@dev:#{$spec_dir}/user_files/dev_dir_ext", silent: true)
+      
+      expect($ext_path).to eq("#{$spec_dir}/user_files/dev_dir_ext/ext.rb")
+      expect($ext_package).to eq('abc@dev')
+      expect($ext_package_path).to eq("#{$spec_dir}/user_files/dev_dir_ext")
+    end
+  end
+  
+  it "installs ext.rb on call to Lyp.on_install" do
+    with_packages(:tmp) do
+      version = Lyp::Package.install("abc@dev:#{$spec_dir}/user_files/dev_dir_installed_ext", silent: true)
+      
+      expect($hello).to eq('hello')
+      
+      
+      expect(Dir["#{Lyp.ext_dir}/*"]).to eq(["#{Lyp.ext_dir}/abc@dev.rb"])
+      f1 = IO.read("#{$spec_dir}/user_files/dev_dir_installed_ext/ext.rb")
+      f2 = IO.read("#{Lyp.ext_dir}/abc@dev.rb")
+      expect(f1).to eq(f2)
+      
+      # extension should go when package is uninstalled
+      # but should leave other extensions alone
+      FileUtils.cp("#{Lyp.ext_dir}/abc@dev.rb", "#{Lyp.ext_dir}/abc@ghi.rb")
+
+      Lyp::Package.uninstall("abc@dev", silent: true)
+      expect(Dir["#{Lyp.ext_dir}/*"]).to eq(["#{Lyp.ext_dir}/abc@ghi.rb"])
+    end
+  end
+  
   it "uninstalls a package" do
     with_packages(:tmp) do
       Lyp::Package.install('dependency-test@0.1', silent: true)
