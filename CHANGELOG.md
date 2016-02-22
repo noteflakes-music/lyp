@@ -1,7 +1,11 @@
+## Version 0.3.3 2016-02-21
+
+- Add support for including ruby extensions in packages.
+- Rewrite package scheme interface, \pinclude now properly supports relative paths when doing nested includes, on both Lilypond 2.18 and 2.19.
+
 ## Version 0.3.2 2016-02-20
 
 - Fix --raw command line option in lilypond binary script.
-- Rewrite package scheme interface, \pinclude now properly supports relative paths when doing nested includes.
 - Wrap also files without package dependencies, in order to provide the \pinclude, etc. functionality. This can be overriden using the --raw command line option.
 
 ## Version 0.3.1 2016-02-04
