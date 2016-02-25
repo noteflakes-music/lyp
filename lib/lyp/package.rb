@@ -326,14 +326,14 @@ module Lyp::Package
     
     def list_lyp_index(pattern = nil)
       list = lyp_index['packages'].inject([]) do |m, kv|
-        m << kv[1].merge(name: kv[0])
+        m << kv[1].merge('name' => kv[0])
       end
       
       if pattern
-        list.select! {|p| p[:name] =~ /#{pattern}/}
+        list.select! {|p| p['name'] =~ /#{pattern}/}
       end
       
-      list.sort_by {|p| p[:name]}
+      list.sort_by {|p| p['name']}
     end
     
     def lyp_index

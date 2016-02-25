@@ -81,6 +81,8 @@ class Lyp::CLI < Thor
         puts "\n * Currently installed\n\n"
       end
     end
+    
+    PACKAGE_FMT = "%-16s => %s"
   
     def search_package(pattern)
       packages = Lyp::Package.list_lyp_index(pattern)
@@ -89,7 +91,8 @@ class Lyp::CLI < Thor
       else
         puts "\nAvailable packages on lyp-index:\n\n"
         packages.each do |p|
-          puts "   #{p[:name]}"
+          puts PACKAGE_FMT % [p['name'], p['description']]
+          # puts "   #{p['name']}"
         end
         puts "\n\n"
       end
