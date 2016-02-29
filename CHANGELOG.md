@@ -1,3 +1,9 @@
+## Version 0.3.4 2016-02-29
+
+- Make lyp and lilypond binaries load faster.
+- Fix installing fonts for system-installed lilyponds (#18)
+- Show package description on search.
+
 ## Version 0.3.3 2016-02-21
 
 - Add support for including ruby extensions in packages.
