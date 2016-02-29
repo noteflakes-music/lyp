@@ -1,4 +1,5 @@
 require File.expand_path('spec_helper', File.dirname(__FILE__))
+require 'rugged'
 
 RSpec.describe "Lyp scheme interface" do
   it "passes scheme assertions" do

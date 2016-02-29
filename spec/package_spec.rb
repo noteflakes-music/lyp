@@ -1,4 +1,5 @@
 require File.expand_path('spec_helper', File.dirname(__FILE__))
+require 'rugged'
 
 RSpec.describe "Lyp::Package" do
   it "returns a list of installed packages" do

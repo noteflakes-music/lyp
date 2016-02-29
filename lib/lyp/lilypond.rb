@@ -1,5 +1,4 @@
 require 'uri'
-require 'httpclient'
 require 'open3'
 require 'ruby-progressbar'
 
@@ -90,10 +89,11 @@ module Lyp::Lilypond
     attr_reader :forced_version
     
     def check_lilypond!
-      # check default
-      select_default_lilypond! unless valid_lilypond?(default_lilypond)
+      path = default_lilypond
+      select_default_lilypond! unless path && path =~ /lilypond$/
       
-      set_current_lilypond(default_lilypond) unless valid_lilypond?(current_lilypond)
+      path = current_lilypond
+      set_current_lilypond(default_lilypond) unless path && path =~ /lilypond$/
     end
     
     def valid_lilypond?(path)
@@ -355,6 +355,8 @@ module Lyp::Lilypond
     end
   
     def download_lilypond(url, fn, opts)
+      require 'httpclient'
+      
       STDERR.puts "Downloading #{url}" unless opts[:silent]
       
       download_count = 0

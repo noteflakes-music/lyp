@@ -221,6 +221,8 @@ module Lyp::Package
     end
     
     def package_repository(url, tmp_path, opts = {})
+      Lyp::System.test_rugged_gem!
+      
       # Create repository
       if File.directory?(tmp_path)
         begin

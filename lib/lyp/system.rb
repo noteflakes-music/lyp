@@ -5,10 +5,14 @@ module Lyp::System
     RUGGED_REQ = Gem::Requirement.new('>=0.23.0')
     
     def test_rugged_gem!
+      return if @already_tested
+      
       return if find_rugged_gem || use_git_based_rugged_gem
       
       STDERR.puts "Lyp needs git in order to be able to install packages. Please install git and then try again."
       exit 1
+    ensure
+      @already_tested = true
     end
     
     def find_rugged_gem
