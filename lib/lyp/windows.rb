@@ -82,10 +82,6 @@ module Lyp::Package
       end
     end
     
-    def lilypond_fonts_path
-      'usr/share/lilypond/current/fonts'
-    end
-  
     def lyp_index
       @lyp_index ||= YAML.load(`curl -s #{LYP_INDEX_URL}`)
     end

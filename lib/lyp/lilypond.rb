@@ -169,6 +169,7 @@ module Lyp::Lilypond
         path = File.join(path, "bin/lilypond")
         list << {
           root_path: root_path,
+          data_path: File.join(root_path, 'share/lilypond/current'),
           path: path,
           version: version
         }
@@ -185,8 +186,11 @@ module Lyp::Lilypond
         begin
           resp = `#{path} -v`
           if resp.lines.first =~ /LilyPond ([0-9\.]+)/i
+            data_path = `#{path} -e"(display (ly:get-option 'datadir))" /dev/null 2>/dev/null`
+            
             m << {
               root_path: File.expand_path(File.join(File.dirname(path), '..')),
+              data_path: data_path,
               path: path,
               version: $1,
               system: true
@@ -203,7 +207,7 @@ module Lyp::Lilypond
       self_bin_dir = File.dirname(File.expand_path($0))
       
       list = `which -a lilypond`
-      list = list.lines.map {|f| f.chomp}.reject do |l|
+      list = list.lines.map {|f| f.chomp}.uniq.reject do |l|
         dir = File.dirname(l)
         (dir == Gem.bindir) || (dir == Lyp::LYP_BIN_DIRECTORY) || (dir == self_bin_dir)
       end
@@ -467,6 +471,14 @@ module Lyp::Lilypond
       return unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(version)
       
       target_fn = File.join(lyp_lilypond_share_dir(version), 'lilypond/current/scm/font.scm')
+      FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
+    end
+    
+    def patch_system_lilypond_font_scm(lilypond)
+      return unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(lilypond[:version])
+      
+      target_fn = File.join(lilypond[:data_path], '/scm/font.scm')
+      puts "patch #{target_fn}"
       FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
     end
 

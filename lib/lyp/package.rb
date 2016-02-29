@@ -274,8 +274,12 @@ module Lyp::Package
       Lyp::Lilypond.list.each do |lilypond|
         next unless req =~ Gem::Version.new(lilypond[:version])
         
-        ly_fonts_dir = File.join(lilypond[:root_path], lilypond_fonts_path)
+        ly_fonts_dir = File.join(lilypond[:data_path], 'fonts')
         package_fonts_dir = File.join(package_path, 'fonts')
+        
+        if lilypond[:system]
+          Lyp::Lilypond.patch_system_lilypond_font_scm(lilypond)
+        end
         
         Dir["#{package_fonts_dir}/*.otf"].each do |fn|
           target_fn = File.join(ly_fonts_dir, 'otf', File.basename(fn))
@@ -292,10 +296,6 @@ module Lyp::Package
           FileUtils.cp(fn, target_fn)
         end
       end
-    end
-    
-    def lilypond_fonts_path
-      'share/lilypond/current/fonts'
     end
     
     def package_git_url(package, search_index = true)
