@@ -36,7 +36,6 @@ task :install_gem do
   sh "gem build lyp.gemspec"
   sh "gem install lyp-#{VERSION}.gem"
   sh "rm lyp-#{VERSION}.gem"
-  puts "Finish installation by running 'lyp install self'"
 end
 
 
