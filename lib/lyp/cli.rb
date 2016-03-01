@@ -219,7 +219,7 @@ class Lyp::CLI < Thor
     end
   
     lilypond = Lyp::Lilypond.use(version, options)
-    puts "Using version #{lilypond[:version]}"
+    puts "Using lilypond version #{lilypond[:version]}"
   end
 
   desc "list [PATTERN|lilypond]", "List installed packages matching PATTERN or versions of lilypond"

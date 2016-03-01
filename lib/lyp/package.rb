@@ -68,7 +68,6 @@ module Lyp::Package
       install_package_dependencies(info[:path], opts)
       
       if File.directory?(File.join(info[:path], 'fonts'))
-        puts "Installing package fonts..." unless opts[:silent]
         install_package_fonts(info[:path], opts)
       end
       
@@ -269,35 +268,56 @@ module Lyp::Package
       end
       sub_deps.each {|d| install(d, opts)}
     end
+
+    SYSTEM_LILYPOND_PROMPT = <<-EOF.gsub(/^\s{6}/, '').chomp
+      Do you wish to install the package fonts on the system-installed lilypond 
+      version %s (this might require sudo password)? (y/n): 
+    EOF
     
     def install_package_fonts(package_path, opts = {})
+      puts "Installing package fonts..." unless opts[:silent]
+      available_on_versions = []
+      
       req = Lyp::FONT_COPY_REQ
       
       Lyp::Lilypond.list.each do |lilypond|
         next unless req =~ Gem::Version.new(lilypond[:version])
-        
+
+        if lilypond[:system]
+          next unless Lyp.confirm_action(SYSTEM_LILYPOND_PROMPT % lilypond[:version])
+        end
+
         ly_fonts_dir = File.join(lilypond[:data_path], 'fonts')
         package_fonts_dir = File.join(package_path, 'fonts')
         
         if lilypond[:system]
-          Lyp::Lilypond.patch_system_lilypond_font_scm(lilypond)
+          if Lyp::Lilypond.patch_system_lilypond_font_scm(lilypond, opts)
+            available_on_versions << lilypond[:version]
+          end
+        else
+          available_on_versions << lilypond[:version]
         end
         
-        Dir["#{package_fonts_dir}/*.otf"].each do |fn|
-          target_fn = File.join(ly_fonts_dir, 'otf', File.basename(fn))
-          FileUtils.cp(fn, target_fn)
-        end
-        
-        Dir["#{package_fonts_dir}/*.svg"].each do |fn|
-          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
-          FileUtils.cp(fn, target_fn)
-        end
-        
-        Dir["#{package_fonts_dir}/*.woff"].each do |fn|
-          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
-          FileUtils.cp(fn, target_fn)
+        Dir["#{package_fonts_dir}/*"].each do |fn|
+          target_fn = case File.extname(fn)
+          when '.otf'
+            File.join(ly_fonts_dir, 'otf', File.basename(fn))
+          when '.svg', '.woff'
+            File.join(ly_fonts_dir, 'svg', File.basename(fn))
+          end
+          
+          if File.writable?(File.dirname(target_fn))
+            FileUtils.cp(fn, target_fn)
+          else
+            Lyp.sudo_cp(fn, target_fn)
+          end
         end
       end
+
+      unless opts[:silent]
+        puts "\nFonts available on lilypond #{available_on_versions.join(', ')}"
+      end
+
     end
     
     def package_git_url(package, search_index = true)

@@ -184,10 +184,10 @@ module Lyp::Lilypond
       
       list.inject([]) do |m, path|
         begin
-          resp = `#{path} -v`
-          if resp.lines.first =~ /LilyPond ([0-9\.]+)/i
-            data_path = `#{path} -e"(display (ly:get-option 'datadir))" /dev/null 2>/dev/null`
-            
+          resp = `#{path} #{Lyp::DETECT_SYSTEM_LILYPOND_FILENAME} 2>/dev/null`
+
+          if resp =~ /(.+)\n(.+)/
+            version, data_path = $1, $2
             m << {
               root_path: File.expand_path(File.join(File.dirname(path), '..')),
               data_path: data_path,
@@ -197,7 +197,7 @@ module Lyp::Lilypond
             }
           end
         rescue
-          # ignore error
+          # ignore error, don't include this version in the list of lilyponds
         end
         m
       end
@@ -475,15 +475,38 @@ module Lyp::Lilypond
       target_fn = File.join(lyp_lilypond_share_dir(version), 'lilypond/current/scm/font.scm')
       FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
     end
+
+    SYSTEM_LILYPOND_PATCH_WARNING = <<-EOF.gsub(/^\s{6}/, '').chomp
+      The system-installed lilypond version %s needs to be patched in 
+      order to support custom music fonts. This operation will replace the file
+      
+        %s
+      
+      Would you like to overwrite this file? (y/n): 
+    EOF
     
-    def patch_system_lilypond_font_scm(lilypond)
-      return unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(lilypond[:version])
+    def patch_system_lilypond_font_scm(lilypond, opts)
+      return false unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(lilypond[:version])
       
       target_fn = File.join(lilypond[:data_path], '/scm/font.scm')
-      puts "patch #{target_fn}"
-      FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
-    end
+      # do nothing if alredy patched
+      if IO.read(target_fn) == IO.read(Lyp::FONT_PATCH_FILENAME)
+        return true
+      end
 
+      prompt = SYSTEM_LILYPOND_PATCH_WARNING % [lilypond[:version], target_fn]
+      return unless Lyp.confirm_action(prompt)
+      
+      puts "Patching #{target_fn}:" unless opts[:silent]
+      if File.writeable?(target_fn)
+        FileUtils.cp(target_fn, "#{target_fn}.old")
+        FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
+      else
+        Lyp.sudo_cp(target_fn, "#{target_fn}.old")
+        Lyp.sudo_cp(Lyp::FONT_PATCH_FILENAME, target_fn)
+      end
+    end
+    
     def copy_fonts_from_all_packages(version, opts)
       return unless Lyp::FONT_COPY_REQ =~ Gem::Version.new(version)
       

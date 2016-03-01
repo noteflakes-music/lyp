@@ -25,12 +25,17 @@ module Lyp
   FONT_COPY_REQ = Gem::Requirement.new('>=2.18.2')
   FONT_PATCH_REQ = Gem::Requirement.new('>=2.18.2', '<2.19.12')
   
+  ETC_DIRECTORY = File.join(File.dirname(__FILE__), 'etc')
+  
   # Font patch filename (required for 2.18.2 <= lilypond < 2.19.12)
-  FONT_PATCH_FILENAME = File.expand_path('etc/font.scm', File.dirname(__FILE__))
+  FONT_PATCH_FILENAME = File.join(ETC_DIRECTORY, 'font.scm')
+
+  # File for detecting version and data dir of system-installed lilypond
+  DETECT_SYSTEM_LILYPOND_FILENAME = File.join(ETC_DIRECTORY, 'detect_system_lilypond.ly')
 
   # etc/lyp.ly contains lyp:* procedure definitions for loading packages and
   # other support code.
-  LYP_LY_LIB_PATH = File.expand_path('etc/lyp.ly', File.dirname(__FILE__))
+  LYP_LY_LIB_PATH = File.join(ETC_DIRECTORY, 'lyp.ly')
   
   LILYPOND_NOT_FOUND_MSG = "No version of lilypond found.\nTo install lilypond run 'lyp install lilypond'"
 
@@ -56,6 +61,19 @@ module Lyp
   def self.ensure_dir(dir)
     FileUtils.mkdir_p(dir) unless File.directory?(dir)
     dir
+  end
+  
+  def self.sudo_cp(src, dest)
+    cmd = "sudo cp #{src} #{dest}"
+    msg = `#{cmd}`
+    raise msg unless $?.success?
+  end
+  
+  def self.confirm_action(prompt)
+    require 'readline'
+    
+    response = Readline.readline(prompt)
+    ["y", "yes"].include?(response)
   end
 end
 
