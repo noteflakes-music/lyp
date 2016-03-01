@@ -1,3 +1,7 @@
+## Version 0.3.5 2016-03-01
+
+- Ask for confirmation before patching and installing fonts in system-installed lilyponds.
+
 ## Version 0.3.4 2016-02-29
 
 - Make lyp and lilypond binaries load faster.
