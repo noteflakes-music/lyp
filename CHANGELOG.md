@@ -1,3 +1,8 @@
+## Version 0.3.6 2016-03-08
+
+- Add -r/--require command line for preloading packages (#19).
+- Rewrite \require, \pinclude, \pincludeOnce commands for better compatibility with legacy lilypond code.
+
 ## Version 0.3.5 2016-03-01
 
 - Ask for confirmation before patching and installing fonts in system-installed lilyponds.
