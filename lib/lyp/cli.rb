@@ -45,7 +45,7 @@ class Lyp::CLI < Thor
   package_name "lyp"
   map "-v" => :version
   check_unknown_options! :except => :compile
-  class_option :verbose, aliases: '-V', :type => :boolean
+  class_option :verbose, aliases: '-V', :type => :boolean, desc: 'show verbose output'
   
   desc "version", "show Lyp version"
   def version

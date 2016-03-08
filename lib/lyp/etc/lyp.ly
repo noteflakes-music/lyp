@@ -96,62 +96,59 @@
       (throw 'lyp:failure "lyp:load"
         (format "File not found ~a" abs-path) #f)
     )
+    (ly:debug (format "lyp:load ~a\n" abs-path))
     (set! lyp:last-this-file abs-path)
     (load abs-path)
     (set! lyp:last-this-file current-file)
   ))
 
-  (define (lyp:do-include parser path)
+  (define (lyp:fmt-include path)
+    (format "#(set! lyp:last-this-file \"~A\")\n\\include \"~A\"\n#(set! lyp:last-this-file \"~A\")\n"
+      path path (lyp:this-file)))
+      
+  (define (lyp:fmt-require entry-point-path package-dir)
+    (format "#(set! lyp:current-package-dir \"~A\")\n~A#(set! lyp:current-package-dir \"~A\")\n"
+      package-dir (lyp:fmt-include entry-point-path) lyp:current-package-dir))
+  
+  ; helper function to cover API changes from 2.18 to 2.19
+  (define (lyp:include-string str)
     (if (defined? '*parser*)
-      (ly:parser-parse-string (ly:parser-clone)
-        (format "\\include \"~a\"" path))
-      (ly:parser-parse-string (ly:parser-clone parser)
-        (format "\\include \"~a\"" path))))
+      (ly:parser-include-string str)
+      (ly:parser-include-string parser str)))
 )
 
 % command form
 require = #(define-void-function (parser location ref)(string?) (let* (
-    (current-file (lyp:this-file))
     (name (lyp:ref->name ref))
     (package-dir (lyp:name->dir name))
     (entry-point-path (lyp:join-path package-dir "package.ly"))
     (loaded? (hash-ref lyp:package-loaded? name))
-    (prev-package-dir lyp:current-package-dir)
   )
   (if (not loaded?) (begin
     (ly:debug "Loading package ~a at ~a" name package-dir)
-    (set! lyp:current-package-dir package-dir)
     (hash-set! lyp:package-loaded? name #t)
     
-    (set! lyp:last-this-file entry-point-path)
-    (lyp:do-include parser entry-point-path)
-    (set! lyp:last-this-file current-file)
-    
-    (set! lyp:current-package-dir prev-package-dir)
+    (lyp:include-string (lyp:fmt-require entry-point-path package-dir))
   ))
 ))
     
 pinclude = #(define-void-function (parser location path)(string?) (let* (
-    (current-file (lyp:this-file))
-    (current-dir  (dirname current-file))
+    (current-dir  (lyp:this-dir))
     (abs-path     (if (lyp:absolute-path? path)
                       path
                       (lyp:expand-path (lyp:join-path current-dir path))))
   )
-  (ly:debug (format "\\pinclude ~a\n" abs-path))
+  (ly:debug "\\pinclude ~a\n" abs-path)
   (if (not (file-exists? abs-path))
     (throw 'lyp:failure "\\pinclude"
       (format "File not found ~a" abs-path) #f))
 
   (hash-set! lyp:file-included? abs-path #t)
-  (set! lyp:last-this-file abs-path)
-  (lyp:do-include parser abs-path)
-  (set! lyp:last-this-file current-file)
+  (lyp:include-string (lyp:fmt-include abs-path))
 ))
 
 pincludeOnce = #(define-void-function (parser location path)(string?) (let* (
-    (current-file (lyp:this-file))
-    (current-dir  (dirname current-file))
+    (current-dir  (lyp:this-dir))
     (abs-path     (if (lyp:absolute-path? path)
                       path
                       (lyp:expand-path (lyp:join-path current-dir path))))
@@ -164,8 +161,6 @@ pincludeOnce = #(define-void-function (parser location path)(string?) (let* (
         (format "File not found ~a" abs-path) #f))
 
     (hash-set! lyp:file-included? abs-path #t)
-    (set! lyp:last-this-file abs-path)
-    (lyp:do-include parser abs-path)
-    (set! lyp:last-this-file current-file)
+    (lyp:include-string (lyp:fmt-include abs-path))
   )
 )))
