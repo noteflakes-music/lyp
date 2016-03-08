@@ -6,7 +6,7 @@ module Lyp
   ))
   
   def self.wrap(fn, opts = {})
-    r = Lyp::Resolver.new(fn).resolve_package_dependencies
+    r = Lyp::Resolver.new(fn, opts).resolve_package_dependencies
 
     # copy current_package_dir option
     r[:current_package_dir] = opts[:current_package_dir]
@@ -15,6 +15,7 @@ module Lyp
     fn = "#{Lyp::TMP_ROOT}/wrappers/#{File.basename(fn)}" 
   
     File.open(fn, 'w+') {|f| f << WRAPPER_TEMPLATE.render(r)}
+    
     fn
   end
 end

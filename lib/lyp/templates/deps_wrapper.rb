@@ -50,10 +50,21 @@ _[:package_dirs].each do |package, path|
   (hash-set! lyp:package-dirs "{{package}}" {{quote_path[path]}})`
 end
 
-
 `
 )
 
 #(ly:debug "package loader is ready")
+`
+
+if _[:preload]
+  _[:preload].each do |package|
+`
+\require "{{package}}"
+`
+  end
+end
+
+`
 \include {{quote_path[user_filename]}}
 `
+

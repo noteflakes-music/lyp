@@ -254,6 +254,17 @@ RSpec.describe Lyp::Resolver do
     end
   end
 
+  it "handles external requires (supplied on command line using -r/--require)" do
+    with_packages(:simple) do
+      resolver = Lyp::Resolver.new('spec/user_files/no_require.ly',
+        ext_require: ['a'])
+
+      r = resolver.resolve_package_dependencies
+      expect(r[:definite_versions]).to eq(%w{a@0.2 b@0.2.2})
+      expect(r[:preload]).to eq(['a'])
+    end
+  end
+
   it "handles a big package setup" do
     with_packages(:big) do
       resolver = Lyp::Resolver.new('spec/user_files/simple.ly')

@@ -1,0 +1,3 @@
+#(assert #t)
+
+#(display "Fine")

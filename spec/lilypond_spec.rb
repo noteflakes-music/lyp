@@ -278,5 +278,20 @@ RSpec.describe "Lyp::Lilypond" do
       expect(versions.map{|l| l[:version]}).to eq(%w{2.18.0 2.18.1 2.18.2})
     end
   end
+  
+  it "accepts command-line require option for compilation" do
+    with_lilyponds(:tmp, copy_from: :empty) do
+      with_packages(:tmp, copy_from: :empty) do
+        Lyp::Lilypond.install('2.19.37', silent: true)
+        Lyp::Package.install('assert', silent: true)
+        
+        Lyp::Lilypond.compile(["#{$spec_dir}/user_files/no_require.ly"],
+          {ext_require: ['assert']})
+        
+        output = "#{$_out}\n#{$_err}"
+        expect(output).to match(/Fine/)
+      end
+    end
+  end
 end
 

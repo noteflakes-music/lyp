@@ -100,33 +100,14 @@ class Lyp::CLI < Thor
   end
 
   desc "compile [<option>...] <FILE>", "Invokes lilypond with given file"
-  method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of lilypond if not present'
-  method_option :env, aliases: '-E', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
-  method_option :use, aliases: '-u', type: :string, desc: 'Use specified version'
-  def compile(*args)
-    $cmd_options = options
+  def compile(*argv)
+    opts, argv = Lyp::Lilypond.preprocess_argv(argv)
 
-    if options[:env]
-      unless ENV['LILYPOND_VERSION']
-        STDERR.puts "$LILYPOND_VERSION not set"
-        exit 1
-      end
-      options[:use] = ENV['LILYPOND_VERSION']
-    end
-    
-    if options[:use]
-      if options[:install]
-        Lyp::Lilypond.install_if_missing(options[:use], no_version_test: true)
-      end
-      Lyp::Lilypond.force_version!(options[:use])
-    end
+    lilypond_path = Lyp::Lilypond.select_lilypond_version(opts)
 
-    # check lilypond default / current settings
-    Lyp::Lilypond.check_lilypond!
-    
     $stderr.puts "Lyp #{Lyp::VERSION}"
     Lyp::System.test_installed_status!
-    Lyp::Lilypond.compile(args)
+    Lyp::Lilypond.compile(argv, opts)
   end
   
   desc "test [<option>...] [.|PATTERN]", "Runs package tests on installed packages or local directory"

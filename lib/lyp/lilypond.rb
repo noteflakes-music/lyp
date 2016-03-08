@@ -4,6 +4,59 @@ require 'ruby-progressbar'
 
 module Lyp::Lilypond
   class << self
+    def preprocess_argv(argv)
+      options = {}
+      argv = argv.dup # copy for iterating
+      argv_clean = []
+      while arg = argv.shift
+        case arg
+        when '-R', '--raw'
+          options[:raw] = true
+        when '-r', '--require'
+          options[:ext_require] ||= []
+          options[:ext_require] << argv.shift
+        when /^(?:\-r|\-\-require\=)"?([^\s]+)"?/
+          options[:ext_require] ||= []
+          options[:ext_require] << $1
+        when '-E', '--env'
+          unless ENV['LILYPOND_VERSION']
+            STDERR.puts "$LILYPOND_VERSION not set"
+            exit 1
+          end
+          options[:use_version] = ENV['LILYPOND_VERSION']
+        when '-u', '--use'
+          options[:use_version] = argv.shift
+        when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
+          options[:use_version] = $1
+        when '-n', '--install'
+          options[:install] = true
+        else
+          argv_clean << arg
+        end
+      end
+
+      [options, argv_clean]
+    end
+    
+    def select_lilypond_version(opts)
+      if opts[:use_version]
+        if opts[:install]
+          Lyp::Lilypond.install_if_missing(opts[:use_version])
+        end
+        Lyp::Lilypond.force_version!(opts[:use_version])
+      end
+      Lyp::Lilypond.check_lilypond!
+      Lyp::Lilypond.current_lilypond.tap do |path|
+        unless path && File.file?(path)
+          STDERR.puts "No version of lilypond found. To install lilypond run 'lyp install lilypond'."
+          exit 1
+        end
+      end
+    rescue => e
+      STDERR.puts e.message
+      exit 1
+    end
+    
     def compile(argv, opts = {})
       unless argv.last == '-'
         fn = Lyp.wrap(argv.pop, opts)

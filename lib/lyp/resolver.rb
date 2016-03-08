@@ -2,6 +2,7 @@ class Lyp::Resolver
   def initialize(user_file, opts = {})
     @user_file = user_file
     @opts = opts
+    @ext_require = @opts[:ext_require]
   end
   
   # Resolving package dependencies involves two stages:
@@ -25,7 +26,8 @@ class Lyp::Resolver
       user_file: @user_file,
       definite_versions: definite_versions,
       package_refs: refs,
-      package_dirs: dirs
+      package_dirs: dirs,
+      preload: @opts[:ext_require]
     }
   end
   
@@ -88,42 +90,58 @@ class Lyp::Resolver
     ly_content.scan(DEP_RE) do |type, ref|
       case type
       when INCLUDE, PINCLUDE, PINCLUDE_ONCE
-        # a package would normally use a plain \pinclude or \pincludeOnce
-        # command to include package files, e.g. \pinclude "inc/init.ly".
-        # 
-        # But a package can also qualify the file reference with the package
-        # name, in order to be able to load files after the package has already
-        # been loaded, e.g. \pinclude "mypack:inc/init.ly"
-        if ref =~ /^([^\:]+)\:(.+)$/
-          # ignore null package (used for testing purposes only)
-          next if $1 == 'null'
-          ref = $2
-        end
-        qualified_path = File.expand_path(ref, dir)
-        queue_file_for_processing(qualified_path, tree, leaf)
+        process_include_command(ref, dir, tree, leaf, opts)
       when REQUIRE
-        forced_path = nil
-        if ref =~ /^([^\:]+)\:(.+)$/
-          ref = $1
-          forced_path = File.expand_path($2, dir)
-        end
-
-        ref =~ Lyp::PACKAGE_RE
-        package, version = $1, $2
-        next if package == 'null'
-
-        # set forced path if applicable
-        if forced_path
-          set_forced_package_path(tree, package, forced_path)
-        end
-
-        find_package_versions(ref, tree, leaf, opts)
+        process_require_command(ref, dir, tree, leaf, opts)
       end
+    end
+
+    # process any external requires (supplied using the -r command line option)
+    if @ext_require
+      @ext_require.each do |p|
+        process_require_command(p, dir, tree, leaf, opts)
+      end
+      @ext_require = nil
     end
     
     tree[:processed_files][path] = true
   rescue Errno::ENOENT
     raise "Cannot find file #{path}"
+  end
+  
+  def process_include_command(ref, dir, tree, leaf, opts)
+    # a package would normally use a plain \pinclude or \pincludeOnce
+    # command to include package files, e.g. \pinclude "inc/init.ly".
+    # 
+    # But a package can also qualify the file reference with the package
+    # name, in order to be able to load files after the package has already
+    # been loaded, e.g. \pinclude "mypack:inc/init.ly"
+    if ref =~ /^([^\:]+)\:(.+)$/
+      # ignore null package (used for testing purposes only)
+      return if $1 == 'null'
+      ref = $2
+    end
+    qualified_path = File.expand_path(ref, dir)
+    queue_file_for_processing(qualified_path, tree, leaf)
+  end
+  
+  def process_require_command(ref, dir, tree, leaf, opts)
+    forced_path = nil
+    if ref =~ /^([^\:]+)\:(.+)$/
+      ref = $1
+      forced_path = File.expand_path($2, dir)
+    end
+
+    ref =~ Lyp::PACKAGE_RE
+    package, version = $1, $2
+    return if package == 'null'
+
+    # set forced path if applicable
+    if forced_path
+      set_forced_package_path(tree, package, forced_path)
+    end
+
+    find_package_versions(ref, tree, leaf, opts)
   end
   
   def queue_file_for_processing(path, tree, leaf)
