@@ -53,5 +53,19 @@ EOF
     expect(Lyp::Template.render(:a)).to eq("xy")
     expect(Lyp::Template.render(:b)).to eq("{\"x\"}")
   end
+  
+  it "correctly handles if blocks" do
+    a = <<EOF
+    `
+    {{? false }} {{'abc'}} {{/}}
+    {{? !!nil.nil? }}
+    def
+    {{/}}
+    `
+EOF
+
+    Lyp::Template.set(:a, a)
+    expect(Lyp::Template.render(:a).strip).to eq("def")
+  end
 end
 

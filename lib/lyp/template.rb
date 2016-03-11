@@ -5,7 +5,11 @@ module Lyp
 
     INTERPOLATION_START = "{{".freeze
     INTERPOLATION_END = "}}".freeze
-    INTERPOLATION_RE = /#{INTERPOLATION_START}((?:(?!#{INTERPOLATION_END}).)*)#{INTERPOLATION_END}/m
+    INTERPOLATION_RE = /#{INTERPOLATION_START}([^\?\/](?:(?!#{INTERPOLATION_END}).)*)#{INTERPOLATION_END}/m
+    
+    IF_START = "{{?".freeze
+    IF_END = "{{/}}".freeze
+    IF_RE = /\{\{\?((?:(?!#{INTERPOLATION_END}).)*)#{INTERPOLATION_END}((?:(?!#{IF_END}).)*)#{IF_END}/m
 
     ESCAPED_QUOTE = '\\"'.freeze
     QUOTE = '"'.freeze
@@ -30,13 +34,27 @@ EOF
 
       metaclass.instance_eval method_str
     end
-  
+    
+    def convert_interpolation(s)
+      s.gsub(INTERPOLATION_RE) do
+        code = $1.gsub(ESCAPED_QUOTE, QUOTE) 
+        "\#{#{code}}"
+      end
+    end
+
     def convert_literal(s)
       # look for interpolated values, wrap them with #{}
       s = s.inspect.gsub(INTERPOLATION_RE) do
         code = $1.gsub(ESCAPED_QUOTE, QUOTE) 
         "\#{#{code}}"
       end
+      
+      s = s.gsub(IF_RE) do 
+        test, code = $1, $2
+        test = test.strip.gsub(ESCAPED_QUOTE, QUOTE)
+        "\#\{if #{test}; \"#{code}\"; end}"
+      end
+
       "__emit__[#{s}]"
     end
     
