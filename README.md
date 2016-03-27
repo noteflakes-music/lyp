@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/noteflakes/lyp.svg?branch=master)](https://travis-ci.org/noteflakes/lyp)
+[![Build Status](https://travis-ci.org/noteflakes/lyp.svg?branch=master)](https://travis-ci.org/noteflakes/lyp) | [the lyp package index](https://github.com/noteflakes/lyp-index)
 
 # lyp - a package manager for lilypond
 
@@ -328,7 +328,7 @@ Loading scheme files that way is a better technique than adding directorys to `%
 
 ### Including fonts
 
-Lyp also supports automatic installation of fonts, based on work by [Abraham Leigh](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
+Lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
 
 **Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version ower than 2.19.12 in order to support custom fonts. 
 

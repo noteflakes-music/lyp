@@ -25,6 +25,7 @@ LYP_LY_HELP = <<EOF
 Lyp-provided options:
   -E, --env                           use version specified in $LILYPOND_VERSION
   -n, --install                       install the specified version if not found
+  -O, --open                          open the target file after compilation
   -R, --raw                           run raw lilypond (no pre-processing)
   -r, --require=PACKAGE               preload the specified package
   -u, --use=VERSION                   use the given version of lilypond

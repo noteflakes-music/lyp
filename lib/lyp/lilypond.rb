@@ -30,6 +30,8 @@ module Lyp::Lilypond
           options[:use_version] = $1
         when '-n', '--install'
           options[:install] = true
+        when '-O', '--open'
+          options[:open] = true
         else
           argv_clean << arg
         end
@@ -68,7 +70,7 @@ module Lyp::Lilypond
     
     def invoke(argv, opts = {})
       lilypond = current_lilypond
-
+      
       case opts[:mode]
       when :system
         system("#{lilypond} #{argv.join(" ")}")
