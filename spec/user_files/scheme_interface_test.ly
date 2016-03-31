@@ -58,6 +58,13 @@
 #(assert:throw (lambda () (pincludeOnce "null/abc.ly")))
 #(assert:throw (lambda () (pincludeOnce "abc/def.ly")))
 
+% \pcondInclude
+#(define cond-include #f)
+\pcondInclude ##f "scheme_interface_test_cond_include.ly"
+#(assert:eq? cond-include #f)
+\pcondInclude ##t "scheme_interface_test_cond_include.ly"
+#(assert:eq? cond-include #t)
+
 #(hash-clear! lyp:file-included?)
 
 \pinclude "null/include.ly"

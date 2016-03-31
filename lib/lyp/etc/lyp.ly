@@ -115,6 +115,25 @@
     (if (defined? '*parser*)
       (ly:parser-include-string str)
       (ly:parser-include-string parser str)))
+      
+  (define (lyp:include parser location path once)  (let* (
+      (current-dir  (lyp:this-dir))
+      (abs-path     (if (lyp:absolute-path? path)
+                        path
+                        (lyp:expand-path (lyp:join-path current-dir path))))
+      (included?    (and once (hash-ref lyp:file-included? abs-path)))
+    )
+    
+    (if (not included?) (begin
+      (ly:debug "include ~a\n" abs-path)
+      (if (not (file-exists? abs-path))
+        (throw 'lyp:failure "lyp:include"
+          (format "File not found ~a" abs-path) #f))
+
+      (hash-set! lyp:file-included? abs-path #t)
+      (lyp:include-string (lyp:fmt-include abs-path))
+    ))
+  ))
 )
 
 % command form
@@ -132,35 +151,15 @@ require = #(define-void-function (parser location ref)(string?) (let* (
   ))
 ))
     
-pinclude = #(define-void-function (parser location path)(string?) (let* (
-    (current-dir  (lyp:this-dir))
-    (abs-path     (if (lyp:absolute-path? path)
-                      path
-                      (lyp:expand-path (lyp:join-path current-dir path))))
-  )
-  (ly:debug "\\pinclude ~a\n" abs-path)
-  (if (not (file-exists? abs-path))
-    (throw 'lyp:failure "\\pinclude"
-      (format "File not found ~a" abs-path) #f))
+pinclude = #(define-void-function (parser location path)(string?) 
+  (lyp:include parser location path #f))
 
-  (hash-set! lyp:file-included? abs-path #t)
-  (lyp:include-string (lyp:fmt-include abs-path))
-))
+pcondInclude = #(define-void-function (parser location expr path)(scheme? string?)
+  (if expr (lyp:include parser location path #f)))
 
-pincludeOnce = #(define-void-function (parser location path)(string?) (let* (
-    (current-dir  (lyp:this-dir))
-    (abs-path     (if (lyp:absolute-path? path)
-                      path
-                      (lyp:expand-path (lyp:join-path current-dir path))))
-    (included?    (hash-ref lyp:file-included? abs-path))
-  )
-  (if (not included?) (begin
-    (ly:debug (format "\\pincludeOnce ~a\n" abs-path))
-    (if (not (file-exists? abs-path))
-      (throw 'lyp:failure "\\pincludeOnce"
-        (format "File not found ~a" abs-path) #f))
+pincludeOnce = #(define-void-function (parser location path)(string?) 
+  (lyp:include parser location path #t))
 
-    (hash-set! lyp:file-included? abs-path #t)
-    (lyp:include-string (lyp:fmt-include abs-path))
-  )
-)))
+pcondIncludeOnce = #(define-void-function (parser location path)(string?) 
+  (if expr (lyp:include parser location path #t)))
+

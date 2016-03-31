@@ -455,7 +455,7 @@ module Lyp::Lilypond
   
     def install_lilypond_files_osx(fn, target, platform, version, opts)
       STDERR.puts "Extracting..." unless opts[:silent]
-      exec "tar -xjf #{fn} -C #{target}"
+      exec "tar -xvjf #{fn} -C #{target}"
     
       copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version, opts)
     end
@@ -671,8 +671,7 @@ module Lyp::Lilypond
     end
     
     def parse_error_msg(msg)
-      (msg =~ /[^\n]+: error.+failed files: ".+"/m) ?
-        $& : msg
+      (msg =~ /[^\n]+: error.+failed files: ".+"/m) ? $& : msg
     end
   end
 end

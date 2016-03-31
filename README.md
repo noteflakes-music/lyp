@@ -331,6 +331,15 @@ Lyp also defines a `lyp:load` scheme function for loading scheme files using rel
 
 Loading scheme files that way is a better technique than adding directorys to `%load-path`, because this way one avoids possible name clashes, which may lead to unexpected behavior.
 
+### Conditional includes
+
+Files can also be included conditionally by evaluating a scheme expression using the `\pcondInclude` and `\pcondIncludeOnce` commands:
+
+```lilypond
+% include edition-specific tweaks
+\pcondInclude #(eq? edition 'urtext) "urtext_tweaks.ly"
+```
+
 ### Including fonts
 
 Lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
