@@ -66,5 +66,6 @@ end
 
 `
 \include {{quote_path[user_filename]}}
-`
 
+#(if (defined? 'assert:summary) (assert:summary))
+`
