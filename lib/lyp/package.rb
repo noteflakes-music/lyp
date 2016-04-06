@@ -447,12 +447,15 @@ module Lyp::Package
     # Runs all tests found in local directory
     def run_local_tests(dir, opts = {})
       package_dir = File.expand_path(dir)
-      test_files = Dir["#{package_dir}/**/*_test.ly"]
       run_tests(opts) do |stats|
-        test_files.each do |f|
+        find_test_files(package_dir).each do |f|
           perform_test(f, stats)
         end
       end
+    end
+    
+    def find_test_files(dir)
+      Dir["#{dir}/**/*_test.ly", "#{dir}/**/*-test.ly"]
     end
     
     # This method runs tests by yielding the test statistics.
@@ -493,7 +496,7 @@ module Lyp::Package
       
       run_tests(opts) do |stats|
         packages.each do |path|
-          files = Dir["#{path}/**/*_test.ly"]
+          files = find_test_files(path)
           next if files.empty?
 
           FileUtils.cd(path) do
