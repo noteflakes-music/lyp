@@ -411,9 +411,9 @@ module Lyp::Lilypond
   
     def download_lilypond(url, fn, opts)
       require 'httpclient'
-      
+
       STDERR.puts "Downloading #{url}" unless opts[:silent]
-      
+
       download_count = 0
       client = HTTPClient.new
       conn = client.get_async(url)
@@ -455,7 +455,7 @@ module Lyp::Lilypond
   
     def install_lilypond_files_osx(fn, target, platform, version, opts)
       STDERR.puts "Extracting..." unless opts[:silent]
-      exec "tar -xvjf #{fn} -C #{target}"
+      exec "tar -xjf #{fn} -C #{target}"
     
       copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version, opts)
     end

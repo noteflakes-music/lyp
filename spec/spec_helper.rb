@@ -45,6 +45,16 @@ module Lyp
         true
       end
     end
+
+    def download_lilypond(url, fn, opts)
+      STDERR.puts "Downloading #{url}" unless opts[:silent]
+
+      if opts[:silent]
+        `curl -s -o "#{fn}" "#{url}"`
+      else
+        `curl -o "#{fn}" "#{url}"`
+      end
+    end
   end
 end
 
