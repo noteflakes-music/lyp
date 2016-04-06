@@ -10,6 +10,7 @@ module Lyp
 
     # copy current_package_dir option
     r[:current_package_dir] = opts[:current_package_dir]
+    r[:opts] = opts
 
     FileUtils.mkdir_p("#{Lyp::TMP_ROOT}/wrappers")
     fn = "#{Lyp::TMP_ROOT}/wrappers/#{File.basename(fn)}" 
