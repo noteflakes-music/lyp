@@ -2,7 +2,7 @@
   <a href="https://travis-ci.org/noteflakes/lyp"><img src="https://travis-ci.org/noteflakes/lyp.svg?branch=master"</a>
 </p>
 <p align="center">
-  <a href="https://github.com/noteflakes/lyp-index">The lyp package index</a>
+  <a href="https://github.com/noteflakes/lyp-index#readme">The lyp package index</a>
 </p>
 
 # lyp - a package manager for lilypond
