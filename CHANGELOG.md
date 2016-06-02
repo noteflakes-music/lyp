@@ -1,5 +1,8 @@
 ## Version 0.3.7 2016-03-31
 
+- Update package URLs (packages are now placed in the [lyp-packages](https://github.com/lyp-packages) organisation).
+- Run *-test.ly as well as *_test.ly files.
+- Show assert summary if assert package was loaded.
 - Add `\pcondInclude`, `\pcondIncludeOnce` commands for conditional includes.
 
 ## Version 0.3.6 2016-03-08
