@@ -39,7 +39,7 @@ RSpec.describe "assert package" do
       with_packages(:tmp) do
         Lyp::Lilypond.install('2.18.2', silent: true)
         
-        url = "https://github.com/noteflakes/lyp-assert.git"
+        url = "https://github.com/lyp-packages/assert.git"
         repo_path = "#{Lyp::TMP_ROOT}/assert-clone"
         FileUtils.rm_rf(repo_path)
         Rugged::Repository.clone_at(url, repo_path)

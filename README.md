@@ -2,7 +2,7 @@
   <a href="https://travis-ci.org/noteflakes/lyp"><img src="https://travis-ci.org/noteflakes/lyp.svg?branch=master"</a>
 </p>
 <p align="center">
-  <a href="https://github.com/noteflakes/lyp-index#readme">The lyp package index</a>
+  <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
 </p>
 
 # lyp - a package manager for lilypond
@@ -135,7 +135,7 @@ The difference between merely copying and including a lilypond file in your musi
 
 In lyp, a package should contain at least a single lilypond file named `package.ly` in its root directory. A package could contain additional lilypond files referenced in the main package file (using relative includes). A package could also depend on other packages by using the `\require` command (see below).
 
-Lilypond packages are expected to be published as git repositories. The packages is then versioned using git tags. A package can be referenced either using its git URL, a short name (if it's registered in the [lyp package index](https://github.com/noteflakes/lyp-index)), or alternatively as a local path (which is meant for package development more than anything else).
+Lilypond packages are expected to be published as git repositories. The packages is then versioned using git tags. A package can be referenced either using its git URL, a short name (if it's registered in the [lyp package index](https://github.com/lyp-packages/index)), or alternatively as a local path (which is meant for package development more than anything else).
 
 ### Installing packages
 
@@ -202,7 +202,7 @@ To install the `assert` package required in the file we run:
 ```bash
 $ lyp resolve test.ly
 #=>
-Cloning https://github.com/noteflakes/lyp-assert.git...
+Cloning https://github.com/lyp-packages/assert.git...
 
 Installed assert@0.2.0
 ```
@@ -221,17 +221,17 @@ A package is normally referenced by its git URL. Lyp lets you provide either ful
 
 ```bash
 # Fully-qualified URLs
-$ lyp install https://github.com/noteflakes/lyp-package-template.git
-$ lyp install https://github.com/noteflakes/lyp-package-template
+$ lyp install https://github.com/lyp-packages/package-template.git
+$ lyp install https://github.com/lyp-packages/package-template
 
 # Partially-qualified URL
-$ lyp install github.com/noteflakes/lyp-package-template
+$ lyp install github.com/lyp-packages/package-template
 
 # Github repository id
 $ lyp install noteflakes/lyp-package-template
 ```
 
-In addition, lyp also provides an [index of publically available package](https://github.com/noteflakes/lyp-index), which maps a package name to its URL (see also below). Using the index, packages are referenced by their published name instead of by their git URL:
+In addition, lyp also provides an [index of publically available package](https://github.com/lyp-packages/index), which maps a package name to its URL (see also below). Using the index, packages are referenced by their published name instead of by their git URL:
 
 ```bash
 $ lyp install dummy
@@ -357,13 +357,13 @@ $ lyp test .
 
 A test file can either be a simple lilypond file which includes the package files and results in a lilypond score, or a lilypond file that performs unit tests on scheme code.
 
-For more information on testing, see the [lyp-assert](https://github.com/noteflakes/lyp-assert) package, which is meant to be used for unit testing lilypond code, and serves as an example of how to test a package.
+For more information on testing, see the [lyp-assert](https://github.com/lyp-packages/assert) package, which is meant to be used for unit testing lilypond code, and serves as an example of how to test a package.
 
 ### Publishing packages
 
 In order for your package to be available to all users, you'll need to first push your code to a publically accessible git repository (for example on github). Users will then be able to install your package by using the git URL of the public repository.
 
-You can also add your package to the lyp [public package index](https://github.com/noteflakes/lyp-index), by cloning it, editing [index.yaml](https://github.com/noteflakes/lyp-index/blob/master/index.yaml), and creating a pull request.
+You can also add your package to the lyp [public package index](https://github.com/lyp-packages/index), by cloning it, editing [index.yaml](https://github.com/lyp-packages/index/blob/master/index.yaml), and creating a pull request.
 
 ## Installing and Using Lilypond
 

@@ -1,7 +1,11 @@
+## Version 0.3.7 2016-03-31
+
+- Add `\pcondInclude`, `\pcondIncludeOnce` commands for conditional includes.
+
 ## Version 0.3.6 2016-03-08
 
-- Add -r/--require command line for preloading packages (#19).
-- Rewrite \require, \pinclude, \pincludeOnce commands for better compatibility with legacy lilypond code.
+- Add `-r/--require` command line for preloading packages (#19).
+- Rewrite `\require`, `\pinclude`, `\pincludeOnce` commands for better compatibility with legacy lilypond code.
 
 ## Version 0.3.5 2016-03-01
 

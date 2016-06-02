@@ -339,7 +339,7 @@ module Lyp::Package
       end
     end
     
-    LYP_INDEX_URL = "https://raw.githubusercontent.com/noteflakes/lyp-index/master/index.yaml"
+    LYP_INDEX_URL = "https://raw.githubusercontent.com/lyp-packages/index/master/index.yaml"
     
     def search_lyp_index(package)
       entry = lyp_index['packages'][package]
