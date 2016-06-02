@@ -33,7 +33,7 @@
 </a></p>
 
 <p align="center">
-  <a href="https://github.com/noteflakes/lyp-index">The lyp package index</a>
+  <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
 </p>
 
 <h1>
@@ -187,7 +187,7 @@ $ lyp-0.2.1-linux-x86_64/lyp install self</pre></div>
 
 <p>In lyp, a package should contain at least a single lilypond file named <code>package.ly</code> in its root directory. A package could contain additional lilypond files referenced in the main package file (using relative includes). A package could also depend on other packages by using the <code>\require</code> command (see below).</p>
 
-<p>Lilypond packages are expected to be published as git repositories. The packages is then versioned using git tags. A package can be referenced either using its git URL, a short name (if it's registered in the <a href="https://github.com/noteflakes/lyp-index">lyp package index</a>), or alternatively as a local path (which is meant for package development more than anything else).</p>
+<p>Lilypond packages are expected to be published as git repositories. The packages is then versioned using git tags. A package can be referenced either using its git URL, a short name (if it's registered in the <a href="https://github.com/lyp-packages/index">lyp package index</a>), or alternatively as a local path (which is meant for package development more than anything else).</p>
 
 <h3>
 <a id="installing-packages" class="anchor" href="#installing-packages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing packages</h3>
@@ -245,7 +245,7 @@ lyp search stylesheet</pre></div>
 
 <div class="highlight highlight-source-shell"><pre>$ lyp resolve <span class="pl-c1">test</span>.ly
 <span class="pl-c">#=&gt;</span>
-Cloning https://github.com/noteflakes/lyp-assert.git...
+Cloning https://github.com/lyp-packages/assert.git...
 
 Installed assert@0.2.0</pre></div>
 
@@ -261,16 +261,16 @@ Installed assert@0.2.0</pre></div>
 <p>A package is normally referenced by its git URL. Lyp lets you provide either fully- or partially qualified URLs. A package hosted on github can be also referenced by the user/repository pair. The following are all equivalent:</p>
 
 <div class="highlight highlight-source-shell"><pre><span class="pl-c"># Fully-qualified URLs</span>
-$ lyp install https://github.com/noteflakes/lyp-package-template.git
-$ lyp install https://github.com/noteflakes/lyp-package-template
+$ lyp install https://github.com/lyp-packages/package-template.git
+$ lyp install https://github.com/lyp-packages/package-template
 
 <span class="pl-c"># Partially-qualified URL</span>
-$ lyp install github.com/noteflakes/lyp-package-template
+$ lyp install github.com/lyp-packages/package-template
 
 <span class="pl-c"># Github repository id</span>
 $ lyp install noteflakes/lyp-package-template</pre></div>
 
-<p>In addition, lyp also provides an <a href="https://github.com/noteflakes/lyp-index">index of publically available package</a>, which maps a package name to its URL (see also below). Using the index, packages are referenced by their published name instead of by their git URL:</p>
+<p>In addition, lyp also provides an <a href="https://github.com/lyp-packages/index">index of publically available package</a>, which maps a package name to its URL (see also below). Using the index, packages are referenced by their published name instead of by their git URL:</p>
 
 <div class="highlight highlight-source-shell"><pre>$ lyp install dummy</pre></div>
 
@@ -368,6 +368,14 @@ package@stable
 <p>Loading scheme files that way is a better technique than adding directorys to <code>%load-path</code>, because this way one avoids possible name clashes, which may lead to unexpected behavior.</p>
 
 <h3>
+<a id="conditional-includes" class="anchor" href="#conditional-includes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Conditional includes</h3>
+
+<p>Files can also be included conditionally by evaluating a scheme expression using the <code>\pcondInclude</code> and <code>\pcondIncludeOnce</code> commands:</p>
+
+<div class="highlight highlight-source-lilypond"><pre><span class="pl-c">% include edition-specific tweaks</span>
+<span class="pl-c1">\pcondInclude</span> #<span class="pl-s1">(<span class="pl-c1">eq?</span> edition <span class="pl-c1">'urtext</span>)</span> <span class="pl-s"><span class="pl-pds">"</span>urtext_tweaks.ly<span class="pl-pds">"</span></span></pre></div>
+
+<h3>
 <a id="including-fonts" class="anchor" href="#including-fonts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Including fonts</h3>
 
 <p>Lyp also supports automatic installation of fonts, based on work by <a href="https://github.com/tisimst">Abraham Lee</a>. When a package is installed, lyp will copy any font files residing in the <code>fonts</code> directory into the corresponding <code>otf</code> and <code>svg</code> directories of all installed versions of lilypond.</p>
@@ -384,14 +392,14 @@ $ lyp <span class="pl-c1">test</span> <span class="pl-c1">.</span></pre></div>
 
 <p>A test file can either be a simple lilypond file which includes the package files and results in a lilypond score, or a lilypond file that performs unit tests on scheme code.</p>
 
-<p>For more information on testing, see the <a href="https://github.com/noteflakes/lyp-assert">lyp-assert</a> package, which is meant to be used for unit testing lilypond code, and serves as an example of how to test a package.</p>
+<p>For more information on testing, see the <a href="https://github.com/lyp-packages/assert">lyp-assert</a> package, which is meant to be used for unit testing lilypond code, and serves as an example of how to test a package.</p>
 
 <h3>
 <a id="publishing-packages" class="anchor" href="#publishing-packages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Publishing packages</h3>
 
 <p>In order for your package to be available to all users, you'll need to first push your code to a publically accessible git repository (for example on github). Users will then be able to install your package by using the git URL of the public repository.</p>
 
-<p>You can also add your package to the lyp <a href="https://github.com/noteflakes/lyp-index">public package index</a>, by cloning it, editing <a href="https://github.com/noteflakes/lyp-index/blob/master/index.yaml">index.yaml</a>, and creating a pull request.</p>
+<p>You can also add your package to the lyp <a href="https://github.com/lyp-packages/index">public package index</a>, by cloning it, editing <a href="https://github.com/lyp-packages/index/blob/master/index.yaml">index.yaml</a>, and creating a pull request.</p>
 
 <h2>
 <a id="installing-and-using-lilypond" class="anchor" href="#installing-and-using-lilypond" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing and Using Lilypond</h2>
