@@ -10,6 +10,14 @@ module Lyp
     def add_version(version, leaf)
       @versions[version.to_s] = leaf
     end
+
+    def eql?(o)
+      @clause.eql?(o.clause) && @versions.eql?(o.versions)
+    end
+
+    def hash
+      1
+    end
   end
 
   class DependencyLeaf
@@ -25,6 +33,14 @@ module Lyp
 
     def resolve(opts = {})
       DependencyResolver.new(self, opts).resolve
+    end
+
+    def eql?(o)
+      @dependencies.eql?(o.dependencies)
+    end
+
+    def hash
+      1
     end
   end
 
@@ -88,6 +104,7 @@ module Lyp
     def resolve_tree
       permutations = permutate_simplified_tree
       permutations = filter_invalid_permutations(permutations)
+      puts "permutations: #{permutations.size}"
 
       # select highest versioned dependencies (for those specified by user)
       user_deps = tree.dependencies.keys
@@ -217,27 +234,6 @@ module Lyp
 
     def pull_file_from_queue
       @queue.shift
-    end
-
-    # Resolve the given dependency tree and return a list of concrete packages
-    # that meet all dependency requirements.
-    #
-    # The following stages are involved:
-    # - Create permutations of possible version combinations for all dependencies
-    # - Remove invalid permutations
-    # - Select the permutation with the highest versions
-    def resolve
-      permutations = permutate_simplified_tree
-      permutations = filter_invalid_permutations(permutations)
-
-      user_deps = tree.dependencies.keys
-      result = select_highest_versioned_permutation(permutations, user_deps).flatten
-
-      if result.empty? && !tree.dependencies.empty?
-        raise "Failed to satisfy dependency requirements"
-      else
-        result
-      end
     end
 
     # Create permutations of package versions for the given dependency tree. The
@@ -465,23 +461,19 @@ module Lyp
         x <=> y
       end
 
-      # Remove old versions for anything but
-      specifiers.each do |package, specifiers|
-        # Remove old versions only if the package is referenced from a single
-        # specifier
-        if specifiers.size == 1
-          specifier = specifiers.values.first
-          specifier.each do |leaf|
-            # check if all versions have same dependencies. Older versions can be
-            # safely removed only if their dependencies are identical
-            deps = leaf.map {|k, v| v.dependencies}
-            if deps.uniq.size == 1
-              versions = leaf.keys.sort(&compare_versions)
-              latest = versions.last
-              leaf.select! {|v| v == latest}
-            end
-          end
+      specifiers.each do |package, clauses|
+        puts "package: #{package} (#{clauses.size})"
+        # Remove old versions only if the package is referenced using a single
+        # specifier clause
+        next unless clauses.size == 1
+
+        spec = clauses.values.first
+        if spec.versions.values.uniq.size == 1
+          versions = spec.versions.keys.sort(&compare_versions)
+          latest = versions.last
+          spec.versions.select! {|k, v| k == latest}
         end
+        puts "versions: #{spec.versions.size}"
       end
     end
 
@@ -496,9 +488,7 @@ module Lyp
         processed[t] = true
         t.dependencies.each do |package, leaf|
           specifiers[package] ||= {}
-          specifiers[package][leaf.clause] ||= []
-          specifiers[package][leaf.clause] << leaf.versions
-
+          specifiers[package][leaf.clause] ||= leaf
           leaf.versions.each_value {|v| l[v]}
         end
       end
