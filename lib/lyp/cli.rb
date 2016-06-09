@@ -263,7 +263,7 @@ class Lyp::CLI < Thor
     $cmd_options = options
 
     resolver = Lyp::Resolver.new(fn)
-    tree = resolver.get_dependency_tree(ignore_missing: true)
+    tree = resolver.compile_dependency_tree(ignore_missing: true)
     tree[:dependencies].each do |package, leaf|
       versions = leaf[:versions].keys.map {|k| k =~ Lyp::PACKAGE_RE; $2 }.sort
       if versions.empty?
@@ -280,7 +280,7 @@ class Lyp::CLI < Thor
     $cmd_options = options
 
     resolver = Lyp::Resolver.new(fn)
-    tree = resolver.get_dependency_tree(ignore_missing: true)
+    tree = resolver.compile_dependency_tree(ignore_missing: true)
     tree[:dependencies].each do |package, leaf|
       if options[:all] || leaf[:versions].empty?
         Lyp::Package.install(leaf[:clause])

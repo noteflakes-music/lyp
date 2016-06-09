@@ -262,7 +262,7 @@ module Lyp::Package
       sub_deps = []
       
       resolver = Lyp::Resolver.new("#{package_path}/package.ly")
-      deps_tree = resolver.get_dependency_tree(ignore_missing: true)
+      deps_tree = resolver.compile_dependency_tree(ignore_missing: true)
       deps_tree[:dependencies].each do |package_name, leaf|
         sub_deps << leaf[:clause] if leaf[:versions].empty?
       end
