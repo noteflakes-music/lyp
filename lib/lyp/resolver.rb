@@ -241,6 +241,7 @@ module Lyp
     # an array of dependencies, from which version permutations are generated.
     def permutate_simplified_tree
       deps = dependencies_array(simplified_deps_tree(tree))
+      puts deps.flatten.size
       return deps if deps.empty?
 
       # Return a cartesian product of dependencies
@@ -467,17 +468,20 @@ module Lyp
         # specifier clause
         next unless clauses.size == 1
 
-        spec = clauses.values.first
-        if spec.versions.values.uniq.size == 1
-          versions = spec.versions.keys.sort(&compare_versions)
-          latest = versions.last
-          spec.versions.select! {|k, v| k == latest}
+        specs = clauses.values.first
+        puts specs.size
+        specs.each do |s|
+          if s.versions.values.uniq.size == 1
+            versions = s.versions.keys.sort(&compare_versions)
+            latest = versions.last
+            s.versions.select! {|k, v| k == latest}
+          end
+          puts "versions: #{s.versions.size}"
         end
-        puts "versions: #{spec.versions.size}"
       end
     end
 
-    # Return a hash mapping packages to package specifiers to version trees, to
+    # Return a hash mapping packages to package specifiers to spec objects, to
     # be used to eliminate older versions from the dependency tree
     def map_specifiers_to_versions
       specifiers = {}
@@ -486,10 +490,12 @@ module Lyp
       l = lambda do |t|
         return if processed[t]
         processed[t] = true
-        t.dependencies.each do |package, leaf|
+        t.dependencies.each do |package, spec|
+          puts "add: #{package} #{spec.clause} #{spec.to_s}"
           specifiers[package] ||= {}
-          specifiers[package][leaf.clause] ||= leaf
-          leaf.versions.each_value {|v| l[v]}
+          specifiers[package][spec.clause] ||= []
+          specifiers[package][spec.clause] << spec
+          spec.versions.each_value {|v| l[v]}
         end
       end
 
