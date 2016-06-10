@@ -288,6 +288,15 @@ class Lyp::CLI < Thor
     end
   end
 
+  desc "cleanup", "Cleanup temporary files"
+  def cleanup
+    $stderr.puts "Lyp #{Lyp::VERSION}"
+    Dir["#{Lyp::TMP_ROOT}/*"].each do |fn|
+      puts "Cleaning up #{fn}"
+      FileUtils.rm_rf(fn)
+    end
+  end
+
   def self.run
     start(ARGV)
   rescue => e
