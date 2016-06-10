@@ -138,6 +138,8 @@ module Lyp
     # Since files to be processed are added to a queue, this method loops through
     # the queue until it's empty.
     def compile_dependency_tree(opts = {})
+      old_opts = @opts
+      @opts = @opts.merge(opts)
       @queue = []
       @processed_files = {}
       @tree ||= DependencyLeaf.new
@@ -148,12 +150,14 @@ module Lyp
         process_lilypond_file(job[:path], job[:leaf], opts)
       end
 
-      unless opts[:ignore_missing]
+      unless @opts[:ignore_missing]
         squash_old_versions
         remove_unfulfilled_dependencies(tree)
       end
 
       @tree
+    ensure
+      @opts = old_opts
     end
 
     # Scans a lilypond file for \require and \(p)include statements. An included
