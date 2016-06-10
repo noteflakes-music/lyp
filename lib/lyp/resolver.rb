@@ -32,7 +32,7 @@ module Lyp
     end
 
     def resolve(opts = {})
-      DependencyResolver.new(self, opts).resolve
+      DependencyResolver.new(self, opts).resolve_tree
     end
 
     def eql?(o)
@@ -104,7 +104,6 @@ module Lyp
     def resolve_tree
       permutations = permutate_simplified_tree
       permutations = filter_invalid_permutations(permutations)
-      puts "permutations: #{permutations.size}"
 
       # select highest versioned dependencies (for those specified by user)
       user_deps = tree.dependencies.keys
@@ -241,7 +240,6 @@ module Lyp
     # an array of dependencies, from which version permutations are generated.
     def permutate_simplified_tree
       deps = dependencies_array(simplified_deps_tree(tree))
-      puts deps.flatten.size
       return deps if deps.empty?
 
       # Return a cartesian product of dependencies
@@ -463,20 +461,17 @@ module Lyp
       end
 
       specifiers.each do |package, clauses|
-        puts "package: #{package} (#{clauses.size})"
         # Remove old versions only if the package is referenced using a single
         # specifier clause
         next unless clauses.size == 1
 
         specs = clauses.values.first
-        puts specs.size
         specs.each do |s|
           if s.versions.values.uniq.size == 1
             versions = s.versions.keys.sort(&compare_versions)
             latest = versions.last
             s.versions.select! {|k, v| k == latest}
           end
-          puts "versions: #{s.versions.size}"
         end
       end
     end
@@ -488,10 +483,9 @@ module Lyp
       processed = {}
 
       l = lambda do |t|
-        return if processed[t]
-        processed[t] = true
+        return if processed[t.object_id]
+        processed[t.object_id] = true
         t.dependencies.each do |package, spec|
-          puts "add: #{package} #{spec.clause} #{spec.to_s}"
           specifiers[package] ||= {}
           specifiers[package][spec.clause] ||= []
           specifiers[package][spec.clause] << spec
