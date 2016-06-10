@@ -46,30 +46,30 @@ class Lyp::CLI < Thor
   map "-v" => :version
   check_unknown_options! :except => :compile
   class_option :verbose, aliases: '-V', :type => :boolean, desc: 'show verbose output'
-  
+
   desc "version", "show Lyp version"
   def version
     $stderr.puts "Lyp #{Lyp::VERSION}"
   end
-  
+
   desc "search [PATTERN|lilypond]", "List available packages matching PATTERN or versions of lilypond"
   def search(pattern = '')
     $cmd_options = options
 
     pattern =~ Lyp::PACKAGE_RE
     package, version = $1, $2
-    
+
     if package == 'lilypond'
       search_lilypond(version)
     else
       search_package(pattern)
     end
   end
-  
+
   no_commands do
     def search_lilypond(version)
       versions = Lyp::Lilypond.search(version)
-  
+
       if versions.empty?
         puts "\nNo available versions of lilypond@#{version} found\n\n"
       else
@@ -81,9 +81,9 @@ class Lyp::CLI < Thor
         puts "\n * Currently installed\n\n"
       end
     end
-    
+
     PACKAGE_FMT = "%-16s => %s"
-  
+
     def search_package(pattern)
       packages = Lyp::Package.list_lyp_index(pattern)
       if packages.empty?
@@ -109,7 +109,7 @@ class Lyp::CLI < Thor
     Lyp::System.test_installed_status!
     Lyp::Lilypond.compile(argv, opts)
   end
-  
+
   desc "test [<option>...] [.|PATTERN]", "Runs package tests on installed packages or local directory"
   method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of lilypond if not present'
   method_option :env, aliases: '-E', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
@@ -124,7 +124,7 @@ class Lyp::CLI < Thor
       end
       options[:use] = ENV['LILYPOND_VERSION']
     end
-    
+
     if options[:use]
       if options[:install]
         Lyp::Lilypond.install_if_missing(options[:use], no_version_test: true)
@@ -134,7 +134,7 @@ class Lyp::CLI < Thor
 
     # check lilypond default / current settings
     Lyp::Lilypond.check_lilypond!
-    
+
     $stderr.puts "Lyp #{Lyp::VERSION}"
     case args
     when ['.']
@@ -151,7 +151,7 @@ class Lyp::CLI < Thor
     $cmd_options = options
 
     raise "No package specified" if args.empty?
-    
+
     args.each do |package|
       case package
       when 'self'
@@ -187,7 +187,7 @@ class Lyp::CLI < Thor
       end
     end
   end
-  
+
   desc "use [lilypond@]<VERSION>", "Switch version of lilypond"
   method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
   def use(version)
@@ -198,7 +198,7 @@ class Lyp::CLI < Thor
     if version =~ Lyp::LILYPOND_RE
       version = $1
     end
-  
+
     lilypond = Lyp::Lilypond.use(version, options)
     puts "Using lilypond version #{lilypond[:version]}"
   end
@@ -227,11 +227,11 @@ class Lyp::CLI < Thor
           return puts "\nNo packages are currently installed\n\n"
         end
       end
-      
+
       by_package = list.inject({}) do |m, p|
         p =~ Lyp::PACKAGE_RE; (m[$1] ||= []) << $2; m
       end
-      
+
       puts "\nInstalled packages:\n\n"
       by_package.keys.sort.each do |p|
         puts "   #{p} => (#{by_package[p].sort.join(', ')})"
@@ -239,7 +239,7 @@ class Lyp::CLI < Thor
       puts "\n\n"
     end
   end
-  
+
   desc "which [PATTERN|lilypond]", "List locations of installed packages matching PATTERN or versions of lilypond"
   def which(pattern = nil)
     $cmd_options = options
@@ -257,37 +257,37 @@ class Lyp::CLI < Thor
       Lyp::Package.which(args.first).each {|p| puts p}
     end
   end
-  
+
   desc "deps FILE", "Lists dependencies found in user's files"
   def deps(fn)
     $cmd_options = options
 
-    resolver = Lyp::Resolver.new(fn)
+    resolver = Lyp::DependencyResolver.new(fn)
     tree = resolver.compile_dependency_tree(ignore_missing: true)
-    tree[:dependencies].each do |package, leaf|
-      versions = leaf[:versions].keys.map {|k| k =~ Lyp::PACKAGE_RE; $2 }.sort
+    tree.dependencies.each do |package, spec|
+      versions = spec.versions.keys.map {|k| k =~ Lyp::PACKAGE_RE; $2 }.sort
       if versions.empty?
-        puts "   #{leaf[:clause]} => (no local version found)"
+        puts "   #{spec.clause} => (no local version found)"
       else
-        puts "   #{leaf[:clause]} => #{versions.join(', ')}"
+        puts "   #{spec.clause} => #{versions.join(', ')}"
       end
     end
   end
-  
+
   desc "resolve FILE", "Resolves and installs missing dependencies found in user's files"
   method_option :all, aliases: '-a', type: :boolean, desc: 'Install all found dependencies'
   def resolve(fn)
     $cmd_options = options
 
-    resolver = Lyp::Resolver.new(fn)
+    resolver = Lyp::DependencyResolver.new(fn)
     tree = resolver.compile_dependency_tree(ignore_missing: true)
-    tree[:dependencies].each do |package, leaf|
-      if options[:all] || leaf[:versions].empty?
-        Lyp::Package.install(leaf[:clause])
+    tree.dependencies.each do |package, spec|
+      if options[:all] || spec.versions.empty?
+        Lyp::Package.install(spec.clause)
       end
     end
   end
-  
+
   def self.run
     start(ARGV)
   rescue => e
@@ -296,4 +296,3 @@ class Lyp::CLI < Thor
     exit(1)
   end
 end
-
