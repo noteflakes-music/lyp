@@ -29,22 +29,22 @@ RSpec.describe Lyp::DependencyResolver do
   it "correctly resolves versions for a dependency tree" do
     t = tree(
       a: spec('a@>=0.1',
-        'a@0.1': dep(
+        :'a@0.1' => dep(
           b: spec('b@>=0.2.0',
-            'b@0.2': dep,
-            'b@0.3': dep
+            :'b@0.2' => dep,
+            :'b@0.3' => dep
           )
         ),
-        'a@0.2': dep(
+        :'a@0.2' => dep(
           b: spec('b@~>0.3.0',
-            'b@0.3': dep
+            :'b@0.3' => dep
           )
         )
       ),
       c: spec('c@~>0.1.0',
-        'c@0.1': dep(
+        :'c@0.1' => dep(
           b: spec('b@~>0.2.0',
-            'b@0.2': dep
+            :'b@0.2' => dep
           )
         )
       )
