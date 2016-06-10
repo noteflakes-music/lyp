@@ -16,7 +16,7 @@ module Lyp
     end
 
     def hash
-      1
+      {clase: clause, versions: versions}.hash
     end
   end
 
@@ -40,7 +40,7 @@ module Lyp
     end
 
     def hash
-      1
+      @dependencies.hash
     end
   end
 
