@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-LYP_VERSION="0.3.7"
+LYP_VERSION="0.3.8"
 WORKDIR="/tmp/lyp-release-installer"
 URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
 
@@ -20,7 +20,7 @@ download() {
     fail "Could not find curl or wget"
   fi
 }
-    
+
 PLATFORM=`uname -sp`
 case $PLATFORM in
   "Linux x86_64")
