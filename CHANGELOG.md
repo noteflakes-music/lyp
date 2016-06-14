@@ -1,6 +1,10 @@
+## Version 0.3.8 2016-06-14
+
+- Fix behavior when `-dhelp` switch is specified.
+- Add custom `-c, --cropped` switch for cropped lilypond output (shorthand for `-dbackend=eps -daux-files=#f`).
 - Fix installing font packages with nested font directories.
 
-## Version 0.3.7 2016-03-31
+## Version 0.3.7 2016-06-02
 
 - Update package URLs (packages are now placed in the [lyp-packages](https://github.com/lyp-packages) organisation).
 - Run *-test.ly as well as *_test.ly files.
