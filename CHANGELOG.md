@@ -1,3 +1,5 @@
+- Fix installing font packages with nested font directories.
+
 ## Version 0.3.7 2016-03-31
 
 - Update package URLs (packages are now placed in the [lyp-packages](https://github.com/lyp-packages) organisation).
@@ -48,7 +50,7 @@
 
 - Improve README documentation.
 - Fix lilypond wrapper to not eat stock lilypond options (#10).
-- Add --env, --use, --install options to lilypond wrapper, lyp test, lyp compile commands. 
+- Add --env, --use, --install options to lilypond wrapper, lyp test, lyp compile commands.
 - Remove nokogiri dependency.
 - Fix behaviour when no version of lilypond is installed.
 - Various improvements to command line interface.

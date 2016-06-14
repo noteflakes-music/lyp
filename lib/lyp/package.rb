@@ -298,12 +298,15 @@ module Lyp::Package
           available_on_versions << lilypond[:version]
         end
 
-        Dir["#{package_fonts_dir}/*"].each do |fn|
+        Dir["#{package_fonts_dir}/*/**"].each do |fn|
+          next unless File.file?(fn)
           target_fn = case File.extname(fn)
           when '.otf'
             File.join(ly_fonts_dir, 'otf', File.basename(fn))
           when '.svg', '.woff'
             File.join(ly_fonts_dir, 'svg', File.basename(fn))
+          else
+            next
           end
 
           if File.writable?(File.dirname(target_fn))
