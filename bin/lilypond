@@ -19,10 +19,12 @@ OVERRIDING_LILYPOND_SWITCHES = %w{
   scheme-sandbox
 }
 LILYPOND_HELP_SWITCHES = %w{
-  -h --help
+  -h --help -dhelp
 }
+
 LYP_LY_HELP = <<EOF
 Lyp-provided options:
+  -c, --cropped                       crop output (requires setting 0 margins)
   -E, --env                           use version specified in $LILYPOND_VERSION
   -n, --install                       install the specified version if not found
   -O, --open                          open the target file after compilation
@@ -39,7 +41,7 @@ when nil, *OVERRIDING_LILYPOND_SWITCHES
 when *LILYPOND_HELP_SWITCHES
   STDERR.puts "Lyp version #{Lyp::VERSION}"
   puts `#{$lilypond_path} #{$argv.join(' ')}`
-  puts LYP_LY_HELP
+  puts LYP_LY_HELP unless $argv.first == '-dhelp'
 else
   begin
     Lyp::Lilypond.compile($argv, $options)
