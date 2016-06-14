@@ -570,19 +570,17 @@ module Lyp::Lilypond
       ly_fonts_dir = File.join(lyp_lilypond_share_dir(version), 'lilypond/current/fonts')
 
       Dir["#{Lyp.packages_dir}/**/fonts"].each do |package_fonts_dir|
+        Dir["#{package_fonts_dir}/**/*"].each do |fn|
+          next unless File.file?(fn)
+          target_fn = case File.extname(fn)
+          when '.otf'
+            File.join(ly_fonts_dir, 'otf', File.basename(fn))
+          when '.svg', '.woff'
+            File.join(ly_fonts_dir, 'svg', File.basename(fn))
+          else
+            next
+          end
 
-        Dir["#{package_fonts_dir}/*.otf"].each do |fn|
-          target_fn = File.join(ly_fonts_dir, 'otf', File.basename(fn))
-          FileUtils.cp(fn, target_fn)
-        end
-
-        Dir["#{package_fonts_dir}/*.svg"].each do |fn|
-          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
-          FileUtils.cp(fn, target_fn)
-        end
-
-        Dir["#{package_fonts_dir}/*.woff"].each do |fn|
-          target_fn = File.join(ly_fonts_dir, 'svg', File.basename(fn))
           FileUtils.cp(fn, target_fn)
         end
       end

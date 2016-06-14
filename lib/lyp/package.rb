@@ -298,7 +298,7 @@ module Lyp::Package
           available_on_versions << lilypond[:version]
         end
 
-        Dir["#{package_fonts_dir}/*/**"].each do |fn|
+        Dir["#{package_fonts_dir}/**/*"].each do |fn|
           next unless File.file?(fn)
           target_fn = case File.extname(fn)
           when '.otf'
