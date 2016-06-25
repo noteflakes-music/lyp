@@ -316,6 +316,11 @@ module Lyp::Lilypond
       search.reverse.find {|l| Gem::Version.new(l[:version]).segments[1].odd?}[:version]
     end
 
+    def latest_installed_unstable_version
+      latest = list.reverse.find {|l| Gem::Version.new(l[:version]).segments[1].odd?}
+      latest ? latest[:version] : nil
+    end
+
     def latest_version
       search.last[:version]
     end
@@ -672,6 +677,36 @@ module Lyp::Lilypond
 
     def parse_error_msg(msg)
       (msg =~ /[^\n]+: error.+failed files: ".+"/m) ? $& : msg
+    end
+
+    CHECK_UPDATE_INTERVAL = 7 * 86400
+    CHECK_UPDATE_STAMP_KEY = 'lilypond/last_update_stamp'
+
+    UNSTABLE_UPDATE_MESSAGE = <<EOF
+Lilypond version %s is now available. Install it by typing:
+
+  lyp install lilypond@unstable
+
+EOF
+
+    def check_update
+      last_check = Lyp::Settings.get_value(
+        CHECK_UPDATE_STAMP_KEY, Time.now - CHECK_UPDATE_INTERVAL)
+
+      return unless last_check < Time.now - CHECK_UPDATE_INTERVAL
+
+      Lyp::Settings.set_value(CHECK_UPDATE_STAMP_KEY, Time.now)
+
+      # check unstable
+      installed = latest_installed_unstable_version
+      return unless installed
+
+      available = {version: latest_unstable_version}
+      installed = {version: installed}
+
+      if CMP_VERSION[available, installed] > 0
+        puts UNSTABLE_UPDATE_MESSAGE % available[:version]
+      end
     end
   end
 end

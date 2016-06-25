@@ -43,7 +43,10 @@ when *LILYPOND_HELP_SWITCHES
   puts `#{$lilypond_path} #{$argv.join(' ')}`
   puts LYP_LY_HELP unless $argv.first == '-dhelp'
 else
+  Lyp::Lilypond.check_update
   begin
     Lyp::Lilypond.compile($argv, $options)
+  rescue => e
+    puts e.message
   end
 end
