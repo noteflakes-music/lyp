@@ -36,6 +36,8 @@ module Lyp::Lilypond
           argv_clean += ['-dbackend=eps', '-daux-files=#f']
         when '-S', '--snippet'
           argv_clean += ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
+        when '-A', '--auto-install-deps'
+          options[:resolve] = true
         else
           argv_clean << arg
         end

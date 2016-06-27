@@ -24,6 +24,7 @@ LILYPOND_HELP_SWITCHES = %w{
 
 LYP_LY_HELP = <<EOF
 Lyp-provided options:
+  -A, --auto-install-deps             install any missing dependencies
   -c, --cropped                       crop output (requires setting 0 margins)
   -E, --env                           use version specified in $LILYPOND_VERSION
   -n, --install                       install the specified version if not found
@@ -47,8 +48,17 @@ when *LILYPOND_HELP_SWITCHES
 else
   Lyp::Lilypond.check_update
   begin
+    if $options[:resolve] && $argv.last != '-'
+      resolver = Lyp::DependencyResolver.new($argv.last)
+      tree = resolver.compile_dependency_tree(ignore_missing: true)
+      tree.dependencies.each do |package, spec|
+        Lyp::Package.install(spec.clause) if spec.versions.empty?
+      end
+    end
+
     Lyp::Lilypond.compile($argv, $options)
   rescue => e
     puts e.message
+    puts e.backtrace.join("\n")
   end
 end
