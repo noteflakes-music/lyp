@@ -147,8 +147,17 @@ class Lyp::CLI < Thor
   desc "install <PACKAGE|lilypond|self>...", "Install a package or a version of lilypond. When 'install self' is invoked, lyp installs itself in ~/.lyp."
   method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
   method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
+  method_option :dev, type: :boolean, desc: 'Install local development package'
   def install(*args)
     $cmd_options = options
+
+    if options[:dev]
+      if args.empty?
+        args = ["#{File.basename(FileUtils.pwd)}@dev:."]
+      else
+        args = args.map {|a| "#{File.basename(File.expand_path(a))}@dev:#{a}"}
+      end
+    end
 
     raise "No package specified" if args.empty?
 
