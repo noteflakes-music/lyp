@@ -1,3 +1,4 @@
+- Add `--snippet` option to lilypond for creating cropped png images (#24).
 - Add `--dev` option for installing development packages (#23).
 - Raise error in mismatching require version clauses in same file (#12).
 - Add automatic periodic checking for new unstable versions of lilypond (#7).

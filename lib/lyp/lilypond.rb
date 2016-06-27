@@ -34,6 +34,8 @@ module Lyp::Lilypond
           options[:open] = true
         when '-c', '--cropped'
           argv_clean += ['-dbackend=eps', '-daux-files=#f']
+        when '-S', '--snippet'
+          argv_clean += ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
         else
           argv_clean << arg
         end

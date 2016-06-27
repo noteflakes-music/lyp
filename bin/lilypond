@@ -30,6 +30,8 @@ Lyp-provided options:
   -O, --open                          open the target file after compilation
   -R, --raw                           run raw lilypond (no pre-processing)
   -r, --require=PACKAGE               preload the specified package
+  -S, --snippet                       produce png cropped images at 600dpi
+                                      (--cropped --png -dresolution=600)
   -u, --use=VERSION                   use the given version of lilypond
 EOF
 
