@@ -1,10 +1,11 @@
 module Lyp
   class DependencySpec
-    attr_reader :clause, :versions
+    attr_reader :clause, :versions, :location
 
-    def initialize(clause, versions = {})
+    def initialize(clause, versions, location = nil)
       @clause = clause
       @versions = versions.inject({}) {|m, kv| m[kv[0].to_s] = kv[1]; m}
+      @location = location
     end
 
     def add_version(version, leaf)
@@ -16,7 +17,7 @@ module Lyp
     end
 
     def hash
-      {clase: clause, versions: versions}.hash
+      {clause: clause, versions: versions}.hash
     end
   end
 
@@ -28,6 +29,9 @@ module Lyp
     end
 
     def add_dependency(name, spec)
+      if @dependencies[name.to_s] && !spec.eql?(@dependencies[name.to_s])
+        DependencyResolver.error("Clause mismatch found in ", spec.location)
+      end
       @dependencies[name.to_s] = spec
     end
 
@@ -110,7 +114,7 @@ module Lyp
       result = select_highest_versioned_permutation(permutations, user_deps).flatten
 
       if result.empty? && !tree.dependencies.empty?
-        raise "Failed to satisfy dependency requirements"
+        error("Failed to satisfy dependency requirements")
       else
         result
       end
@@ -174,29 +178,33 @@ module Lyp
       dir = File.dirname(path)
 
       # Parse lilypond file for \include and \require
-      ly_content.scan(DEP_RE) do |type, ref|
-        case type
-        when INCLUDE, PINCLUDE, PINCLUDE_ONCE
-          process_include_command(ref, dir, leaf, opts)
-        when REQUIRE
-          process_require_command(ref, dir, leaf, opts)
+      location = {path: path, line: 0}
+      ly_content.each_line do |line|
+        location[:line] += 1
+        line.scan(DEP_RE) do |type, ref|
+          case type
+          when INCLUDE, PINCLUDE, PINCLUDE_ONCE
+            process_include_command(ref, dir, leaf, opts, location)
+          when REQUIRE
+            process_require_command(ref, dir, leaf, opts, location)
+          end
         end
       end
 
       # process any external requires (supplied using the -r command line option)
       if @ext_require
         @ext_require.each do |p|
-          process_require_command(p, dir, leaf, opts)
+          process_require_command(p, dir, leaf, opts, {ext_require: true})
         end
         @ext_require = nil
       end
 
       @processed_files[path] = true
     rescue Errno::ENOENT
-      raise "Cannot find file #{path}"
+      error("Could not find file #{path}")
     end
 
-    def process_include_command(ref, dir, leaf, opts)
+    def process_include_command(ref, dir, leaf, opts, location)
       # a package would normally use a plain \pinclude or \pincludeOnce
       # command to include package files, e.g. \pinclude "inc/init.ly".
       #
@@ -209,10 +217,15 @@ module Lyp
         ref = $2
       end
       qualified_path = File.expand_path(ref, dir)
+
+      unless File.file?(qualified_path)
+        error("Include file #{qualified_path} not found", location)
+      end
+
       queue_file_for_processing(qualified_path, leaf)
     end
 
-    def process_require_command(ref, dir, leaf, opts)
+    def process_require_command(ref, dir, leaf, opts, location)
       forced_path = nil
       if ref =~ /^([^\:]+)\:(.+)$/
         ref = $1
@@ -228,7 +241,7 @@ module Lyp
         set_forced_package_path(package, forced_path)
       end
 
-      find_package_versions(ref, leaf)
+      find_package_versions(ref, leaf, location)
     end
 
     def queue_file_for_processing(path, leaf)
@@ -430,7 +443,7 @@ module Lyp
 
     # Find available packaging matching the package specifier, and queue them for
     # processing any include files or transitive dependencies.
-    def find_package_versions(ref, leaf)
+    def find_package_versions(ref, leaf, location)
       return {} unless ref =~ Lyp::PACKAGE_RE
       ref_package = $1
       version_clause = $2
@@ -439,7 +452,7 @@ module Lyp
 
       # Raise if no match found and we're at top of the tree
       if matches.empty? && (leaf == tree) && !opts[:ignore_missing]
-        raise "No package found for requirement #{ref}"
+        error("No package found for requirement #{ref}")
       end
 
       matches.each do |p, package_leaf|
@@ -449,7 +462,7 @@ module Lyp
       end
 
       # Setup up dependency leaf
-      leaf.add_dependency(ref_package, DependencySpec.new(ref, matches))
+      leaf.add_dependency(ref_package, DependencySpec.new(ref, matches, location))
     end
 
     # Remove redundant older versions of dependencies by collating package
@@ -525,7 +538,7 @@ module Lyp
           end
         end
         if dependency.versions.empty? && raise_on_missing
-          raise "No valid version found for package #{package}"
+          error("No valid version found for package #{package}")
         end
       end
     end
@@ -537,5 +550,23 @@ module Lyp
       available_packages["#{package}@forced"] = DependencyPackage.new(
         File.join(path, MAIN_PACKAGE_FILE))
     end
+
+    def error(msg, location)
+      DependencyResolver.error(msg, location)
+    end
+
+    def self.error(msg, location)
+      msg << " #{format_location(location)}" if location
+      raise ResolveError, msg
+    end
+
+    def self.format_location(location)
+      return "" unless @location
+      return "require flag" if @location[:ext_require]
+      "#{@location[:path]}:#{@location[:line]}"
+    end
   end
+end
+
+class ResolveError < RuntimeError
 end

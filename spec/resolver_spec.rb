@@ -119,7 +119,7 @@ RSpec.describe Lyp::DependencyResolver do
     with_packages(:simple) do
       o = dep()
       r = resolver
-      r.find_package_versions('b@>=0.2', o)
+      r.find_package_versions('b@>=0.2', o, nil)
 
       expect(o.dependencies['b'].clause).to eq('b@>=0.2')
       expect(o.dependencies['b'].versions['b@0.2'].path).to eq("#{$packages_dir}/b@0.2/package.ly")
@@ -140,6 +140,7 @@ RSpec.describe Lyp::DependencyResolver do
 
       expect(o.dependencies['a'].versions['a@0.1'].dependencies['b'].versions.keys.sort).to eq(%w{b@0.1 b@0.2 b@0.2.2})
 
+      resolver = resolver('spec/user_files/simple.ly')
       r = resolver.resolve_package_dependencies
       expect(r[:definite_versions]).to eq(%w{a@0.1 b@0.1 c@0.1})
       expect(r[:package_refs]).to eq({
@@ -300,6 +301,22 @@ RSpec.describe Lyp::DependencyResolver do
       expect(r[:package_dirs]['b']).to eq(
         "#{$packages_dir}/b"
       )
+    end
+  end
+
+  it "raises error on mismatching requires in same file" do
+    with_packages(:simple) do
+      r = resolver('spec/user_files/double.ly')
+
+      expect {r.resolve_package_dependencies}.to raise_error(ResolveError)
+    end
+  end
+
+  it "raises error on mismatching requires in included files" do
+    with_packages(:simple) do
+      r = resolver('spec/user_files/include_double.ly')
+
+      expect {r.resolve_package_dependencies}.to raise_error(ResolveError)
     end
   end
 end

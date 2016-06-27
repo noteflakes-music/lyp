@@ -1,3 +1,4 @@
+- Raise error in mismatching require version clauses in same file (#12)
 - Add automatic periodic checking for new unstable versions of lilypond (#7).
 
 ## Version 0.3.8 2016-06-14
