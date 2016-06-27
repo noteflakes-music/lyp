@@ -30,7 +30,7 @@ module Lyp
 
     def add_dependency(name, spec)
       if @dependencies[name.to_s] && !spec.eql?(@dependencies[name.to_s])
-        DependencyResolver.error("Clause mismatch found in ", spec.location)
+        DependencyResolver.error("Clause mismatch found in %s", spec.location)
       end
       @dependencies[name.to_s] = spec
     end
@@ -219,7 +219,7 @@ module Lyp
       qualified_path = File.expand_path(ref, dir)
 
       unless File.file?(qualified_path)
-        error("Include file #{qualified_path} not found", location)
+        error("Invalid include file specified in %s", location)
       end
 
       queue_file_for_processing(qualified_path, leaf)
@@ -452,7 +452,8 @@ module Lyp
 
       # Raise if no match found and we're at top of the tree
       if matches.empty? && (leaf == tree) && !opts[:ignore_missing]
-        error("No package found for requirement #{ref}")
+        msg = "Missing package dependency #{ref} in %sYou can install any missing packages by running:\n\n  lyp resolve #{@user_file}"
+        error(msg, location)
       end
 
       matches.each do |p, package_leaf|
@@ -551,19 +552,26 @@ module Lyp
         File.join(path, MAIN_PACKAGE_FILE))
     end
 
-    def error(msg, location)
+    def error(msg, location = nil)
       DependencyResolver.error(msg, location)
     end
 
-    def self.error(msg, location)
-      msg << " #{format_location(location)}" if location
-      raise ResolveError, msg
+    def self.error(msg, location = nil)
+      location = location ? format_location(location) : nil
+      raise ResolveError, msg % location
     end
 
     def self.format_location(location)
-      return "" unless @location
-      return "require flag" if @location[:ext_require]
-      "#{@location[:path]}:#{@location[:line]}"
+      return "" unless location
+      return "require flag" if location[:ext_require]
+      source_line = get_source_line(location[:path], location[:line])
+      "#{location[:path]}:#{location[:line]}: \n\n  #{source_line}\n"
+    end
+
+    def self.get_source_line(path, line)
+      IO.read(path).lines[line - 1]
+    rescue => e
+      "???"
     end
   end
 end
