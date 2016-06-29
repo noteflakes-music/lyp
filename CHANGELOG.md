@@ -1,3 +1,5 @@
+- Implement flatten command (#26).
+
 ## Version 0.3.9 2016-06-27
 
 - Add `--auto-install-deps` lilypond option for automatically installing missing dependencies (#25).

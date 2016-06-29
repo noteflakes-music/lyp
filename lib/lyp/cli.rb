@@ -306,6 +306,19 @@ class Lyp::CLI < Thor
     end
   end
 
+  desc "flatten FILE", "Flatten a file and included files into a single output file"
+  def flatten(input_path, output_path = nil)
+    input_path = File.expand_path(input_path)
+    output_path = File.expand_path(output_path) if output_path
+    flat = Lyp::Transform.flatten(input_path)
+    if output_path
+      File.open(output_path, 'w+') {|f| f << flat}
+    else
+      puts flat
+    end
+  end
+
+
   def self.run
     start(ARGV)
   rescue => e
