@@ -1,3 +1,4 @@
+- Fix `\pcondIncludeOnce`.
 - Implement flatten command (#26).
 
 ## Version 0.3.9 2016-06-27

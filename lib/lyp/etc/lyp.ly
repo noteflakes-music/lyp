@@ -77,8 +77,8 @@
       (format "Invalid package name ~a" ref) #f))
   ))
 
-  ; Because the *location* in lilypond is kinda broken (it becomes unusable 
-  ; when using nested includes, even in > 2.19.22, we provide an alternative 
+  ; Because the *location* in lilypond is kinda broken (it becomes unusable
+  ; when using nested includes, even in > 2.19.22, we provide an alternative
   ; for keeping track of the current file, and thus be able to include files
   ; using relative path names (relative to the current file).
   (define lyp:last-this-file #f)
@@ -105,17 +105,17 @@
   (define (lyp:fmt-include path)
     (format "#(set! lyp:last-this-file \"~A\")\n\\include \"~A\"\n#(set! lyp:last-this-file \"~A\")\n"
       path path (lyp:this-file)))
-      
+
   (define (lyp:fmt-require entry-point-path package-dir)
     (format "#(set! lyp:current-package-dir \"~A\")\n~A#(set! lyp:current-package-dir \"~A\")\n"
       package-dir (lyp:fmt-include entry-point-path) lyp:current-package-dir))
-  
+
   ; helper function to cover API changes from 2.18 to 2.19
   (define (lyp:include-string str)
     (if (defined? '*parser*)
       (ly:parser-include-string str)
       (ly:parser-include-string parser str)))
-      
+
   (define (lyp:include parser location path once)  (let* (
       (current-dir  (lyp:this-dir))
       (abs-path     (if (lyp:absolute-path? path)
@@ -123,7 +123,7 @@
                         (lyp:expand-path (lyp:join-path current-dir path))))
       (included?    (and once (hash-ref lyp:file-included? abs-path)))
     )
-    
+
     (if (not included?) (begin
       (ly:debug "include ~a\n" abs-path)
       (if (not (file-exists? abs-path))
@@ -146,20 +146,19 @@ require = #(define-void-function (parser location ref)(string?) (let* (
   (if (not loaded?) (begin
     (ly:debug "Loading package ~a at ~a" name package-dir)
     (hash-set! lyp:package-loaded? name #t)
-    
+
     (lyp:include-string (lyp:fmt-require entry-point-path package-dir))
   ))
 ))
-    
-pinclude = #(define-void-function (parser location path)(string?) 
+
+pinclude = #(define-void-function (parser location path)(string?)
   (lyp:include parser location path #f))
 
 pcondInclude = #(define-void-function (parser location expr path)(scheme? string?)
   (if expr (lyp:include parser location path #f)))
 
-pincludeOnce = #(define-void-function (parser location path)(string?) 
+pincludeOnce = #(define-void-function (parser location path)(string?)
   (lyp:include parser location path #t))
 
-pcondIncludeOnce = #(define-void-function (parser location path)(string?) 
+pcondIncludeOnce = #(define-void-function (parser location expr path)(scheme? string?) 
   (if expr (lyp:include parser location path #t)))
-
