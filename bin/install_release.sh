@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-LYP_VERSION="0.3.9"
+LYP_VERSION="1.0.0"
 WORKDIR="/tmp/lyp-release-installer"
 URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
 
