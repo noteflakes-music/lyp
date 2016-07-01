@@ -44,14 +44,14 @@ end
 namespace :release do
   namespace :linux do
     desc "Package your app for Linux x86"
-    task :x86 => [:bundle_install, 
+    task :x86 => [:bundle_install,
       "#{TRAVELING_RUBY_BASE_PATH}-linux-x86.tar.gz",
     ] do
       create_package("linux-x86")
     end
 
     desc "Package your app for Linux x86_64"
-    task :x86_64 => [:bundle_install, 
+    task :x86_64 => [:bundle_install,
       "#{TRAVELING_RUBY_BASE_PATH}-linux-x86_64.tar.gz",
     ] do
       create_package("linux-x86_64")
@@ -59,12 +59,12 @@ namespace :release do
   end
 
   desc "Package your app for OS X"
-  task :osx => [:bundle_install, 
+  task :osx => [:bundle_install,
     "#{TRAVELING_RUBY_BASE_PATH}-osx.tar.gz",
   ] do
     create_package("osx")
   end
-  
+
   desc "Package your app for Windows x86"
   task :win32 => [:bundle_install, "#{TRAVELING_RUBY_BASE_PATH}-win32.tar.gz"] do
     puts "create_package win32"
@@ -106,7 +106,10 @@ end
 
 def create_package(target, os_type = :unix)
   package_path = "#{PACKAGE_NAME}-#{VERSION}-#{target}"
-  sh "rm -rf #{package_path}"
+
+  puts "create_package #{package_path}"
+
+  sh "rm -rf #{package_path}/"
   sh "mkdir #{package_path}"
   sh "mkdir -p #{package_path}/lib/app"
   sh "cp -r bin #{package_path}/lib/app/"
@@ -115,7 +118,7 @@ def create_package(target, os_type = :unix)
   sh "tar -xzf #{TRAVELING_RUBY_BASE_PATH}-#{target}.tar.gz -C #{package_path}/lib/ruby"
 
   sh "mkdir -p #{package_path}/bin"
-  
+
   if os_type == :unix
     sh "cp #{VENDOR_DIR}/lyp/release_wrapper_lyp.sh #{package_path}/bin/lyp"
     sh "cp #{VENDOR_DIR}/lyp/release_wrapper_lilypond.sh #{package_path}/bin/lilypond"
@@ -124,7 +127,11 @@ def create_package(target, os_type = :unix)
     sh "cp #{VENDOR_DIR}/lyp/release_wrapper_lilypond.bat #{package_path}/bin/lilypond.bat"
   end
 
-  sh "cp -pR #{DIST_DIR}/vendor #{package_path}/lib/"
+  # sh "cp -pR #{DIST_DIR}/vendor #{package_path}/lib/"
+  sh "mkdir #{package_path}/lib/vendor"
+  sh "cp -pR #{DIST_DIR}/vendor/lyp #{package_path}/lib/vendor/"
+  sh "cp -pR #{DIST_DIR}/vendor/ruby #{package_path}/lib/vendor/"
+
   sh "cp Gemfile Gemfile.lock #{package_path}/lib/vendor/"
   sh "mkdir #{package_path}/lib/vendor/.bundle"
   sh "cp #{VENDOR_DIR}/lyp/bundler-config #{package_path}/lib/vendor/.bundle/config"
@@ -135,7 +142,7 @@ def create_package(target, os_type = :unix)
     else
       sh "zip -9r #{RELEASE_DIR}/#{package_path}.zip #{package_path}"
     end
-    sh "rm -rf #{package_path}"
+    sh "rm -rf #{package_path}/"
   end
 end
 
