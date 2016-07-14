@@ -1,3 +1,6 @@
+- Improve lilypond option processing by allowing a string of single-letter options, e.g. `lilypond -FncO`.
+- Add `--force-version` lilypond option for selecting lilypond version according to version statement in user file (#28).
+
 ## Version 1.0.0 2016-06-29
 
 - Fix `\pcondIncludeOnce`.

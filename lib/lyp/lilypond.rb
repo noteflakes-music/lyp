@@ -4,40 +4,50 @@ require 'ruby-progressbar'
 
 module Lyp::Lilypond
   class << self
+    NO_ARGUMENT_OPTIONS_REGEXP = /\-([REnFOcSA]+)(.+)/
+
     def preprocess_argv(argv)
       options = {}
       argv = argv.dup # copy for iterating
       argv_clean = []
       while arg = argv.shift
         case arg
-        when '-R', '--raw'
-          options[:raw] = true
-        when '-r', '--require'
-          options[:ext_require] ||= []
-          options[:ext_require] << argv.shift
-        when /^(?:\-r|\-\-require\=)"?([^\s]+)"?/
-          options[:ext_require] ||= []
-          options[:ext_require] << $1
+        when NO_ARGUMENT_OPTIONS_REGEXP
+          # handle multiple options in shorthand form, e.g. -FnO
+          tmp_args = []
+          $1.each_char {|c| tmp_args << "-#{c}"}
+          tmp_args << "-#{$2}"
+          argv = tmp_args + argv
+        when '-A', '--auto-install-deps'
+          options[:resolve] = true
+        when '-c', '--cropped'
+          argv_clean += ['-dbackend=eps', '-daux-files=#f']
         when '-E', '--env'
           unless ENV['LILYPOND_VERSION']
             STDERR.puts "$LILYPOND_VERSION not set"
             exit 1
           end
           options[:use_version] = ENV['LILYPOND_VERSION']
-        when '-u', '--use'
-          options[:use_version] = argv.shift
-        when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
-          options[:use_version] = $1
+        when '-F', '--force-version'
+          options[:force_version] = true
         when '-n', '--install'
           options[:install] = true
         when '-O', '--open'
           options[:open] = true
-        when '-c', '--cropped'
-          argv_clean += ['-dbackend=eps', '-daux-files=#f']
+        when '-r', '--require'
+          options[:ext_require] ||= []
+          options[:ext_require] << argv.shift
+        when /^(?:\-r|\-\-require\=)"?([^\s]+)"?/
+          options[:ext_require] ||= []
+          options[:ext_require] << $1
+        when '-R', '--raw'
+          options[:raw] = true
         when '-S', '--snippet'
           argv_clean += ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
-        when '-A', '--auto-install-deps'
-          options[:resolve] = true
+        when '-u', '--use'
+          options[:use_version] = argv.shift
+        when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
+          options[:use_version] = $1
         else
           argv_clean << arg
         end
@@ -46,13 +56,17 @@ module Lyp::Lilypond
       [options, argv_clean]
     end
 
-    def select_lilypond_version(opts)
-      if opts[:use_version]
-        if opts[:install]
-          Lyp::Lilypond.install_if_missing(opts[:use_version])
-        end
-        Lyp::Lilypond.force_version!(opts[:use_version])
+    VERSION_STATEMENT_REGEX = /\\version "([^"]+)"/
+
+    def select_lilypond_version(opts, file_path)
+      forced_version = opts[:force_version] ?
+        get_file_expected_version(file_path) : opts[:use_version]
+
+      if forced_version
+        Lyp::Lilypond.install_if_missing(forced_version) if opts[:install]
+        Lyp::Lilypond.force_version!(forced_version)
       end
+
       Lyp::Lilypond.check_lilypond!
       Lyp::Lilypond.current_lilypond.tap do |path|
         unless path && File.file?(path)
@@ -63,6 +77,16 @@ module Lyp::Lilypond
     rescue => e
       STDERR.puts e.message
       exit 1
+    end
+
+    def get_file_expected_version(file_path)
+      if IO.read(file_path) =~ VERSION_STATEMENT_REGEX
+        $1
+      else
+        raise "Could not find version statement in #{file_path}"
+      end
+    rescue => e
+      raise "Failed to read #{file_path}"
     end
 
     def compile(argv, opts = {})

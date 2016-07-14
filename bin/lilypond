@@ -7,7 +7,7 @@ require 'lyp'
 
 $options, $argv = Lyp::Lilypond.preprocess_argv(ARGV)
 
-$lilypond_path = Lyp::Lilypond.select_lilypond_version($options)
+$lilypond_path = Lyp::Lilypond.select_lilypond_version($options, ARGV.last)
 
 if $options[:raw]
   exec("#{$lilypond_path} #{$argv.join(' ')}")
@@ -27,6 +27,7 @@ Lyp-provided options:
   -A, --auto-install-deps             install any missing dependencies
   -c, --cropped                       crop output (requires setting 0 margins)
   -E, --env                           use version specified in $LILYPOND_VERSION
+  -F, --force_version                 use lilypond version specified in user file
   -n, --install                       install the specified version if not found
   -O, --open                          open the target file after compilation
   -R, --raw                           run raw lilypond (no pre-processing)

@@ -103,7 +103,7 @@ class Lyp::CLI < Thor
   def compile(*argv)
     opts, argv = Lyp::Lilypond.preprocess_argv(argv)
 
-    lilypond_path = Lyp::Lilypond.select_lilypond_version(opts)
+    lilypond_path = Lyp::Lilypond.select_lilypond_version(opts, argv.last)
 
     $stderr.puts "Lyp #{Lyp::VERSION}"
     Lyp::System.test_installed_status!
