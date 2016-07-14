@@ -44,6 +44,7 @@ module Lyp::Lilypond
           options[:raw] = true
         when '-S', '--snippet'
           argv_clean += ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
+          options[:snippet_paper_preamble] = true
         when '-u', '--use'
           options[:use_version] = argv.shift
         when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/

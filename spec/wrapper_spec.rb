@@ -6,15 +6,15 @@ RSpec.describe "Lyp.wrap" do
     fn = Lyp.wrap(orig_fn)
     expect(fn).to_not eq(orig_fn)
   end
-  
+
   it "creates a wrapper file containing dependency paths for a file with dependencies" do
     with_packages(:simple) do
       orig_fn = File.expand_path('user_files/simple.ly', File.dirname(__FILE__))
       fn = Lyp.wrap(orig_fn)
       expect(fn).to_not eq(orig_fn)
-      
+
       code = IO.read(fn)
-      
+
       expect(code).to include("(define lyp:input-filename \"#{orig_fn}\")")
       expect(code).to include("(define lyp:input-dirname \"#{File.dirname(orig_fn)}\")")
 
@@ -35,9 +35,9 @@ RSpec.describe "Lyp.wrap" do
       orig_fn = File.expand_path('user_files/no_require.ly', File.dirname(__FILE__))
       fn = Lyp.wrap(orig_fn, ext_require: ['a'])
       expect(fn).to_not eq(orig_fn)
-      
+
       code = IO.read(fn)
-      
+
       expect(code).to include("(define lyp:input-filename \"#{orig_fn}\")")
       expect(code).to include("(define lyp:input-dirname \"#{File.dirname(orig_fn)}\")")
 
@@ -50,5 +50,14 @@ RSpec.describe "Lyp.wrap" do
       expect(code).to include("\\require \"a\"")
     end
   end
-end
 
+  it "includes paper preamble on relevant option" do
+    orig_fn = File.expand_path('user_files/no_require.ly', File.dirname(__FILE__))
+    fn = Lyp.wrap(orig_fn, snippet_paper_preamble: true)
+    expect(fn).to_not eq(orig_fn)
+
+    code = IO.read(fn)
+    expect(code).to include("indent = 0\\mm")
+
+  end
+end

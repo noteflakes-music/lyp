@@ -1,3 +1,4 @@
+- Add appropriate `\paper` preamble when `--snippet` option is specified (#29).
 - Improve lilypond option processing by allowing a string of single-letter options, e.g. `lilypond -FncO`.
 - Add `--force-version` lilypond option for selecting lilypond version according to version statement in user file (#28).
 

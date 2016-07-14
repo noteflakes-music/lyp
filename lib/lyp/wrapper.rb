@@ -7,7 +7,6 @@ module Lyp
 
   def self.wrap(fn, opts = {})
     r = Lyp::DependencyResolver.new(fn, opts).resolve_package_dependencies
-
     # copy current_package_dir option
     r[:current_package_dir] = opts[:current_package_dir]
     r[:opts] = opts
