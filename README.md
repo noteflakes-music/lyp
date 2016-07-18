@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://travis-ci.org/noteflakes/lyp"><img src="https://travis-ci.org/noteflakes/lyp.svg?branch=master"</a>
+  <a href="https://travis-ci.org/noteflakes/lyp"><img src="https://travis-ci.org/noteflakes/lyp.svg?branch=master"></a>
 </p>
 <p align="center">
   <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
@@ -129,7 +129,7 @@ For more information on running lilypond see the section on [Running lilypond](#
 
 A package is a library of lilypond code, containing one or more lilypond files, that provide commonly-used functionality for users. A package can be a library of scheme code to extend lilypond, as in openlilylib; or a stylesheet which contains music fonts and additional lilypond code to change the look of the music: font, spacing, line widths, sizes, etc.
 
-The difference between merely copying and including a lilypond file in your music, and using a lilypond package is that you can easily share your music file with anyone and let them compile your music without having to download and copy additional code. lyp takes care of installing and resolving any dependencies in your lilypond files, so that you can compile your lilypond files anywhere without schlepping around a bunch of include files. Also, because packages are versioned, repeatable compilation using external code becomes trivial. 
+The difference between merely copying and including a lilypond file in your music, and using a lilypond package is that you can easily share your music file with anyone and let them compile your music without having to download and copy additional code. lyp takes care of installing and resolving any dependencies in your lilypond files, so that you can compile your lilypond files anywhere without schlepping around a bunch of include files. Also, because packages are versioned, repeatable compilation using external code becomes trivial.
 
 ### What constitutes a package?
 
@@ -344,7 +344,7 @@ Files can also be included conditionally by evaluating a scheme expression using
 
 Lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
 
-**Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version ower than 2.19.12 in order to support custom fonts. 
+**Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version ower than 2.19.12 in order to support custom fonts.
 
 ### Testing Packages
 
@@ -403,7 +403,7 @@ $ lyp uninstall lilypond@2.18.2
 ### Showing the list of installed lilypond versions
 
 To display all installed versions of lilypond, use the `list` command:
-  
+
 ```bash
 $ lyp list lilypond
 ```
@@ -506,7 +506,7 @@ Once one or more versions of lilypond are installed, the lilypond command may be
   $ lilypond --use=stable ...
   $ lilypond --use=latest ...
   ```
-  
+
 - `--env`, `-E` - use a version set by the `$LILYPOND_VERSION` environment variable:
 
   ```bash
@@ -518,7 +518,7 @@ Once one or more versions of lilypond are installed, the lilypond command may be
   ```bash
   $ lilypond -u2.19.35 -n ...
   ```
-  
+
 - `--raw`, `-r` - do not pre-process input file (no scanning for dependencies, no wrapping).
 
   ```bash
