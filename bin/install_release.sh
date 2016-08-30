@@ -8,14 +8,8 @@ shopt -s extglob
 set -o errtrace
 set -o errexit
 
-fail() {
-  log "\nERROR: $*\n"
-  exit 1
-}
-
-has() {
-  type "$1" > /dev/null 2>&1
-}
+fail() { log "\nERROR: $*\n"; exit 1; }
+has() { type "$1" > /dev/null 2>&1; }
 
 download() {
   if has "curl"; then
