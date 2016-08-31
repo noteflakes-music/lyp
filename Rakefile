@@ -1,5 +1,6 @@
 # For Bundler.with_clean_env
-require 'bundler/setup'
+require 'bundler'
+Bundler.require(:default)
 require File.expand_path("./lib/lyp/version", File.dirname(__FILE__))
 
 PACKAGE_NAME = "lyp"
