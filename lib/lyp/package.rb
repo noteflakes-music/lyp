@@ -238,7 +238,11 @@ module Lyp::Package
       puts "Cloning #{url}..." unless opts[:silent]
       Rugged::Repository.clone_at(url, tmp_path)
     rescue => e
-      raise "Could not clone repository (please check that the package URL is correct.)"
+      if opts[:verbose]
+        raise e
+      else
+        raise "Could not clone repository (please check that the package URL is correct.)"
+      end
     end
 
     def checkout_package_version(repo, version, opts = {})
