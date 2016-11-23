@@ -32,7 +32,9 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 - [Developing packages](#developing-packages)
   - [The package interface](#the-package-interface)
   - [Including files](#including-files)
+  - [Scheme interface](#scheme-interface)
   - [Including fonts](#including-fonts)
+  - [Extending lyp](#extending-lyp)
   - [Testing packages](#testing-packages)
   - [Publishing packages](#publishing-packages)
 - [Installing and Using Lilypond](#installing-and-using-lilypond)
@@ -329,7 +331,7 @@ Lyp also defines a `lyp:load` scheme function for loading scheme files using rel
 #(if (not (defined? 'mypack:init))(lyp:load "scm/init.scm"))
 ```
 
-Loading scheme files that way is a better technique than adding directorys to `%load-path`, because this way one avoids possible name clashes, which may lead to unexpected behavior.
+Loading scheme files that way is a better technique than adding directories to `%load-path`, because this way one avoids possible name clashes, which may lead to unexpected behavior.
 
 ### Conditional includes
 
