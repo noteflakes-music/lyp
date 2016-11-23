@@ -340,11 +340,39 @@ Files can also be included conditionally by evaluating a scheme expression using
 \pcondInclude #(eq? edition 'urtext) "urtext_tweaks.ly"
 ```
 
+### Scheme interface
+
+Lyp provides to loaded packages a small API to facilitate handling relative paths and loading of lilypond include files and scheme files. The API is documented on the [lyp wiki](https://github.com/noteflakes/lyp/wiki/Package-Scheme-Interface).  
+
 ### Including fonts
 
 Lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
 
-**Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version ower than 2.19.12 in order to support custom fonts.
+**Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version newer than 2.19.12 in order to support custom fonts.
+
+### Extending lyp
+
+A package can also be used to extend or override lyp's stock functionality or add more features and commands. Extensions are written in Ruby in a file named `ext.rb` placed in the package's main directory. An extension can be used to either perform a certain action when the package is installed, or be loaded each time lyp is invoked.
+
+When a package is installed, lyp executes the code in `ext.rb`. To make the extension run each time lyp is invoked, the extension should include the following line:
+
+```ruby
+Lyp.install_extension(__FILE__)
+```
+
+More commands can be added to lyp's command line interface by adding methods to the `Lyp::CLI` class using the [Thor](https://github.com/erikhuda/thor/wiki/Method-Options) API. For example:
+
+```ruby
+class Lyp::CLI
+  desc "count", "show package count"
+  def count
+    packages = Lyp::Package.list_lyp_index("")
+    puts "#{packages.size} packages installed"
+  end
+end
+```
+
+The implementation of the stock lyp commands can be be found in [`lib/lyp/cli.rb`](./lib/lyp/cli.rb).
 
 ### Testing Packages
 
