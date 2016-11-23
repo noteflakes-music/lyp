@@ -29,8 +29,8 @@
       </header>
       <section>
         <p align="center">
-  <a href="https://travis-ci.org/noteflakes/lyp"><img src="https://travis-ci.org/noteflakes/lyp.svg?branch=master">
-</a></p>
+  <a href="https://travis-ci.org/noteflakes/lyp"><img src="https://travis-ci.org/noteflakes/lyp.svg?branch=master"></a>
+</p>
 
 <p align="center">
   <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
@@ -79,7 +79,9 @@
 <ul>
 <li><a href="#the-package-interface">The package interface</a></li>
 <li><a href="#including-files">Including files</a></li>
+<li><a href="#scheme-interface">Scheme interface</a></li>
 <li><a href="#including-fonts">Including fonts</a></li>
+<li><a href="#extending-lyp">Extending lyp</a></li>
 <li><a href="#testing-packages">Testing packages</a></li>
 <li><a href="#publishing-packages">Publishing packages</a></li>
 </ul>
@@ -180,7 +182,7 @@ $ lyp-0.2.1-linux-x86_64/lyp install self</pre></div>
 
 <p>A package is a library of lilypond code, containing one or more lilypond files, that provide commonly-used functionality for users. A package can be a library of scheme code to extend lilypond, as in openlilylib; or a stylesheet which contains music fonts and additional lilypond code to change the look of the music: font, spacing, line widths, sizes, etc.</p>
 
-<p>The difference between merely copying and including a lilypond file in your music, and using a lilypond package is that you can easily share your music file with anyone and let them compile your music without having to download and copy additional code. lyp takes care of installing and resolving any dependencies in your lilypond files, so that you can compile your lilypond files anywhere without schlepping around a bunch of include files. Also, because packages are versioned, repeatable compilation using external code becomes trivial. </p>
+<p>The difference between merely copying and including a lilypond file in your music, and using a lilypond package is that you can easily share your music file with anyone and let them compile your music without having to download and copy additional code. lyp takes care of installing and resolving any dependencies in your lilypond files, so that you can compile your lilypond files anywhere without schlepping around a bunch of include files. Also, because packages are versioned, repeatable compilation using external code becomes trivial.</p>
 
 <h3>
 <a id="what-constitutes-a-package" class="anchor" href="#what-constitutes-a-package" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What constitutes a package?</h3>
@@ -365,7 +367,7 @@ package@stable
 
 <div class="highlight highlight-source-lilypond"><pre>#<span class="pl-s1">(<span class="pl-k">if</span> (<span class="pl-c1">not</span> (defined? <span class="pl-c1">'mypack:init</span>))(lyp:load <span class="pl-s"><span class="pl-pds">"</span>scm/init.scm<span class="pl-pds">"</span></span>))</span></pre></div>
 
-<p>Loading scheme files that way is a better technique than adding directorys to <code>%load-path</code>, because this way one avoids possible name clashes, which may lead to unexpected behavior.</p>
+<p>Loading scheme files that way is a better technique than adding directories to <code>%load-path</code>, because this way one avoids possible name clashes, which may lead to unexpected behavior.</p>
 
 <h3>
 <a id="conditional-includes" class="anchor" href="#conditional-includes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Conditional includes</h3>
@@ -376,11 +378,37 @@ package@stable
 <span class="pl-c1">\pcondInclude</span> #<span class="pl-s1">(<span class="pl-c1">eq?</span> edition <span class="pl-c1">'urtext</span>)</span> <span class="pl-s"><span class="pl-pds">"</span>urtext_tweaks.ly<span class="pl-pds">"</span></span></pre></div>
 
 <h3>
+<a id="scheme-interface" class="anchor" href="#scheme-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Scheme interface</h3>
+
+<p>Lyp provides to loaded packages a small API to facilitate handling relative paths and loading of lilypond include files and scheme files. The API is documented on the <a href="https://github.com/noteflakes/lyp/wiki/Package-Scheme-Interface">lyp wiki</a>.  </p>
+
+<h3>
 <a id="including-fonts" class="anchor" href="#including-fonts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Including fonts</h3>
 
 <p>Lyp also supports automatic installation of fonts, based on work by <a href="https://github.com/tisimst">Abraham Lee</a>. When a package is installed, lyp will copy any font files residing in the <code>fonts</code> directory into the corresponding <code>otf</code> and <code>svg</code> directories of all installed versions of lilypond.</p>
 
-<p><strong>Note</strong>: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version ower than 2.19.12 in order to support custom fonts. </p>
+<p><strong>Note</strong>: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version newer than 2.19.12 in order to support custom fonts.</p>
+
+<h3>
+<a id="extending-lyp" class="anchor" href="#extending-lyp" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extending lyp</h3>
+
+<p>A package can also be used to extend or override lyp's stock functionality or add more features and commands. Extensions are written in Ruby in a file named <code>ext.rb</code> placed in the package's main directory. An extension can be used to either perform a certain action when the package is installed, or be loaded each time lyp is invoked.</p>
+
+<p>When a package is installed, lyp executes the code in <code>ext.rb</code>. To make the extension run each time lyp is invoked, the extension should include the following line:</p>
+
+<div class="highlight highlight-source-ruby"><pre><span class="pl-c1">Lyp</span>.install_extension(<span class="pl-v">__FILE__</span>)</pre></div>
+
+<p>More commands can be added to lyp's command line interface by adding methods to the <code>Lyp::CLI</code> class using the <a href="https://github.com/erikhuda/thor/wiki/Method-Options">Thor</a> API. For example:</p>
+
+<div class="highlight highlight-source-ruby"><pre><span class="pl-k">class</span> <span class="pl-en">Lyp::CLI</span>
+  desc <span class="pl-s"><span class="pl-pds">"</span>count<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>show package count<span class="pl-pds">"</span></span>
+  <span class="pl-k">def</span> <span class="pl-en">count</span>
+    packages <span class="pl-k">=</span> <span class="pl-c1">Lyp</span>::<span class="pl-c1">Package</span>.list_lyp_index(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>)
+    puts <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pse">#{</span><span class="pl-s1">packages.size</span><span class="pl-pse"><span class="pl-s1">}</span></span> packages installed<span class="pl-pds">"</span></span>
+  <span class="pl-k">end</span>
+<span class="pl-k">end</span></pre></div>
+
+<p>The implementation of the stock lyp commands can be be found in <a href="./lib/lyp/cli.rb"><code>lib/lyp/cli.rb</code></a>.</p>
 
 <h3>
 <a id="testing-packages" class="anchor" href="#testing-packages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Testing Packages</h3>
