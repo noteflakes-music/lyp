@@ -4,7 +4,7 @@ require 'ruby-progressbar'
 
 module Lyp::Lilypond
   class << self
-    NO_ARGUMENT_OPTIONS_REGEXP = /\-([REnFOcSA]+)(.+)/
+    NO_ARGUMENT_OPTIONS_REGEXP = /^\-([REnFOcSA]+)(.+)/
 
     def preprocess_argv(argv)
       options = {}

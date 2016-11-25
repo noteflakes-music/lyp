@@ -6,7 +6,6 @@ require 'lyp/version'
 require 'lyp'
 
 $options, $argv = Lyp::Lilypond.preprocess_argv(ARGV)
-
 $lilypond_path = Lyp::Lilypond.select_lilypond_version($options, ARGV.last)
 
 if $options[:raw]
