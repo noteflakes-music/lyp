@@ -1,3 +1,7 @@
+
+- Fix ARGV parsing when filename includes hyphen.
+- Better documentation for Ruby extension API.
+
 ## Version 1.0.1 2016-08-31
 
 - Better error reporting when installing packages.
