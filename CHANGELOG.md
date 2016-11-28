@@ -1,3 +1,5 @@
+# Version 1.0.2 2016-11-28
+
 - Add support for finalizers in package Scheme API.
 - Fix ARGV parsing when filename includes hyphen.
 - Better documentation for Ruby extension API.
