@@ -134,6 +134,18 @@
       (lyp:include-string (lyp:fmt-include abs-path))
     ))
   ))
+
+  ; define list of finalizer lambdas to be called after the user's file has been
+  ; \included.
+  (module-define! (current-module) 'lyp:finalProcs '())
+  (define (lyp:getFinalProcs)
+    (module-ref (current-module) 'lyp:finalProcs))
+  (define (lyp:setFinalProcs l) 
+    (module-define! (current-module) 'lyp:finalProcs l))
+  (define (lyp:finalize proc)
+    (lyp:setFinalProcs (append (lyp:getFinalProcs) (list proc))))
+  (define (lyp:callFinalizers)
+    (for-each (lambda (p) (p)) (lyp:getFinalProcs)))
 )
 
 % command form

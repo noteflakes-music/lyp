@@ -15,7 +15,7 @@ RSpec.describe "Lyp scheme interface" do
         expect(Lyp::Lilypond.compile([test_file])).to eq(true)
       end
     end
-  end  
+  end
 end
 
 RSpec.describe "assert package" do

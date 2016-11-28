@@ -1,4 +1,4 @@
-
+- Add support for finalizers in package Scheme API.
 - Fix ARGV parsing when filename includes hyphen.
 - Better documentation for Ruby extension API.
 
