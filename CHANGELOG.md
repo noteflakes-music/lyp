@@ -1,3 +1,5 @@
+# Version 1.0.3 2016-11-30
+
 - Refactor Lilypond option parsing.
 - Refactor version and version requirement construction.
 
