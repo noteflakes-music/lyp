@@ -2,7 +2,7 @@ require 'fileutils'
 
 module Lyp::System
   class << self
-    RUGGED_REQ = Gem::Requirement.new('>=0.23.0')
+    RUGGED_REQ = Lyp.version_req('>=0.23.0')
     
     def test_rugged_gem!
       return if @already_tested

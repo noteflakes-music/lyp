@@ -361,7 +361,7 @@ module Lyp
 
       map = lambda do |m, p|
         if p =~ Lyp::PACKAGE_RE
-          m[$1] = versions[p] ||= (Gem::Version.new($2 || '0.0') rescue nil)
+          m[$1] = versions[p] ||= (Lyp.version($2 || '0.0') rescue nil)
         end
         m
       end
@@ -426,10 +426,10 @@ module Lyp
         req_version = 'forced'
       end
 
-      req = Gem::Requirement.new(req_version || '>=0') rescue nil
+      req = Lyp.version_req(req_version || '>=0') rescue nil
       available_packages.select do |package, leaf|
         if (package =~ Lyp::PACKAGE_RE) && (req_package == $1)
-          version = Gem::Version.new($2 || '0') rescue nil
+          version = Lyp.version($2 || '0') rescue nil
           if version.nil? || req.nil?
             req_version.nil? || (req_version == $2)
           else
@@ -473,8 +473,8 @@ module Lyp
       specifiers = map_specifiers_to_versions
 
       compare_versions = lambda do |x, y|
-        v_x = x =~ Lyp::PACKAGE_RE && Gem::Version.new($2)
-        v_y = y =~ Lyp::PACKAGE_RE && Gem::Version.new($2)
+        v_x = x =~ Lyp::PACKAGE_RE && Lyp.version($2)
+        v_y = y =~ Lyp::PACKAGE_RE && Lyp.version($2)
         x <=> y
       end
 

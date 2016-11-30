@@ -75,5 +75,12 @@ module Lyp
     response = Readline.readline(prompt)
     ["y", "yes"].include?(response)
   end
-end
 
+  def self.version(v)
+    Gem::Version.new(v)
+  end
+
+  def self.version_req(r)
+    Gem::Requirement.new(r)
+  end
+end

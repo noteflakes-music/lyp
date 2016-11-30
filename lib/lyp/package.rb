@@ -13,14 +13,14 @@ module Lyp::Package
       if pattern
         if (pattern =~ /[@\>\<\=\~]/) && (pattern =~ Lyp::PACKAGE_RE)
           package, version = $1, $2
-          req = Gem::Requirement.new(version) rescue nil
+          req = Lyp.version_req(version) rescue nil
           packages.select! do |p|
             p =~ Lyp::PACKAGE_RE
             p_pack, p_ver = $1, $2
 
             next false unless p_pack == package
 
-            if req && (p_gemver = Gem::Version.new(p_ver) rescue nil)
+            if req && (p_gemver = Lyp.version(p_ver) rescue nil)
               req =~ p_gemver
             else
               p_ver == version
@@ -38,8 +38,8 @@ module Lyp::Package
         x =~ Lyp::PACKAGE_RE; x_package, x_version = $1, $2
         y =~ Lyp::PACKAGE_RE; y_package, y_version = $1, $2
 
-        x_version = (x_version && Gem::Version.new(x_version) rescue x)
-        y_version = (y_version && Gem::Version.new(y_version) rescue y)
+        x_version = (x_version && Lyp.version(x_version) rescue x)
+        y_version = (y_version && Lyp.version(y_version) rescue y)
 
         if (x_package == y_package) && (x_version.class == y_version.class)
           x_version <=> y_version
@@ -285,7 +285,7 @@ module Lyp::Package
       req = Lyp::FONT_COPY_REQ
 
       Lyp::Lilypond.list.each do |lilypond|
-        next unless req =~ Gem::Version.new(lilypond[:version])
+        next unless req =~ Lyp.version(lilypond[:version])
 
         if lilypond[:system]
           next unless Lyp.confirm_action(SYSTEM_LILYPOND_PROMPT % lilypond[:version])
@@ -413,9 +413,9 @@ module Lyp::Package
       when nil, '', 'latest'
         highest_versioned_tag(repo) || 'master'
       when /^(\>=|~\>|\d)/
-        req = Gem::Requirement.new(version_specifier)
+        req = Lyp.version_req(version_specifier)
         tag = repo_tags(repo).reverse.find do |t|
-          (v = tag_version(t.name)) && (req =~ Gem::Version.new(v))
+          (v = tag_version(t.name)) && (req =~ Lyp.version(v))
         end
         unless tag
           raise "Could not find a version matching #{version_specifier}"
@@ -428,7 +428,7 @@ module Lyp::Package
     end
 
     def highest_versioned_tag(repo)
-      tag = repo_tags(repo).select {|t| Gem::Version.new(tag_version(t.name)) rescue nil}.last
+      tag = repo_tags(repo).select {|t| Lyp.version(tag_version(t.name)) rescue nil}.last
       tag && tag.name
     end
 
@@ -440,7 +440,7 @@ module Lyp::Package
       tags.sort do |x, y|
         x_version, y_version = tag_version(x.name), tag_version(y.name)
         if x_version && y_version
-          Gem::Version.new(x_version) <=> Gem::Version.new(y_version)
+          Lyp.version(x_version) <=> Lyp.version(y_version)
         else
           x.name <=> y.name
         end

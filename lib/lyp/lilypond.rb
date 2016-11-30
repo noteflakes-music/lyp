@@ -11,50 +11,54 @@ module Lyp::Lilypond
       argv = argv.dup # copy for iterating
       argv_clean = []
       while arg = argv.shift
-        case arg
-        when NO_ARGUMENT_OPTIONS_REGEXP
-          # handle multiple options in shorthand form, e.g. -FnO
-          tmp_args = []
-          $1.each_char {|c| tmp_args << "-#{c}"}
-          tmp_args << "-#{$2}"
-          argv = tmp_args + argv
-        when '-A', '--auto-install-deps'
-          options[:resolve] = true
-        when '-c', '--cropped'
-          argv_clean += ['-dbackend=eps', '-daux-files=#f']
-        when '-E', '--env'
-          unless ENV['LILYPOND_VERSION']
-            STDERR.puts "$LILYPOND_VERSION not set"
-            exit 1
-          end
-          options[:use_version] = ENV['LILYPOND_VERSION']
-        when '-F', '--force-version'
-          options[:force_version] = true
-        when '-n', '--install'
-          options[:install] = true
-        when '-O', '--open'
-          options[:open] = true
-        when '-r', '--require'
-          options[:ext_require] ||= []
-          options[:ext_require] << argv.shift
-        when /^(?:\-r|\-\-require\=)"?([^\s]+)"?/
-          options[:ext_require] ||= []
-          options[:ext_require] << $1
-        when '-R', '--raw'
-          options[:raw] = true
-        when '-S', '--snippet'
-          argv_clean += ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
-          options[:snippet_paper_preamble] = true
-        when '-u', '--use'
-          options[:use_version] = argv.shift
-        when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
-          options[:use_version] = $1
-        else
-          argv_clean << arg
-        end
+        parse_lilypond_arg(arg, argv, argv_clean, options)
       end
 
       [options, argv_clean]
+    end
+
+    def parse_lilypond_arg(arg, argv, argv_clean, options)
+      case arg
+      when NO_ARGUMENT_OPTIONS_REGEXP
+        # handle multiple options in shorthand form, e.g. -FnO
+        tmp_args = []
+        $1.each_char {|c| tmp_args << "-#{c}"}
+        tmp_args << "-#{$2}"
+        argv = tmp_args + argv
+      when '-A', '--auto-install-deps'
+        options[:resolve] = true
+      when '-c', '--cropped'
+        argv_clean += ['-dbackend=eps', '-daux-files=#f']
+      when '-E', '--env'
+        unless ENV['LILYPOND_VERSION']
+          STDERR.puts "$LILYPOND_VERSION not set"
+          exit 1
+        end
+        options[:use_version] = ENV['LILYPOND_VERSION']
+      when '-F', '--force-version'
+        options[:force_version] = true
+      when '-n', '--install'
+        options[:install] = true
+      when '-O', '--open'
+        options[:open] = true
+      when '-r', '--require'
+        options[:ext_require] ||= []
+        options[:ext_require] << argv.shift
+      when /^(?:\-r|\-\-require\=)"?([^\s]+)"?/
+        options[:ext_require] ||= []
+        options[:ext_require] << $1
+      when '-R', '--raw'
+        options[:raw] = true
+      when '-S', '--snippet'
+        argv_clean += ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
+        options[:snippet_paper_preamble] = true
+      when '-u', '--use'
+        options[:use_version] = argv.shift
+      when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
+        options[:use_version] = $1
+      else
+        argv_clean << arg
+      end
     end
 
     VERSION_STATEMENT_REGEX = /\\version "([^"]+)"/
@@ -137,7 +141,7 @@ module Lyp::Lilypond
       path = current_lilypond
       version = File.basename(File.expand_path("#{File.dirname(path)}/../.."))
 
-      unless (Gem::Version.new(version) rescue nil)
+      unless (Lyp.version(version) rescue nil)
         resp = `#{path} -v`
         if resp.lines.first =~ /LilyPond ([0-9\.]+)/i
           version = $1
@@ -211,7 +215,7 @@ module Lyp::Lilypond
     end
 
     CMP_VERSION = proc do |x, y|
-      Gem::Version.new(x[:version]) <=> Gem::Version.new(y[:version])
+      Lyp.version(x[:version]) <=> Lyp.version(y[:version])
     end
 
     def filter_installed_list(version_specifier)
@@ -329,24 +333,24 @@ module Lyp::Lilypond
       when 'latest'
         version == all_versions.last
       when 'stable'
-        Gem::Version.new(version).segments[1].even?
+        Lyp.version(version).segments[1].even?
       when 'unstable'
-        Gem::Version.new(version).segments[1].odd?
+        Lyp.version(version).segments[1].odd?
       else
-        Gem::Requirement.new(specifier) =~ Gem::Version.new(version)
+        Lyp.version_req(specifier) =~ Lyp.version(version)
       end
     end
 
     def latest_stable_version
-      search.reverse.find {|l| Gem::Version.new(l[:version]).segments[1].even?}[:version]
+      search.reverse.find {|l| Lyp.version(l[:version]).segments[1].even?}[:version]
     end
 
     def latest_unstable_version
-      search.reverse.find {|l| Gem::Version.new(l[:version]).segments[1].odd?}[:version]
+      search.reverse.find {|l| Lyp.version(l[:version]).segments[1].odd?}[:version]
     end
 
     def latest_installed_unstable_version
-      latest = list.reverse.find {|l| Gem::Version.new(l[:version]).segments[1].odd?}
+      latest = list.reverse.find {|l| Lyp.version(l[:version]).segments[1].odd?}
       latest ? latest[:version] : nil
     end
 
@@ -387,8 +391,8 @@ module Lyp::Lilypond
       when 'latest'
         latest_version
       else
-        req = Gem::Requirement.new(version_specifier)
-        lilypond = search.reverse.find {|l| req =~ Gem::Version.new(l[:version])}
+        req = Lyp.version_req(version_specifier)
+        lilypond = search.reverse.find {|l| req =~ Lyp.version(l[:version])}
         if lilypond
           lilypond[:version]
         else
@@ -561,7 +565,7 @@ module Lyp::Lilypond
     end
 
     def patch_font_scm(version)
-      return unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(version)
+      return unless Lyp::FONT_PATCH_REQ =~ Lyp.version(version)
 
       target_fn = File.join(lyp_lilypond_share_dir(version), 'lilypond/current/scm/font.scm')
       FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
@@ -577,7 +581,7 @@ module Lyp::Lilypond
     EOF
 
     def patch_system_lilypond_font_scm(lilypond, opts)
-      return false unless Lyp::FONT_PATCH_REQ =~ Gem::Version.new(lilypond[:version])
+      return false unless Lyp::FONT_PATCH_REQ =~ Lyp.version(lilypond[:version])
 
       target_fn = File.join(lilypond[:data_path], '/scm/font.scm')
       # do nothing if alredy patched
@@ -599,7 +603,7 @@ module Lyp::Lilypond
     end
 
     def copy_fonts_from_all_packages(version, opts)
-      return unless Lyp::FONT_COPY_REQ =~ Gem::Version.new(version)
+      return unless Lyp::FONT_COPY_REQ =~ Lyp.version(version)
 
       ly_fonts_dir = File.join(lyp_lilypond_share_dir(version), 'lilypond/current/fonts')
 
@@ -637,16 +641,16 @@ module Lyp::Lilypond
         lilypond = lilypond_list.first
       when 'stable'
         lilypond = lilypond_list.find do |v|
-          Gem::Version.new(v[:version]).segments[1].even?
+          Lyp.version(v[:version]).segments[1].even?
         end
       when 'unstable'
         lilypond = lilypond_list.find do |v|
-          Gem::Version.new(v[:version]).segments[1].odd?
+          Lyp.version(v[:version]).segments[1].odd?
         end
       else
         version = "~>#{version}.0" if version =~ /^\d+\.\d+$/
-        req = Gem::Requirement.new(version)
-        lilypond = lilypond_list.find {|v| req =~ Gem::Version.new(v[:version])}
+        req = Lyp.version_req(version)
+        lilypond = lilypond_list.find {|v| req =~ Lyp.version(v[:version])}
       end
 
       unless lilypond
