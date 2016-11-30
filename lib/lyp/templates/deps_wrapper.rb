@@ -7,6 +7,12 @@
 #   }
 # }
 
+if _[:opts][:lilypond_version]
+`
+\version "{{_[:opts][:lilypond_version]}}"
+`
+end
+
 require 'fileutils'
 
 user_filename = File.expand_path(_[:user_file])

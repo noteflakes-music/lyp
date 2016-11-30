@@ -73,6 +73,9 @@ module Lyp::Lilypond
       end
 
       Lyp::Lilypond.check_lilypond!
+
+      opts[:lilypond_version] = current_lilypond_version
+
       Lyp::Lilypond.current_lilypond.tap do |path|
         unless path && File.file?(path)
           STDERR.puts "No version of lilypond found. To install lilypond run 'lyp install lilypond'."
@@ -181,6 +184,7 @@ module Lyp::Lilypond
 
     attr_reader :forced_version
 
+    # Make sure there's a default and current lilypond set
     def check_lilypond!
       path = default_lilypond
       select_default_lilypond! unless path && path =~ /lilypond$/
