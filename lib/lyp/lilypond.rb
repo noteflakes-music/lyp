@@ -109,6 +109,9 @@ module Lyp::Lilypond
       case opts[:mode]
       when :system
         system("#{lilypond} #{argv.join(" ")}")
+      when :spawn
+        pid = spawn(lilypond, *argv, opts[:spawn_opts] || {})
+        Process.detach(pid)
       else
         Kernel.exec(lilypond, *argv)
       end
