@@ -148,6 +148,7 @@ class Lyp::CLI < Thor
   method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
   method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
   method_option :dev, type: :boolean, desc: 'Install local development package'
+  method_option :update, aliases: '-u', type: :boolean, desc: 'Remove any old versions of the package'
   def install(*args)
     $cmd_options = options
 
@@ -175,7 +176,14 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "uninstall <PACKAGE|lilypond|self>...", "Uninstall a package or a version of lilypond. When 'uninstall self' is invoked, lyp uninstalls itself from ~/.lyp."
+  desc "update <PACKAGE>...", "Install a package after removing all previous versions"
+  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default Lilypond version'
+  method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
+  def update(*args)
+    invoke 'install', args, options.merge(update: true)
+  end
+
+  desc "uninstall <PACKAGE|lilypond|self>...", "Uninstall a package or a version of Lilypond. When 'uninstall self' is invoked, lyp uninstalls itself from ~/.lyp."
   method_option :all, aliases: '-a', type: :boolean, desc: 'Uninstall all versions'
   def uninstall(*args)
     $cmd_options = options

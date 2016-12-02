@@ -10,29 +10,7 @@ module Lyp::Package
         File.dirname(path).gsub("#{Lyp.packages_dir}/", '')
       end
 
-      if pattern
-        if (pattern =~ /[@\>\<\=\~]/) && (pattern =~ Lyp::PACKAGE_RE)
-          package, version = $1, $2
-          req = Lyp.version_req(version) rescue nil
-          packages.select! do |p|
-            p =~ Lyp::PACKAGE_RE
-            p_pack, p_ver = $1, $2
-
-            next false unless p_pack == package
-
-            if req && (p_gemver = Lyp.version(p_ver) rescue nil)
-              req =~ p_gemver
-            else
-              p_ver == version
-            end
-          end
-        else
-          packages.select! do |p|
-            p =~ Lyp::PACKAGE_RE
-            $1 =~ /#{pattern}/
-          end
-        end
-      end
+      packages = filter_packages(packages, pattern) if pattern
 
       packages.sort do |x, y|
         x =~ Lyp::PACKAGE_RE; x_package, x_version = $1, $2
@@ -49,6 +27,33 @@ module Lyp::Package
       end
     end
 
+    def filter_packages(packages, pattern)
+      if (pattern =~ /[@\>\<\=\~]/) && (pattern =~ Lyp::PACKAGE_RE)
+        package, version = $1, $2
+        req = Lyp.version_req(version) rescue nil
+        packages.select do |p|
+          p =~ Lyp::PACKAGE_RE
+          p_name, p_ver = $1, $2
+
+          next false unless p_name == package
+
+          if req && (p_gemver = Lyp.version(p_ver) rescue nil)
+            req =~ p_gemver
+          else
+            p_ver == version
+          end
+        end
+      else
+        if pattern =~ /^"(.+)"$/
+          pattern = $1
+        end
+        packages.select do |p|
+          p =~ Lyp::PACKAGE_RE
+          $1 =~ /#{pattern}/
+        end
+      end
+    end
+
     def which(pattern = nil)
       list(pattern).map {|p| "#{Lyp.packages_dir}/#{p}" }
     end
@@ -58,6 +63,10 @@ module Lyp::Package
         raise "Invalid package specifier #{package_specifier}"
       end
       package, version = $1, $2
+
+      # The update flag means all installed versions are removed prior to 
+      # proceeding with installation 
+      uninstall(package, {all: true}) if opts[:update]
 
       if version =~ /\:/
         info = install_from_local_files(package, version, opts)
@@ -69,14 +78,6 @@ module Lyp::Package
 
       if File.directory?(File.join(info[:path], 'fonts'))
         install_package_fonts(info[:path], opts)
-      end
-
-      unless opts[:silent]
-        if info[:local_path]
-          puts "\nInstalled #{package}@#{info[:version]} => #{info[:local_path]}\n\n"
-        else
-          puts "\nInstalled #{package}@#{info[:version]}\n\n"
-        end
       end
 
       if opts[:test]
@@ -95,6 +96,8 @@ module Lyp::Package
     def install_from_local_files(package, version, opts)
       version =~ /^([^\:]+)\:(.+)$/
       version, local_path = $1, $2
+
+      puts "Installing #{package}@#{version} => #{local_path}" unless opts[:silent]      
 
       entry_point_path = nil
       local_path = File.expand_path(local_path)
@@ -142,6 +145,8 @@ module Lyp::Package
 
       repo = package_repository(url, tmp_path, opts)
       version = checkout_package_version(repo, version, opts)
+
+      puts "Installing #{package}@#{version}" unless opts[:silent]      
 
       # Copy files
       package_path = git_url_to_package_path(
