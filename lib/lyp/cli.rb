@@ -111,7 +111,7 @@ class Lyp::CLI < Thor
   end
 
   desc "test [<option>...] [.|PATTERN]", "Runs package tests on installed packages or local directory"
-  method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of lilypond if not present'
+  method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of Lilypond if not present'
   method_option :env, aliases: '-E', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
   method_option :use, aliases: '-u', type: :string, desc: 'Use specified version'
   def test(*args)
@@ -144,8 +144,8 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "install <PACKAGE|lilypond|self>...", "Install a package or a version of lilypond. When 'install self' is invoked, lyp installs itself in ~/.lyp."
-  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
+  desc "install <PACKAGE|lilypond|self>...", "Install a package or a version of Lilypond. When 'install self' is invoked, lyp installs itself in ~/.lyp."
+  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default Lilypond version'
   method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
   method_option :dev, type: :boolean, desc: 'Install local development package'
   method_option :update, aliases: '-u', type: :boolean, desc: 'Remove any old versions of the package'
@@ -205,8 +205,8 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "use [lilypond@]<VERSION>", "Switch version of lilypond"
-  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default lilypond version'
+  desc "use [lilypond@]<VERSION>", "Switch version of Lilypond"
+  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default Lilypond version'
   def use(version)
     $cmd_options = options
 
@@ -217,10 +217,10 @@ class Lyp::CLI < Thor
     end
 
     lilypond = Lyp::Lilypond.use(version, options)
-    puts "Using lilypond version #{lilypond[:version]}"
+    puts "Using Lilypond version #{lilypond[:version]}"
   end
 
-  desc "list [PATTERN|lilypond]", "List installed packages matching PATTERN or versions of lilypond"
+  desc "list [PATTERN|lilypond]", "List installed packages matching PATTERN or versions of Lilypond"
   def list(pattern = nil)
     $cmd_options = options
 
@@ -257,7 +257,7 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "which [PATTERN|lilypond]", "List locations of installed packages matching PATTERN or versions of lilypond"
+  desc "which [PATTERN|lilypond]", "List locations of installed packages matching PATTERN or versions of Lilypond"
   def which(pattern = nil)
     $cmd_options = options
 
