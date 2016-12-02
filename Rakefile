@@ -13,7 +13,7 @@ VENDOR_DIR = "#{DIST_DIR}/vendor"
 TRAVELING_RUBY_BASE_PATH = "#{VENDOR_DIR}/traveling-ruby/traveling-ruby-#{TRAVELING_RUBY_VERSION}"
 RELEASE_DIR = "#{DIST_DIR}/release"
 
-task :default => [:package]
+task :default => [:release]
 
 desc "Package release files"
 task :release => %w{
