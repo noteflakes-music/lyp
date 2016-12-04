@@ -1,5 +1,3 @@
-require 'tempfile'
-
 module Lyp
   WRAPPER_TEMPLATE = Lyp::Template.new(IO.read(
     File.expand_path('templates/deps_wrapper.rb', File.dirname(__FILE__))

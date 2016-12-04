@@ -1,7 +1,3 @@
-require 'fileutils'
-require 'open-uri'
-require 'yaml'
-
 module Lyp::Package
   class << self
 
@@ -371,6 +367,8 @@ module Lyp::Package
     end
 
     def lyp_index
+      req_ext 'yaml'
+      req_ext 'open-uri'
       @lyp_index ||= YAML.load(open(LYP_INDEX_URL))
     end
 

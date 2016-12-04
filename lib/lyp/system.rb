@@ -1,5 +1,3 @@
-require 'fileutils'
-
 module Lyp::System
   class << self
     RUGGED_REQ = Lyp.version_req('>=0.23.0')
@@ -26,7 +24,7 @@ module Lyp::System
     
     def require_rugged_gem
       gem 'rugged', RUGGED_REQ.to_s
-      require 'rugged'
+      req_ext 'rugged'
     end
     
     def use_git_based_rugged_gem

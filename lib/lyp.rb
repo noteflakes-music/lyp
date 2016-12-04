@@ -1,14 +1,23 @@
-def req(f); require File.expand_path("lyp/#{f}", File.dirname(__FILE__)) end
+def req_int(f)
+  require File.expand_path("lyp/#{f}", File.dirname(__FILE__))
+end
 
-req 'base'
-req 'system'
-req 'settings'
+module Kernel
+  @@ext_requires = {}
+  def req_ext(l)
+    @@ext_requires[l] ||= require(l)
+  end
+end 
 
-req 'template'
-req 'resolver'
-req 'wrapper'
-req 'package'
-req 'lilypond'
-req 'transform'
+req_int 'base'
+req_int 'system'
+req_int 'settings'
 
-req 'windows' if Lyp::WINDOWS
+req_int 'template'
+req_int 'resolver'
+req_int 'wrapper'
+req_int 'package'
+req_int 'lilypond'
+req_int 'transform'
+
+req_int 'windows' if Lyp::WINDOWS

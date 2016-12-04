@@ -13,8 +13,6 @@ if _[:opts][:lilypond_version]
 `
 end
 
-require 'fileutils'
-
 user_filename = File.expand_path(_[:user_file])
 user_dirname = File.dirname(user_filename)
 

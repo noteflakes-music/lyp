@@ -1,5 +1,3 @@
-require 'fileutils'
-
 module Lyp::Transform
   class << self
     R = Lyp::DependencyResolver

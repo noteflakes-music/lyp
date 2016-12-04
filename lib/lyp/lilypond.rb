@@ -1,7 +1,3 @@
-require 'uri'
-require 'open3'
-require 'ruby-progressbar'
-
 module Lyp::Lilypond
   class << self
     NO_ARGUMENT_OPTIONS_REGEXP = /^\-([REnFOcSA]+)(.+)/
@@ -208,10 +204,14 @@ module Lyp::Lilypond
     end
 
     def get_session_settings
-      YAML.load(IO.read(session_settings_filename)) rescue {}
+      req_ext('yaml')
+      settings = YAML.load(IO.read(session_settings_filename)) rescue {}
+      settings = {} unless settings.is_a?(Hash)
+      settings
     end
 
     def set_session_settings(settings)
+      req_ext('yaml')
       File.open(session_settings_filename, 'w+') do |f|
         f << YAML.dump(settings)
       end
@@ -314,7 +314,7 @@ module Lyp::Lilypond
 
     # Returns a list of versions of lilyponds available for download
     def search(version_specifier = nil)
-      require 'open-uri'
+      req_ext 'open-uri'
 
       platform = detect_lilypond_platform
       url = "#{BASE_URL}/#{platform}/"
@@ -452,12 +452,14 @@ module Lyp::Lilypond
     end
 
     def temp_install_filename(url)
+      req_ext('uri')
       u = URI(url)
       "#{Lyp::TMP_ROOT}/#{File.basename(u.path)}"
     end
 
     def download_lilypond(url, fn, opts)
-      require 'httpclient'
+      req_ext 'ruby-progressbar'
+      req_ext 'httpclient'
 
       STDERR.puts "Downloading #{url}" unless opts[:silent]
 
@@ -700,6 +702,7 @@ module Lyp::Lilypond
     end
 
     def exec(cmd, raise_on_failure = true)
+      req_ext('open3')
       $_out = ""
       $_err = ""
       success = nil
