@@ -1,6 +1,7 @@
 # Version 1.1.0 2016-12-04
 
 - Improve performance by loading dependencies only when needed.
+- Implement `lyp update` and `lyp install -u` commands (#33).
 
 # Version 1.0.3 2016-11-30
 
