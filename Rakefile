@@ -59,7 +59,7 @@ namespace :release do
     end
   end
 
-  desc "Package your app for OS X"
+  desc "Package your app for MacOS"
   task :osx => [:bundle_install,
     "#{TRAVELING_RUBY_BASE_PATH}-osx.tar.gz",
   ] do

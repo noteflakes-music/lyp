@@ -49,14 +49,16 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
 
 ### System requirements
 
-Lyp is tested to work on Linux, Mac OS X and Windows 7+.
+Lyp is tested to work on Linux, MacOS and Windows 7+.
 
 ### Installing lyp as a Ruby gem
+
+_Note_: A recent version of Ruby (2.0.0 or later) is included in MacOS 10.9.0 or later.
 
 If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem.
 
 ```bash
-# Linux/Mac OS X:
+# Linux/MacOS:
 $ gem install lyp
 
 # Windows:
@@ -86,7 +88,7 @@ Windows users can simply download the latest Windows [release](https://github.co
 
 ### Manually installing releases
 
-(This section is for Linux / Mac OS X users.)
+(This section is for Linux / MacOS users.)
 
 If you feel uneasy about piping curl output to bash, you can install lyp yourself by downloading a [release](https://github.com/noteflakes/lyp/releases), untarring it, and running `lyp install self`:
 
