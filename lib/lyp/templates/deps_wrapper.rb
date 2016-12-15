@@ -83,5 +83,5 @@ end
 `
 \include {{quote_path[user_filename]}}
 
-#(lyp:callFinalizers)
+#(lyp:call-finalizers)
 `

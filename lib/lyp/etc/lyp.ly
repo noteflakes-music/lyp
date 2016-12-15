@@ -136,16 +136,13 @@
   ))
 
   ; define list of finalizer lambdas to be called after the user's file has been
-  ; \included.
-  (module-define! (current-module) 'lyp:finalProcs '())
-  (define (lyp:getFinalProcs)
-    (module-ref (current-module) 'lyp:finalProcs))
-  (define (lyp:setFinalProcs l) 
-    (module-define! (current-module) 'lyp:finalProcs l))
+  ; processed. packages invoke (lyp:finalize proc) to add their own code.
+  ; Finalizers are called in the order they were added.
+  (define lyp:final-procs '())
   (define (lyp:finalize proc)
-    (lyp:setFinalProcs (append (lyp:getFinalProcs) (list proc))))
-  (define (lyp:callFinalizers)
-    (for-each (lambda (p) (p)) (lyp:getFinalProcs)))
+    (set! lyp:final-procs (append lyp:final-procs (list proc))))
+  (define (lyp:call-finalizers)
+    (for-each (lambda (p) (p)) lyp:final-procs))
 )
 
 % command form

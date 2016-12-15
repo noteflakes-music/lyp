@@ -7,7 +7,7 @@
   (module-define! (current-module) 'test:temp1 0)
   (lyp:finalize (lambda () (module-define! (current-module) 'test:temp1 1)))
 
-  (lyp:callFinalizers)
+  (lyp:call-finalizers)
   (assert:eq? (module-ref (current-module) 'test:temp1) 1)
 )
 
