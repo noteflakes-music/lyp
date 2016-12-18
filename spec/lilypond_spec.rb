@@ -49,6 +49,7 @@ RSpec.describe "Lyp::Lilypond" do
       # get list and set default to latest version available
       Lyp::Lilypond.list
       expect(Lyp::Lilypond.current_lilypond).to be_nil
+      expect(Lyp::Lilypond.current_lilypond_bin_path).to be_nil
     end
     
     with_lilyponds(:simple) do
@@ -59,11 +60,17 @@ RSpec.describe "Lyp::Lilypond" do
       expect(Lyp::Lilypond.current_lilypond).to eq(
         "#{$lilyponds_dir}/2.19.21/#{$LILYPOND_BIN}"
       )
+      expect(Lyp::Lilypond.current_lilypond_bin_path).to eq(
+        "#{$lilyponds_dir}/2.19.21/#{$LILYPOND_BIN_DIR}"
+      )
       
       Lyp::Lilypond.set_current_lilypond("#{$lilyponds_dir}/2.18.1/#{$LILYPOND_BIN}")
       
       expect(Lyp::Lilypond.current_lilypond).to eq(
         "#{$lilyponds_dir}/2.18.1/#{$LILYPOND_BIN}"
+      )
+      expect(Lyp::Lilypond.current_lilypond_bin_path).to eq(
+        "#{$lilyponds_dir}/2.18.1/#{$LILYPOND_BIN_DIR}"
       )
       expect(Lyp::Lilypond.default_lilypond).to eq(
         "#{$lilyponds_dir}/2.19.21/#{$LILYPOND_BIN}"
@@ -79,6 +86,9 @@ RSpec.describe "Lyp::Lilypond" do
       )
       expect(Lyp::Lilypond.current_lilypond).to eq(
         "#{$lilyponds_dir}/2.19.21/#{$LILYPOND_BIN}"
+      )
+      expect(Lyp::Lilypond.current_lilypond_bin_path).to eq(
+        "#{$lilyponds_dir}/2.19.21/#{$LILYPOND_BIN_DIR}"
       )
       
       Lyp::Lilypond.install("2.18.2", silent: true)
@@ -96,6 +106,9 @@ RSpec.describe "Lyp::Lilypond" do
       expect(Lyp::Lilypond.current_lilypond).to eq(
         "#{$lilyponds_dir}/2.18.2/#{$LILYPOND_BIN}"
       )
+      expect(Lyp::Lilypond.current_lilypond_bin_path).to eq(
+        "#{$lilyponds_dir}/2.18.2/#{$LILYPOND_BIN_DIR}"
+      )
     end
   end
   
@@ -107,6 +120,9 @@ RSpec.describe "Lyp::Lilypond" do
       )
       expect(Lyp::Lilypond.current_lilypond).to eq(
         "#{$lilyponds_dir}/2.19.21/#{$LILYPOND_BIN}"
+      )
+      expect(Lyp::Lilypond.current_lilypond_bin_path).to eq(
+        "#{$lilyponds_dir}/2.19.21/#{$LILYPOND_BIN_DIR}"
       )
       
       Lyp::Lilypond.install("2.18.2", {silent: true, default: true})
@@ -123,6 +139,9 @@ RSpec.describe "Lyp::Lilypond" do
       )
       expect(Lyp::Lilypond.current_lilypond).to eq(
         "#{$lilyponds_dir}/2.18.2/#{$LILYPOND_BIN}"
+      )
+      expect(Lyp::Lilypond.current_lilypond_bin_path).to eq(
+        "#{$lilyponds_dir}/2.18.2/#{$LILYPOND_BIN_DIR}"
       )
     end
   end

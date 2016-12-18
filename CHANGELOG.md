@@ -1,3 +1,5 @@
+- Add `lyp exec` command for running arbitrary lilypond bundled scripts.
+
 # Version 1.1.0 2016-12-04
 
 - Improve performance by loading dependencies only when needed.

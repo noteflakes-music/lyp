@@ -39,9 +39,9 @@ module Lyp
 
       case opts[:mode]
       when :system
-        exec("#{lilypond} #{argv.join(' ')}", false)
+        run_cmd("#{lilypond} #{argv.join(' ')}", false)
       else
-        exec("#{lilypond} #{argv.join(' ')}")
+        run_cmd("#{lilypond} #{argv.join(' ')}")
         true
       end
     end

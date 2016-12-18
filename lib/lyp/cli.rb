@@ -99,7 +99,7 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "compile [<option>...] <FILE>", "Invokes lilypond with given file"
+  desc "compile [<option>...] <FILE>", "Invoke lilypond with given file"
   def compile(*argv)
     opts, argv = Lyp::Lilypond.preprocess_argv(argv)
 
@@ -110,7 +110,14 @@ class Lyp::CLI < Thor
     Lyp::Lilypond.compile(argv, opts)
   end
 
-  desc "test [<option>...] [.|PATTERN]", "Runs package tests on installed packages or local directory"
+  desc "exec <CMD> [<options>...]", "Execute a lilypond script"
+  def exec(*argv)
+    $stderr.puts "Lyp #{Lyp::VERSION}"
+    Lyp::System.test_installed_status!
+    Lyp::Lilypond.invoke_script(argv, {})
+  end
+
+  desc "test [<option>...] [.|PATTERN]", "Run package tests on installed packages or local directory"
   method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of Lilypond if not present'
   method_option :env, aliases: '-E', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
   method_option :use, aliases: '-u', type: :string, desc: 'Use specified version'
@@ -275,7 +282,7 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "deps FILE", "Lists dependencies found in user's files"
+  desc "deps FILE", "List dependencies found in user's files"
   def deps(fn)
     $cmd_options = options
 
@@ -291,7 +298,7 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "resolve FILE", "Resolves and installs missing dependencies found in user's files"
+  desc "resolve FILE", "Resolve and install missing dependencies found in user's files"
   method_option :all, aliases: '-a', type: :boolean, desc: 'Install all found dependencies'
   def resolve(fn)
     $cmd_options = options

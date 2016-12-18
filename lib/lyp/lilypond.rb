@@ -116,6 +116,20 @@ module Lyp::Lilypond
       end
     end
 
+    def invoke_script(argv, opts = {})
+      cmd = File.join(current_lilypond_bin_path, argv.shift)
+
+      case opts[:mode]
+      when :system
+        system("#{cmd} #{argv.join(" ")}")
+      when :spawn
+        pid = spawn(cmd, *argv, opts[:spawn_opts] || {})
+        Process.detach(pid)
+      else
+        Kernel.exec(cmd, *argv)
+      end
+    end
+
     def default_lilypond
       Lyp::Settings['lilypond/default']
     end
@@ -137,6 +151,11 @@ module Lyp::Lilypond
       end
 
       settings[:current]
+    end
+
+    def current_lilypond_bin_path
+      lilypond = current_lilypond
+      lilypond && File.dirname(lilypond)
     end
 
     def current_lilypond_version
@@ -504,7 +523,7 @@ module Lyp::Lilypond
 
     def install_lilypond_files_osx(fn, target, platform, version, opts)
       STDERR.puts "Extracting..." unless opts[:silent]
-      exec "tar -xjf #{fn} -C #{target}"
+      run_cmd "tar -xjf #{fn} -C #{target}"
 
       copy_lilypond_files("#{target}/LilyPond.app/Contents/Resources", version, opts)
     end
@@ -519,12 +538,12 @@ module Lyp::Lilypond
       FileUtils.mkdir_p(tmp_dir)
 
       FileUtils.cd(tmp_dir) do
-        exec "sh #{fn} --tarball >/dev/null"
+        run_cmd "sh #{fn} --tarball >/dev/null"
       end
 
       tmp_fn = "#{tmp_dir}/lilypond-#{version}-1.#{platform}.tar.bz2"
 
-      exec "tar -xjf #{tmp_fn} -C #{target}"
+      run_cmd "tar -xjf #{tmp_fn} -C #{target}"
 
       copy_lilypond_files("#{target}/usr", version, opts)
     ensure
@@ -701,7 +720,7 @@ module Lyp::Lilypond
       FileUtils.rm_rf(path)
     end
 
-    def exec(cmd, raise_on_failure = true)
+    def run_cmd(cmd, raise_on_failure = true)
       req_ext('open3')
       $_out = ""
       $_err = ""
@@ -713,7 +732,7 @@ module Lyp::Lilypond
         success = exit_value == 0
       end
       if !success && raise_on_failure
-        raise "Error executing cmd #{cmd}:\n#{parse_error_msg($_err)}"
+        raise "Error executing #{cmd}:\n#{parse_error_msg($_err)}"
       end
       success
     end
