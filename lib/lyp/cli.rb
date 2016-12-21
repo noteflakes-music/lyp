@@ -333,6 +333,15 @@ class Lyp::CLI < Thor
     end
   end
 
+  desc "accelerate", "Rewrite gem binaries to make lyp faster"
+  def accelerate
+    unless Lyp::System.is_gem?
+      puts "Lyp is not installed as a gem."
+      exit 1
+    end
+
+    Lyp::System.rewrite_gem_scripts
+  end
 
   def self.run
     start(ARGV)

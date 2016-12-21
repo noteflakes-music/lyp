@@ -110,6 +110,15 @@ EOF
     def is_gem?
       SELF_DIR !~ /#{RELEASE_BIN_PATH}$/
     end
+
+    def rewrite_gem_scripts
+      %w{lyp lilypond}.each do |script_name|
+        src_path = Gem.bin_path('lyp', script_name)
+        dest_path = File.join(Gem.bindir, script_name)
+        puts "cp #{src_path} #{dest_path}"
+        FileUtils.cp(src_path, dest_path)
+      end
+    end
     
     def setup_gem_files
       FileUtils.rm_rf(Lyp::LYP_BIN_DIRECTORY)
