@@ -1,3 +1,5 @@
+# Version 1.2.0 2016-12-21
+
 - Implement `lyp accelerate` command for making lyp and lilypond scripts faster (#34).
 - Add `lyp exec` command for running arbitrary lilypond bundled scripts (#35).
 
