@@ -1,3 +1,4 @@
 *.gem
 releases
 packaging
+dist
