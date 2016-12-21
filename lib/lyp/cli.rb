@@ -123,20 +123,21 @@ class Lyp::CLI < Thor
   method_option :use, aliases: '-u', type: :string, desc: 'Use specified version'
   def test(*args)
     $cmd_options = options
+    test_opts = options.dup
 
-    if options[:env]
+    if test_opts[:env]
       unless ENV['LILYPOND_VERSION']
         STDERR.puts "$LILYPOND_VERSION not set"
         exit 1
       end
-      options[:use] = ENV['LILYPOND_VERSION']
+      test_opts[:use] = ENV['LILYPOND_VERSION']
     end
 
-    if options[:use]
-      if options[:install]
-        Lyp::Lilypond.install_if_missing(options[:use], no_version_test: true)
+    if test_opts[:use]
+      if test_opts[:install]
+        Lyp::Lilypond.install_if_missing(test_opts[:use], no_version_test: true)
       end
-      Lyp::Lilypond.force_version!(options[:use])
+      Lyp::Lilypond.force_version!(test_opts[:use])
     end
 
     # check lilypond default / current settings
