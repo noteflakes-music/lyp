@@ -1,3 +1,7 @@
+# Version 1.2.1 2016-12-21
+
+- Fix `lyp test --env` command.
+
 # Version 1.2.0 2016-12-21
 
 - Implement `lyp accelerate` command for making lyp and lilypond scripts faster (#34).
