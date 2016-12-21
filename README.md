@@ -5,13 +5,13 @@
   <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
 </p>
 
-# lyp - a package manager for lilypond
+# lyp - a package manager for Lilypond
 
-Use lyp to install and manage packages for lilypond, and install and manage multiple versions of lilypond on your machine.
+Use lyp to install and manage packages for Lilypond, and install and manage multiple versions of Lilypond on your machine.
 
-__Code reuse__: lyp lets you install packages that act as lilypond code libraries and can be used to enhance your lilypond files with additional functionality. Packages can depend on other packages. Lyp resolves both direct and transitive package dependencies, and automatically selects the correct version to use for each package.
+__Code reuse__: lyp lets you install packages that act as Lilypond code libraries and can be used to enhance your Lilypond files with additional functionality. Packages can depend on other packages. Lyp resolves both direct and transitive package dependencies, and automatically selects the correct version to use for each package.
 
-__No hassle Lilypond installation__: With lyp you can also install any version of lilypond on your machine with a single command, without having to visit the lilypond website, clicking a link and then copying files around. In addition, lyp lets you switch between multiple versions of lilypond and always keep your machine up to date with the latest version.
+__No hassle Lilypond installation__: With lyp you can also install any version of Lilypond on your machine with a single command, without having to visit the Lilypond website, clicking a link and then copying files around. In addition, lyp lets you switch between multiple versions of Lilypond and always keep your machine up to date with the latest version.
 
 ## Table of contents
 
@@ -23,7 +23,7 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [Uninstalling lyp](#uninstalling-lyp)
 - [How lyp works](#how-lyp-works)
 - [Working with packages](#working-with-packages)
-  - [What constitutes a package?](#what-constitutes-a-package)
+  - [What is a package?](#what-is-a-package)
   - [Installing packages](#installing-packages)
   - [Automatic package installation](#automatic-package-installation)
   - [Package references](#package-references)
@@ -38,11 +38,11 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [Testing packages](#testing-packages)
   - [Publishing packages](#publishing-packages)
 - [Installing and Using Lilypond](#installing-and-using-lilypond)
-  - [Installing/uninstalling a version of lilypond](#installing-uninstalling a version of lilypond)
-  - [Showing the list of installed lilypond versions](#showing-the-list-of-installed-lilypond-versions)
-  - [Showing available lilypond versions](#Showing-available-lilypond-versions)
-  - [Switching between lilypond versions](#switching-between-lilypond-versions)
-  - [Running lilypond](#running-lilypond)
+  - [Installing/uninstalling a version of Lilypond](#installing-uninstalling a version of lilypond)
+  - [Showing the list of installed Lilypond versions](#showing-the-list-of-installed-lilypond-versions)
+  - [Showing available Lilypond versions](#Showing-available-lilypond-versions)
+  - [Switching between Lilypond versions](#switching-between-lilypond-versions)
+  - [Running Lilypond](#running-lilypond)
 - [Contributing](#contributing)
 
 ## Installation
@@ -119,27 +119,29 @@ $ rm -rf ~/.lyp
 
 ## How lyp works
 
-Lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  installed packages, and installed versions of lilypond. Lyp provides a wrapper script for lilypond, which does the following:
+Lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  installed packages, and installed versions of Lilypond. Lyp provides a wrapper script for Lilypond, which does the following:
 
-- Select the correct version of lilypond to use (see below).
-- Scan the given lilypond file for any dependencies (specified using `\require`), and also recursively scan any include files for dependencies
+- Select the correct version of Lilypond to use (see [below](#installing-and-using-lilypond)).
+- Scan the given Lilypond file for any dependencies (specified using `\require`), and also recursively scan any include files for dependencies
 - Resolve the dependency tree and calculate the correct versions to use for each required package.
-- Create a wrapper lilypond file that loads the packages.
-- Invoke the selected version of lilypond.
+- Create a wrapper Lilypond file that loads the packages.
+- Invoke the selected version of Lilypond.
 
-For more information on running lilypond see the section on [Running lilypond](#running-lilypond).
+For more information on running Lilypond see the section on [Running Lilypond](#running-lilypond).
 
 ## Working with Packages
 
-A package is a library of lilypond code, containing one or more lilypond files, that provide commonly-used functionality for users. A package can be a library of scheme code to extend lilypond, as in openlilylib; or a stylesheet which contains music fonts and additional lilypond code to change the look of the music: font, spacing, line widths, sizes, etc.
+A package is a library of Lilypond code, containing one or more Lilypond files, that provide commonly-used functionality for users. A package can be a library of scheme code to extend Lilypond, as in [OpenLilyLib](https://github.com/openlilylib/); or a stylesheet which contains music fonts and additional Lilypond code to change the look of the music: font, spacing, line widths, sizes, etc.
 
-The difference between merely copying and including a lilypond file in your music, and using a lilypond package is that you can easily share your music file with anyone and let them compile your music without having to download and copy additional code. lyp takes care of installing and resolving any dependencies in your lilypond files, so that you can compile your lilypond files anywhere without schlepping around a bunch of include files. Also, because packages are versioned, repeatable compilation using external code becomes trivial.
+The difference between merely copying and including a Lilypond file in your music, and using a Lilypond package is that you can easily share your music file with anyone and let them compile your music without having to download and copy additional code. lyp takes care of installing and resolving any dependencies in your Lilypond files, so that you can compile your Lilypond files anywhere without schlepping around a bunch of include files. Also, because packages are versioned, repeatable compilation using external code becomes trivial.
 
-### What constitutes a package?
+### What is a package?
 
-In lyp, a package should contain at least a single lilypond file named `package.ly` in its root directory. A package could contain additional lilypond files referenced in the main package file (using relative includes). A package could also depend on other packages by using the `\require` command (see below).
+In lyp, a package is a directory that should contain at least a single Lilypond file named `package.ly` in its root directory. A package could contain additional Lilypond and scheme files referenced in the main package file (using relative `\include`s). A package could also depend on other packages by using the `\require` command (see [below](#using-packages)).
 
-Lilypond packages are expected to be published as git repositories. The packages is then versioned using git tags. A package can be referenced either using its git URL, a short name (if it's registered in the [lyp package index](https://github.com/lyp-packages/index)), or alternatively as a local path (which is meant for package development more than anything else).
+Lyp packages are expected to be published as git repositories. The package is then versioned using git tags. A package can be referenced either using its git URL, a registered canonical name (if it's registered in the [lyp package index](https://github.com/lyp-packages/index)), or alternatively as a local path (which is really meant for package development more than anything else).
+
+Packages can also include test files, examples that demonstrate proper usage, ruby source code for enhancing lyp itself, or alternative font files for creating a custom look for Lilypond scores.
 
 ### Installing packages
 
@@ -191,7 +193,7 @@ lyp search stylesheet
 
 ### Automatic package installation
 
-An easier way to install packages is by using the `lyp resolve` command, which installs all packages required for a given input file. Suppose a lilypond called `test.ly` with the following content:
+An easier way to install packages is by using the `lyp resolve` command, which installs all packages required for a given input file. Suppose a Lilypond called `test.ly` with the following content:
 
 ```lilypond
 \version "2.19.35"
@@ -205,7 +207,7 @@ To install the `assert` package required in the file we run:
 
 ```bash
 $ lyp resolve test.ly
-#=>
+
 Cloning https://github.com/lyp-packages/assert.git...
 
 Installed assert@0.2.0
@@ -215,7 +217,7 @@ Package dependencies for a given input file can be shown using the `lyp deps` co
 
 ```bash
 $ lyp deps test.ly
-#=>
+
   assert => 0.2.0
 ```
 
@@ -261,7 +263,7 @@ Version constraints specify a range of versions to use. Lyp currently supports t
 - Optimistic constraint: `package>=0.1.0`, which means any version equal to or higher than 0.1.0.
 - Pessimistic constraint: `package~>0.1.0`, which means any version equal or higher than 0.1.0, and lower than 0.2.0. This type of constraint is useful for packages which follow the semantic versioning standard.
 
-Version specifiers could be used when installing, listing and requiring packages, and also for specifying versions of lilypond (see below). For example:
+Version specifiers could be used when installing, listing and requiring packages, and also for specifying versions of Lilypond (see [below](#installing-and-using-lilypond)). For example:
 
 ```bash
 $ lyp install "dummy~>0.2.0"
@@ -269,28 +271,28 @@ $ lyp install "dummy~>0.2.0"
 
 **Note**: when using version constraints you should put the package specifier in quotes for bash properly parse the command.
 
-### Requiring packages
+### Using packages
 
-To include a package in your lilypond code, use the `\require` command:
+To include a package in your Lilypond code, use the `\require` command:
 
 ```lilypond
 \require "dummy"
 \require "github.com/lulu/mypack>=0.4.0"
 ```
 
-**Note**: once you use `\require` in your code, you will have to compile it using the lilypond wrapper provided by lyp. It will not pass compilation using plain lilypond.
+**Note**: once you use `\require` in your code, you will have to compile it using the Lilypond wrapper provided by lyp. It will not pass compilation using plain Lilypond.
 
 Once the package requirements are defined, you can either install packages manually using [`lyp install`](#installing-packages), or automatically using [`lyp resolve`](#automatic-package-installation) as described above.
 
 ## Developing packages
 
-To create a lilypond package:
+To create a Lilypond package:
 
 - Create a git repository.
 - Add a `package.ly` file, which is the main entry point for your package.
-- Optionally add additional lilypond files or package dependencies.
-- Test & debug your code (see below).
-- Publish your package (see below).
+- Optionally add additional Lilypond files or package dependencies.
+- Test & debug your code (see [below](#testing-packages)).
+- Publish your package (see [below](#publishing-packages)).
 
 To test your package with an actual input file, you can install it from a local path (for more on testing see [below](#testing-packages)). Suppose your package is at ~/repo/mypack:
 
@@ -346,13 +348,13 @@ Files can also be included conditionally by evaluating a scheme expression using
 
 ### Scheme interface
 
-Lyp provides to loaded packages a small API to facilitate handling relative paths and loading of lilypond include files and scheme files. The API is documented on the [lyp wiki](https://github.com/noteflakes/lyp/wiki/Package-Scheme-Interface).  
+Lyp provides to loaded packages a small API to facilitate handling relative paths and loading of Lilypond include files and scheme files. The API is documented on the [lyp wiki](https://github.com/noteflakes/lyp/wiki/Package-Scheme-Interface).  
 
 ### Including fonts
 
-Lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of lilypond.
+Lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of Lilypond.
 
-**Note**: fonts will be only installed in versions of lilypond starting from than 2.18.2. Lyp automatically patches any version newer than 2.19.12 in order to support custom fonts.
+**Note**: fonts will be only installed in versions of Lilypond starting from than 2.18.2. Lyp automatically patches any version newer than 2.19.12 in order to support custom fonts.
 
 ### Extending lyp
 
@@ -387,9 +389,9 @@ $ cd mypack
 $ lyp test .
 ```
 
-A test file can either be a simple lilypond file which includes the package files and results in a lilypond score, or a lilypond file that performs unit tests on scheme code.
+A test file can either be a simple Lilypond file which includes the package files and results in a Lilypond score, or a Lilypond file that performs unit tests on scheme code.
 
-For more information on testing, see the [lyp-assert](https://github.com/lyp-packages/assert) package, which is meant to be used for unit testing lilypond code, and serves as an example of how to test a package.
+For more information on testing, see the [lyp-assert](https://github.com/lyp-packages/assert) package, which is meant to be used for unit testing Lilypond code, and serves as an example of how to test a package.
 
 ### Publishing packages
 
@@ -399,9 +401,9 @@ You can also add your package to the lyp [public package index](https://github.c
 
 ## Installing and Using Lilypond
 
-### Installing/uninstalling a version of lilypond
+### Installing/uninstalling a version of Lilypond
 
-When installing lilypond, the specific version to download can be specified in different ways:
+When installing Lilypond, the specific version to download can be specified in different ways:
 
 ```bash
 # latest stable version
@@ -426,15 +428,15 @@ $ lyp install "lilypond>=2.19.27"
 $ lyp install "lilypond~>2.18.1"
 ```
 
-To uninstall a version lilypond use `lyp uninstall`
+To uninstall a version Lilypond use `lyp uninstall`
 
 ```bash
 $ lyp uninstall lilypond@2.18.2
 ```
 
-### Showing the list of installed lilypond versions
+### Showing the list of installed Lilypond versions
 
-To display all installed versions of lilypond, use the `list` command:
+To display all installed versions of Lilypond, use the `list` command:
 
 ```bash
 $ lyp list lilypond
@@ -454,16 +456,16 @@ Lilypond versions:
 #  * - default
 ```
 
-(For current, default settings see below)
+(For current, default settings see [below](#switching-between-lilypond-versions))
 
-This will also list any versions of lilypond found on the user's `$PATH` outside of the `~/.lyp` directory (these versions will be marked as 'system' versions).
+This will also list any versions of Lilypond found on the user's `$PATH` outside of the `~/.lyp` directory (these versions will be marked as 'system' versions).
 
-### Showing available lilypond versions
+### Showing available Lilypond versions
 
-You can also list available versions of lilypond by using the `search` command:
+You can also list available versions of Lilypond by using the `search` command:
 
 ```bash
-# display all available versions of lilypond
+# display all available versions of Lilypond
 $ lyp search lilypond
 
 # display all available versions higher than 2.19
@@ -495,7 +497,7 @@ Available versions of lilypond@stable:
  * Currently installed
 ```
 
-### Switching between lilypond versions
+### Switching between Lilypond versions
 
 To switch between versions use the `lyp use`. The same version specifiers could be used as for the `lyp install` command:
 
@@ -507,37 +509,30 @@ $ lyp use stable
 $ lyp use unstable
 ```
 
-**Note**: The setting of the current lilypond version to use will be maintained for the current shell session.
+**Note**: The setting of the current Lilypond version to use will be maintained for the current shell session.
 
-In order to switch the default version of lilypond to use, add the `--default` switch:
+In order to switch the default version of Lilypond to use, add the `--default` switch:
 
 ```bash
 $ lyp use --default 2.19.35
 ```
 
-The version used can be further controlled using the `--use` and `--env` options passed to `lilypond` (see below).
+The version used can be further controlled using the `--use` and `--env` options passed to `lilypond` (see [below](#running-lilypond)).
 
 As discussed [above](#showing-the-list-of-installed-lilypond-versions), the `lyp list lilypond` command displays the current and default settings. You can also display the path to the currently selected version by running `lyp which lilypond`:
 
 ```bash
 $ lyp which lilypond
-#=> /Users/sharon/.lyp/lilyponds/2.18.2/bin/lilypond
+/Users/sharon/.lyp/lilyponds/2.18.2/bin/lilypond
 ```
 
-### Running lilypond
+### Running Lilypond
 
-Once one or more versions of lilypond are installed, the lilypond command may be used normally to compile lilypond files. Lyp adds a few extra options:
+Once one or more versions of Lilypond are installed, the Lilypond command may be used normally to compile Lilypond files. Lyp adds a few extra options:
 
-- `--use`, `-u` - use a specific version of lilypond:
+- `--auto-install-deps`, `-A` - automatically install any missing dependencies.
 
-  ```bash
-  $ lilypond --use=2.19.12 ...
-
-  # version constraints can also be used:
-  $ lilypond --use=">=2.19.12" ...
-  $ lilypond --use=stable ...
-  $ lilypond --use=latest ...
-  ```
+- `--cropped`, `-c` - produce a cropped score (requires setting margins to 0).
 
 - `--env`, `-E` - use a version set by the `$LILYPOND_VERSION` environment variable:
 
@@ -545,16 +540,39 @@ Once one or more versions of lilypond are installed, the lilypond command may be
   $ LILYPOND_VERSION=2.18.2 lilypond --env ...
   ```
 
-- `--install`, `-n` - install the specified version of lilypond if not present. This option works only in conjunction with `--env` or `--use`:
+- `--force-version`, `-F` - use the Lilypond version specified in the user file.
+
+- `--install`, `-n` - install the specified version of Lilypond if not present. This option works only in conjunction with `--env` or `--use`:
 
   ```bash
   $ lilypond -u2.19.35 -n ...
   ```
 
-- `--raw`, `-r` - do not pre-process input file (no scanning for dependencies, no wrapping).
+- `--open`, `-O` - open target file after compilation.
+
+- `--raw`, `-R` - do not pre-process input file (no scanning for dependencies, no wrapping).
 
   ```bash
   $ lilypond --raw ...
+  ```
+
+- `--require`, `--r` - require a package:
+
+  ```bash
+  $ lilypond -rassert mytest.ly
+  ```
+
+- `--snippet`, `-S` - produce a cropped PNG image at 600dpi
+
+- `--use`, `-u` - use a specific version of Lilypond:
+
+  ```bash
+  $ lilypond --use=2.19.12 myfile.ly
+
+  # version constraints can also be used:
+  $ lilypond --use=">=2.19.12" myfile.ly
+  $ lilypond --ustable myfile.ly
+  $ lilypond --ulatest myfile.ly
   ```
 
 ## Contributing
