@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-LYP_VERSION="1.2.1"
+echo "Detecting latest lyp version..."
+LATEST_RELEASE=`curl -s https://github.com/noteflakes/lyp/releases/latest`
+VERSION_REGEX="tag/v([0-9\.]+)"
+if [[ $LATEST_RELEASE =~ $VERSION_REGEX ]]
+then
+  LYP_VERSION="${BASH_REMATCH[1]}"
+else
+  echo "Could not get latest version from GitHub."
+fi
+
 WORKDIR="/tmp/lyp-release-installer"
 URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
 
