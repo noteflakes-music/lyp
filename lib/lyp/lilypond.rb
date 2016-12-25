@@ -52,6 +52,8 @@ module Lyp::Lilypond
         options[:use_version] = argv.shift
       when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
         options[:use_version] = $1
+      when '--invoke-system'
+        options[:mode] = :system
       else
         argv_clean << arg
       end

@@ -43,28 +43,19 @@ $cmd_options = {}
 
 class Lyp::CLI < Thor
   package_name "lyp"
-  map "-v" => :version
+  map "-v" => :version,
+      "c" => :compile,
+      "i" => :install,
+      "l" => :list,
+      "s" => :search,
+      "t" => :test,
+      "u" => :uninstall,
+      "U" => :use,
+      "w" => :watch,
+      "x" => :exec
+
   check_unknown_options! :except => :compile
   class_option :verbose, aliases: '-V', :type => :boolean, desc: 'show verbose output'
-
-  desc "version", "show Lyp version"
-  def version
-    $stderr.puts "Lyp #{Lyp::VERSION}"
-  end
-
-  desc "search [PATTERN|lilypond]", "List available packages matching PATTERN or versions of lilypond"
-  def search(pattern = '')
-    $cmd_options = options
-
-    pattern =~ Lyp::PACKAGE_RE
-    package, version = $1, $2
-
-    if package == 'lilypond'
-      search_lilypond(version)
-    else
-      search_package(pattern)
-    end
-  end
 
   no_commands do
     def search_lilypond(version)
@@ -99,6 +90,25 @@ class Lyp::CLI < Thor
     end
   end
 
+  desc "accelerate", "Rewrite gem binaries to make lyp faster"
+  def accelerate
+    unless Lyp::System.is_gem?
+      puts "Lyp is not installed as a gem."
+      exit 1
+    end
+
+    Lyp::System.rewrite_gem_scripts
+  end
+
+  desc "cleanup", "Cleanup temporary files"
+  def cleanup
+    $stderr.puts "Lyp #{Lyp::VERSION}"
+    Dir["#{Lyp::TMP_ROOT}/*"].each do |fn|
+      puts "Cleaning up #{fn}"
+      FileUtils.rm_rf(fn)
+    end
+  end
+
   desc "compile [<option>...] <FILE>", "Invoke lilypond with given file"
   def compile(*argv)
     opts, argv = Lyp::Lilypond.preprocess_argv(argv)
@@ -110,6 +120,22 @@ class Lyp::CLI < Thor
     Lyp::Lilypond.compile(argv, opts)
   end
 
+  desc "deps FILE", "List dependencies found in user's files"
+  def deps(fn)
+    $cmd_options = options
+
+    resolver = Lyp::DependencyResolver.new(fn)
+    tree = resolver.compile_dependency_tree(ignore_missing: true)
+    tree.dependencies.each do |package, spec|
+      versions = spec.versions.keys.map {|k| k =~ Lyp::PACKAGE_RE; $2 }.sort
+      if versions.empty?
+        puts "   #{spec.clause} => (no local version found)"
+      else
+        puts "   #{spec.clause} => #{versions.join(', ')}"
+      end
+    end
+  end
+
   desc "exec <CMD> [<options>...]", "Execute a lilypond script"
   def exec(*argv)
     $stderr.puts "Lyp #{Lyp::VERSION}"
@@ -117,38 +143,15 @@ class Lyp::CLI < Thor
     Lyp::Lilypond.invoke_script(argv, {})
   end
 
-  desc "test [<option>...] [.|PATTERN]", "Run package tests on installed packages or local directory"
-  method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of Lilypond if not present'
-  method_option :env, aliases: '-E', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
-  method_option :use, aliases: '-u', type: :string, desc: 'Use specified version'
-  def test(*args)
-    $cmd_options = options
-    test_opts = options.dup
-
-    if test_opts[:env]
-      unless ENV['LILYPOND_VERSION']
-        STDERR.puts "$LILYPOND_VERSION not set"
-        exit 1
-      end
-      test_opts[:use] = ENV['LILYPOND_VERSION']
-    end
-
-    if test_opts[:use]
-      if test_opts[:install]
-        Lyp::Lilypond.install_if_missing(test_opts[:use], no_version_test: true)
-      end
-      Lyp::Lilypond.force_version!(test_opts[:use])
-    end
-
-    # check lilypond default / current settings
-    Lyp::Lilypond.check_lilypond!
-
-    $stderr.puts "Lyp #{Lyp::VERSION}"
-    case args
-    when ['.']
-      Lyp::Package.run_local_tests('.')
+  desc "flatten FILE", "Flatten a file and included files into a single output file"
+  def flatten(input_path, output_path = nil)
+    input_path = File.expand_path(input_path)
+    output_path = File.expand_path(output_path) if output_path
+    flat = Lyp::Transform.flatten(input_path)
+    if output_path
+      File.open(output_path, 'w+') {|f| f << flat}
     else
-      Lyp::Package.run_package_tests(args)
+      puts flat
     end
   end
 
@@ -182,50 +185,6 @@ class Lyp::CLI < Thor
         Lyp::Package.install(package, options)
       end
     end
-  end
-
-  desc "update <PACKAGE>...", "Install a package after removing all previous versions"
-  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default Lilypond version'
-  method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
-  def update(*args)
-    invoke 'install', args, options.merge(update: true)
-  end
-
-  desc "uninstall <PACKAGE|lilypond|self>...", "Uninstall a package or a version of Lilypond. When 'uninstall self' is invoked, lyp uninstalls itself from ~/.lyp."
-  method_option :all, aliases: '-a', type: :boolean, desc: 'Uninstall all versions'
-  def uninstall(*args)
-    $cmd_options = options
-
-    Lyp::System.test_installed_status!
-
-    raise "No package specified" if args.empty?
-    args.each do |package|
-      case package
-      when 'self'
-        Lyp::System.uninstall!
-      when Lyp::LILYPOND_RE
-        Lyp::System.test_installed_status!
-        Lyp::Lilypond.uninstall($1, options)
-      else
-        Lyp::System.test_installed_status!
-        Lyp::Package.uninstall(package, options)
-      end
-    end
-  end
-
-  desc "use [lilypond@]<VERSION>", "Switch version of Lilypond"
-  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default Lilypond version'
-  def use(version)
-    $cmd_options = options
-
-    Lyp::System.test_installed_status!
-
-    if version =~ Lyp::LILYPOND_RE
-      version = $1
-    end
-
-    lilypond = Lyp::Lilypond.use(version, options)
-    puts "Using Lilypond version #{lilypond[:version]}"
   end
 
   desc "list [PATTERN|lilypond]", "List installed packages matching PATTERN or versions of Lilypond"
@@ -265,6 +224,158 @@ class Lyp::CLI < Thor
     end
   end
 
+  desc "resolve FILE", "Resolve and install missing dependencies found in user's files"
+  method_option :all, aliases: '-a', type: :boolean, desc: 'Install all found dependencies'
+  def resolve(fn)
+    $cmd_options = options
+
+    resolver = Lyp::DependencyResolver.new(fn)
+    tree = resolver.compile_dependency_tree(ignore_missing: true)
+    tree.dependencies.each do |package, spec|
+      if options[:all] || spec.versions.empty?
+        Lyp::Package.install(spec.clause)
+      end
+    end
+  end
+
+  desc "search [PATTERN|lilypond]", "List available packages matching PATTERN or versions of lilypond"
+  def search(pattern = '')
+    $cmd_options = options
+
+    pattern =~ Lyp::PACKAGE_RE
+    package, version = $1, $2
+
+    if package == 'lilypond'
+      search_lilypond(version)
+    else
+      search_package(pattern)
+    end
+  end
+
+  desc "test [<option>...] [.|PATTERN]", "Run package tests on installed packages or local directory"
+  method_option :install, aliases: '-n', type: :boolean, desc: 'Install the requested version of Lilypond if not present'
+  method_option :env, aliases: '-E', type: :boolean, desc: 'Use version set by LILYPOND_VERSION environment variable'
+  method_option :use, aliases: '-u', type: :string, desc: 'Use specified version'
+  def test(*args)
+    $cmd_options = options
+    test_opts = options.dup
+
+    if test_opts[:env]
+      unless ENV['LILYPOND_VERSION']
+        STDERR.puts "$LILYPOND_VERSION not set"
+        exit 1
+      end
+      test_opts[:use] = ENV['LILYPOND_VERSION']
+    end
+
+    if test_opts[:use]
+      if test_opts[:install]
+        Lyp::Lilypond.install_if_missing(test_opts[:use], no_version_test: true)
+      end
+      Lyp::Lilypond.force_version!(test_opts[:use])
+    end
+
+    # check lilypond default / current settings
+    Lyp::Lilypond.check_lilypond!
+
+    $stderr.puts "Lyp #{Lyp::VERSION}"
+    case args
+    when ['.']
+      Lyp::Package.run_local_tests('.')
+    else
+      Lyp::Package.run_package_tests(args)
+    end
+  end
+
+  desc "uninstall <PACKAGE|lilypond|self>...", "Uninstall a package or a version of Lilypond. When 'uninstall self' is invoked, lyp uninstalls itself from ~/.lyp."
+  method_option :all, aliases: '-a', type: :boolean, desc: 'Uninstall all versions'
+  def uninstall(*args)
+    $cmd_options = options
+
+    Lyp::System.test_installed_status!
+
+    raise "No package specified" if args.empty?
+    args.each do |package|
+      case package
+      when 'self'
+        Lyp::System.uninstall!
+      when Lyp::LILYPOND_RE
+        Lyp::System.test_installed_status!
+        Lyp::Lilypond.uninstall($1, options)
+      else
+        Lyp::System.test_installed_status!
+        Lyp::Package.uninstall(package, options)
+      end
+    end
+  end
+
+  desc "update <PACKAGE>...", "Install a package after removing all previous versions"
+  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default Lilypond version'
+  method_option :test, aliases: '-t', type: :boolean, desc: 'Run package tests after installation'
+  def update(*args)
+    invoke 'install', args, options.merge(update: true)
+  end
+
+  desc "use [lilypond@]<VERSION>", "Switch version of Lilypond"
+  method_option :default, aliases: '-d', type: :boolean, desc: 'Set default Lilypond version'
+  def use(version)
+    $cmd_options = options
+
+    Lyp::System.test_installed_status!
+
+    if version =~ Lyp::LILYPOND_RE
+      version = $1
+    end
+
+    lilypond = Lyp::Lilypond.use(version, options)
+    puts "Using Lilypond version #{lilypond[:version]}"
+  end
+
+  desc "version", "show Lyp version"
+  def version
+    $stderr.puts "Lyp #{Lyp::VERSION}"
+  end
+
+  desc "watch PATH...", "Watch files and directories and recompile when a file changes"
+  method_option :target, aliases: '-t', type: :string, desc: 'Set compile target'
+  def watch(*paths)
+    req_ext "directory_watcher"
+
+    recompile_proc = lambda do |path|
+      puts "#{path} changed"
+      path = options[:target] || path
+      puts "recompile #{path}"
+      if path =~ /\.(i?)ly$/
+        compile("--invoke-system", path)
+      end
+    end
+
+    target = options[:target]
+
+    watchers = paths.map do |path|
+      if File.directory?(path)
+        glob = ["**/*.ly", "**/*.ily", "**/*.scm"]
+      else
+        glob = [File.basename(path)]
+        path = File.dirname(path)
+      end
+
+      puts "Watching #{path}"
+      puts "glob: #{glob.inspect}"
+      w = DirectoryWatcher.new(path, glob: glob, pre_load: true).tap do |w|
+        w.interval = 0.1
+        w.add_observer do |*events|
+          events.each {|e| recompile_proc[e.path] if e.type == :modified}
+        end
+        w.start
+      end
+    end
+
+    trap("INT") {watchers.each {|w| w.stop}; puts; exit}
+    puts "Press ^C to exit"
+    loop {sleep 1}
+  end
+
   desc "which [PATTERN|lilypond]", "List locations of installed packages matching PATTERN or versions of Lilypond"
   def which(pattern = nil)
     $cmd_options = options
@@ -281,67 +392,6 @@ class Lyp::CLI < Thor
     else
       Lyp::Package.which(args.first).each {|p| puts p}
     end
-  end
-
-  desc "deps FILE", "List dependencies found in user's files"
-  def deps(fn)
-    $cmd_options = options
-
-    resolver = Lyp::DependencyResolver.new(fn)
-    tree = resolver.compile_dependency_tree(ignore_missing: true)
-    tree.dependencies.each do |package, spec|
-      versions = spec.versions.keys.map {|k| k =~ Lyp::PACKAGE_RE; $2 }.sort
-      if versions.empty?
-        puts "   #{spec.clause} => (no local version found)"
-      else
-        puts "   #{spec.clause} => #{versions.join(', ')}"
-      end
-    end
-  end
-
-  desc "resolve FILE", "Resolve and install missing dependencies found in user's files"
-  method_option :all, aliases: '-a', type: :boolean, desc: 'Install all found dependencies'
-  def resolve(fn)
-    $cmd_options = options
-
-    resolver = Lyp::DependencyResolver.new(fn)
-    tree = resolver.compile_dependency_tree(ignore_missing: true)
-    tree.dependencies.each do |package, spec|
-      if options[:all] || spec.versions.empty?
-        Lyp::Package.install(spec.clause)
-      end
-    end
-  end
-
-  desc "cleanup", "Cleanup temporary files"
-  def cleanup
-    $stderr.puts "Lyp #{Lyp::VERSION}"
-    Dir["#{Lyp::TMP_ROOT}/*"].each do |fn|
-      puts "Cleaning up #{fn}"
-      FileUtils.rm_rf(fn)
-    end
-  end
-
-  desc "flatten FILE", "Flatten a file and included files into a single output file"
-  def flatten(input_path, output_path = nil)
-    input_path = File.expand_path(input_path)
-    output_path = File.expand_path(output_path) if output_path
-    flat = Lyp::Transform.flatten(input_path)
-    if output_path
-      File.open(output_path, 'w+') {|f| f << flat}
-    else
-      puts flat
-    end
-  end
-
-  desc "accelerate", "Rewrite gem binaries to make lyp faster"
-  def accelerate
-    unless Lyp::System.is_gem?
-      puts "Lyp is not installed as a gem."
-      exit 1
-    end
-
-    Lyp::System.rewrite_gem_scripts
   end
 
   def self.run

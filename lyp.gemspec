@@ -21,4 +21,5 @@ Gem::Specification.new do |s|
   s.add_dependency "ruby-progressbar", "~>1.7", ">=1.7.5"
   s.add_dependency "thor", "~>0.19", ">=0.19.1"
   s.add_dependency "rugged", "0.23.0"
+  s.add_dependency "directory_watcher", "1.5.1"
 end

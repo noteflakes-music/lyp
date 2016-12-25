@@ -1,3 +1,6 @@
+- Add shortcuts for common commands.
+- Add `lyp watch` command (#38).
+
 # Version 1.2.1 2016-12-21
 
 - Fix `lyp test --env` command.

@@ -2,7 +2,7 @@
 
 - Specs for lilypond command.
 
-- rename pinclude pincludeOnce:
+- rename require, pinclude, pincludeOnce etc:
 
 ```lilypond
 \req "blah"
@@ -11,3 +11,4 @@
 \condIncl #(eq? edition 'urtext) "urtext_tweaks.ly"
 \condInclOnce #(eq? edition 'urtext) "urtext_tweaks.ly"
 ```
+
