@@ -5,9 +5,9 @@
   <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
 </p>
 
-# lyp - The Lilypond Swiss-Army Knife
+# lyp - The Lilypond Swiss Army Knife
 
-Use lyp to install and manage packages for Lilypond, and install and manage multiple versions of Lilypond on your machine, and improve your Lilypond workflow.
+Use lyp to install and manage packages for Lilypond, install and manage multiple versions of Lilypond on your machine, and improve your Lilypond workflow.
 
 __Code reuse__: lyp lets you install packages that act as Lilypond code libraries and can be used to enhance your Lilypond files with additional functionality. Packages can depend on other packages. Lyp resolves both direct and transitive package dependencies, and automatically selects the correct version to use for each package.
 
