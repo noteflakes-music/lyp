@@ -5,13 +5,15 @@
   <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
 </p>
 
-# lyp - a package manager for Lilypond
+# lyp - The Lilypond Swiss-Army Knife
 
-Use lyp to install and manage packages for Lilypond, and install and manage multiple versions of Lilypond on your machine.
+Use lyp to install and manage packages for Lilypond, and install and manage multiple versions of Lilypond on your machine, and improve your Lilypond workflow.
 
 __Code reuse__: lyp lets you install packages that act as Lilypond code libraries and can be used to enhance your Lilypond files with additional functionality. Packages can depend on other packages. Lyp resolves both direct and transitive package dependencies, and automatically selects the correct version to use for each package.
 
 __No hassle Lilypond installation__: With lyp you can also install any version of Lilypond on your machine with a single command, without having to visit the Lilypond website, clicking a link and then copying files around. In addition, lyp lets you switch between multiple versions of Lilypond and always keep your machine up to date with the latest version.
+
+__Tools for power users__: with lyp you can [benchmark](#lyp-benchmark) and compare the performance of multiple versions of Lilypond, [flatten](#lyp-flatten) include files, automatically recompile [modified source files](#lyp-watch), and [automatically install](#lyp-compile) package dependencies or any required version of Lilypond.
 
 ## Table of contents
 
@@ -600,13 +602,13 @@ Once one or more versions of Lilypond are installed, the Lilypond command may be
 
 Synopsis: `lyp accelerate`
 
-__Power users__: rewrite gem binaries for faster execution. When lyp is installed as a gem, the Rubygems system creates wrapper script files for `lyp` and `lilypond` which incur a performance penalty that adds up to 200msecs per invocation. Use this command to rewrite the gem binaries so as to improve their running time.
+Rewrites gem binaries for faster execution. When lyp is installed as a gem, the Rubygems system creates wrapper script files for `lyp` and `lilypond` which incur a performance penalty that adds up to 200msecs per invocation. Use this command to rewrite the gem binaries so as to improve their running time.
 
 ### lyp benchmark
 
 Synopsis: `lyp benchmark FILE`
 
-__Power users__: benchmark the running time of all installed versions of Lilypond using the given source file. This command accepts all Lilypond command line switches.
+Benchmarks the running time of all installed versions of Lilypond using the given source file. This command accepts all Lilypond command line switches.
 
 ### lyp cleanup
 
