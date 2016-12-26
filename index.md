@@ -5,13 +5,15 @@
   <a href="https://github.com/lyp-packages/index#readme">The lyp package index</a>
 </p>
 
-# lyp - a package manager for Lilypond
+# lyp - The Lilypond Swiss Army Knife
 
-Use lyp to install and manage packages for Lilypond, and install and manage multiple versions of Lilypond on your machine.
+Use lyp to install and manage packages for Lilypond, install and manage multiple versions of Lilypond on your machine, and improve your Lilypond workflow.
 
 __Code reuse__: lyp lets you install packages that act as Lilypond code libraries and can be used to enhance your Lilypond files with additional functionality. Packages can depend on other packages. Lyp resolves both direct and transitive package dependencies, and automatically selects the correct version to use for each package.
 
 __No hassle Lilypond installation__: With lyp you can also install any version of Lilypond on your machine with a single command, without having to visit the Lilypond website, clicking a link and then copying files around. In addition, lyp lets you switch between multiple versions of Lilypond and always keep your machine up to date with the latest version.
+
+__Tools for power users__: with lyp you can [benchmark](#lyp-benchmark) and compare the performance of multiple versions of Lilypond, [flatten](#lyp-flatten) include files, automatically recompile [modified source files](#lyp-watch), and [automatically install](#lyp-compile) package dependencies or any required version of Lilypond.
 
 ## Table of contents
 
@@ -38,27 +40,46 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [Testing packages](#testing-packages)
   - [Publishing packages](#publishing-packages)
 - [Installing and Using Lilypond](#installing-and-using-lilypond)
-  - [Installing/uninstalling a version of Lilypond](#installing-uninstalling a version of lilypond)
+  - [Installing/uninstalling a version of Lilypond](#installinguninstalling-a-version-of-lilypond)
   - [Showing the list of installed Lilypond versions](#showing-the-list-of-installed-lilypond-versions)
   - [Showing available Lilypond versions](#Showing-available-lilypond-versions)
   - [Switching between Lilypond versions](#switching-between-lilypond-versions)
   - [Running Lilypond](#running-lilypond)
+- [Command Reference](#command-reference)
+  - [lyp accelerate](#lyp-accelerate) - rewrite gem binaries for faster execution
+  - [lyp benchmark](#lyp-benchmark) - benchmark installed versions of Lilypnd
+  - [lyp cleanup](#lyp-cleanup) - cleanup temporary files
+  - [lyp compile](#lyp-compile) - compile Lilypond source files
+  - [lyp deps](#lyp-deps) - show dependencies for a given source file
+  - [lyp exec](#lyp-exec) - execute a Lilypond script
+  - [lyp flatten](#lyp-flatten) - flatten a Lilypond project by inlining includes
+  - [lyp install](#lyp-install) - install package or Lilypond
+  - [lyp list](#lyp-list) - list installed packages or Lilyponds
+  - [lyp resolve](#lyp-resolve) - resolve and install dependencies for a given source file
+  - [lyp search](#lyp-search) - search for packages or Lilyponds
+  - [lyp test](#lyp-test) - run Lilypond test files
+  - [lyp uninstall](#lyp-uninstall) - uninstall packages or Lilyponds
+  - [lyp update](#lyp-update) - update packages
+  - [lyp use](#lyp-use) - switch between installed Lilyponds
+  - [lyp version](#lyp-version) - show lyp version
+  - [lyp watch](#lyp-watch) - watch files and directories and recompile on change
+  - [lyp which](#lyp-which) - show location of packages or Lilyponds
 - [Contributing](#contributing)
 
 ## Installation
 
 ### System requirements
 
-Lyp is tested to work on Linux, MacOS and Windows 7+.
+Lyp is tested to work on Linux, macOS and Windows 7+.
 
 ### Installing lyp as a Ruby gem
 
-_Note_: A recent version of Ruby (2.0.0 or later) is included in MacOS 10.9.0 or later.
+_Note_: A recent version of Ruby (2.0.0 or later) is included in macOS 10.9.0 or later.
 
 If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem.
 
 ```bash
-# Linux/MacOS:
+# Linux/macOS:
 $ gem install lyp
 
 # Windows:
@@ -88,7 +109,7 @@ Windows users can simply download the latest Windows [release](https://github.co
 
 ### Manually installing releases
 
-(This section is for Linux / MacOS users.)
+(This section is for Linux / macOS users.)
 
 If you feel uneasy about piping curl output to bash, you can install lyp yourself by downloading a [release](https://github.com/noteflakes/lyp/releases), untarring it, and running `lyp install self`:
 
@@ -574,6 +595,177 @@ Once one or more versions of Lilypond are installed, the Lilypond command may be
   $ lilypond --ustable myfile.ly
   $ lilypond --ulatest myfile.ly
   ```
+
+## Command Reference
+
+### lyp accelerate
+
+Synopsis: `lyp accelerate`
+
+Rewrites gem binaries for faster execution. When lyp is installed as a gem, the Rubygems system creates wrapper script files for `lyp` and `lilypond` which incur a performance penalty that adds up to 200msecs per invocation. Use this command to rewrite the gem binaries so as to improve their running time.
+
+### lyp benchmark
+
+Synopsis: `lyp benchmark FILE`
+
+Benchmarks the running time of all installed versions of Lilypond using the given source file. This command accepts all Lilypond command line switches.
+
+### lyp cleanup
+
+Synopsis: `lyp cleanup`
+
+Cleanup temporary files. lyp keeps a bunch of temporary directories and files under the system temporary directory, usually at `/tmp/lyp`. These include wrapper files, git repositories for installed packages, Lilypond archive files etc. These will normally be cleaned up by the OS after a period of time, but you can use this command to delete the entire content of this directory if you need the disk space.
+
+### lyp compile
+
+Synopsis: `lyp compile ... FILE`
+
+Shorthand: `lyp c`
+
+Compiles Lilypond source files. This command is synonymous to running `lilypond`. You can pass along any switches accepted by Lilypond. In addition, lyp adds a few options to provide additional functionality:
+
+- `--auto-install-deps`/`-a`: install any missing dependencies
+- `--cropped`/`-c`: crop output (requires setting 0 margins)
+- `--env`/`-E`: use the Lilypond version specified in the `LILYPOND_VERSION` environment variable:
+
+  ```bash
+  $ LILYPOND_VERSION=2.19.50 lyp c mysuperscore.ly
+  ```
+
+- `--force-version`/`-F`: use Lilypond version specified in user file
+- `--install`/`-n`: install version of Lilypond if not found (if the required version was overriden using any of `--env`, `--force-version` or `--use`)
+- `--open`/`-O`: open output file after compilation
+- `--raw`/`-R`: run Lilypond "raw" (no pre-processing of dependencies)
+- `--require=PACKAGE`/`-rPACKAGE`: preload the specified package
+
+  ```bash
+  $ lyp -rassert mytests.ly
+  ```
+
+- `--snippet`/`-S`: produce png cropped images at 600dpi (equivalent to `--cropped --png -dresolution=600`)
+- `--use=VERSION`/`-uVERSION`: use the given version of Lilypond:
+  
+  ```bash
+  $ lyp c -u2.19.53 myfile.ly
+  # automatically install given version of Lilypond
+  $ lyp c -nu2.19.53 myfile.ly
+  ```
+
+### lyp deps
+
+Synopsis: `lyp deps FILE`
+
+Shows dependencies for a given source file.
+
+### lyp exec
+
+Synopsis: `lyp exec SCRIPT ...`
+
+Shorthand: `lyp x`
+
+Runs a Lilypond script (using the currently selected version of Lilypond).
+
+### lyp flatten
+
+Synopsis: `lyp flatten FILE`
+
+Flattens a source file and all included files into a single file.
+
+### lyp install
+
+Synopsis: `lyp install PACKAGE|lilypond@VERSION`
+
+Shorthand: `lyp i`
+
+Installs a package or a Lilypond. See [installing packages](#installing-packages) and [installing versions of Lilypond](#installing-and-using-lilypond) above.
+
+### lyp list
+
+Synopsis: `lyp list [PACKAGE|lilypond]`
+
+Shorthand: `lyp l`
+
+Lists installed packages or Lilyponds.
+
+### lyp resolve
+
+Synopsis: `lyp resolve FILE``
+
+Resolves and optionally installs all dependencies for a given source file. To install required dependencies use the `--all`/`-a` switch:
+
+```bash
+$ lyp resolve -a myfile.ly
+```
+
+### lyp search
+
+Synopsis: `lyp search PACKAGE|lilypond``
+
+Shorthand: `lyp s`
+
+Searches for packages or versions of Lilypond.
+
+### lyp test
+
+Synopsis: `lyp test DIRECTORY`
+
+Shorthand: `lyp t`
+
+Runs Lilypond tests by compiling all files in the given directory matching the pattern `*-test.ly`.
+
+### lyp uninstall
+
+Synopsis: `lyp uninstall PACKAGE|lilypond@VERSION`
+
+Shorthand: `lyp u`
+
+Uninstalls a package or a Lilypond.
+
+### lyp update
+
+Synopsis: `lyp update PACKAGE`
+
+Updates an installed package to its latest available version.
+
+### lyp use
+
+Synopsis: `lyp use VERSION``
+
+Shorthand: `lyp U`
+
+Switches to a different version of Lilypond. To set the default version, use the `--default` switch:
+
+```bash
+$ lyp use --default 2.19.52
+```
+
+### lyp version
+
+Synopsis: `lyp version``
+
+Shorthand: `lyp -v``
+
+Displays the version of lyp.
+
+### lyp watch
+
+Synopsis: `lyp watch DIRECTORY|FILE...``
+
+Shorthand: `lyp w`
+
+Watches one or more directories or files and recompiles any files that have been modified. To watch a directory of include files and always recompile the same project file, use the `--target`/`-t` switch:
+
+```bash
+$ lyp watch bwv35 --target bwv35/score.ly
+```
+
+This command accepts all Lilypond command line switches.
+
+### lyp which
+
+Synopsis: `lyp which PACKAGE|lilypond`
+
+Shows the location of the given package or the currently selected Lilypond.
 
 ## Contributing
 
