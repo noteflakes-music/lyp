@@ -1,4 +1,4 @@
-# Version 1.3.0 2016-12-26
+# Version 1.3.1 2016-12-26
 
 - Add `lyp benchmark` command (#17).
 - Add shortcuts for common commands.
