@@ -45,6 +45,7 @@ __No hassle Lilypond installation__: With lyp you can also install any version o
   - [Running Lilypond](#running-lilypond)
 - [Command Reference](#command-reference)
   - [lyp accelerate](#lyp-accelerate) - rewrite gem binaries for faster execution
+  - [lyp benchmark](#lyp-benchmark) - benchmark installed versions of Lilypnd
   - [lyp cleanup](#lyp-cleanup) - cleanup temporary files
   - [lyp compile](#lyp-compile) - compile Lilypond source files
   - [lyp deps](#lyp-deps) - show dependencies for a given source file
@@ -601,6 +602,12 @@ Synopsis: `lyp accelerate`
 
 __Power users__: rewrite gem binaries for faster execution. When lyp is installed as a gem, the Rubygems system creates wrapper script files for `lyp` and `lilypond` which incur a performance penalty that adds up to 200msecs per invocation. Use this command to rewrite the gem binaries so as to improve their running time.
 
+### lyp benchmark
+
+Synopsis: `lyp benchmark FILE`
+
+__Power users__: benchmark the running time of all installed versions of Lilypond using the given source file. This command accepts all Lilypond command line switches.
+
 ### lyp cleanup
 
 Synopsis: `lyp cleanup`
@@ -749,6 +756,8 @@ Watches one or more directories or files and recompiles any files that have been
 ```bash
 $ lyp watch bwv35 --target bwv35/score.ly
 ```
+
+This command accepts all Lilypond command line switches.
 
 ### lyp which
 

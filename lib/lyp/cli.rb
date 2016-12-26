@@ -54,7 +54,7 @@ class Lyp::CLI < Thor
       "w" => :watch,
       "x" => :exec
 
-  check_unknown_options! :except => :compile
+  check_unknown_options! :except => [:compile, :watch, :benchmark]
   class_option :verbose, aliases: '-V', :type => :boolean, desc: 'show verbose output'
 
   no_commands do
@@ -100,6 +100,22 @@ class Lyp::CLI < Thor
     Lyp::System.rewrite_gem_scripts
   end
 
+  desc "benchmark FILE", "Benchmark all installed versions of Lilypond"
+  def benchmark(*argv)
+    list = Lyp::Lilypond.list
+    if list.empty?
+      puts Lyp::LILYPOND_NOT_FOUND_MSG
+    else
+      list.each do |info|
+        Lyp::Lilypond.force_version!(info[:version])
+        t1 = Time.now
+        compile("--invoke-quiet", *argv)
+        t2 = Time.now
+        puts "%-7s: %.3gs" % [info[:version], t2-t1]
+      end
+    end
+  end
+
   desc "cleanup", "Cleanup temporary files"
   def cleanup
     $stderr.puts "Lyp #{Lyp::VERSION}"
@@ -109,13 +125,13 @@ class Lyp::CLI < Thor
     end
   end
 
-  desc "compile [<option>...] <FILE>", "Invoke lilypond with given file"
+  desc "compile [<option>...] <FILE>", "compile given file Lilypond source file"
   def compile(*argv)
     opts, argv = Lyp::Lilypond.preprocess_argv(argv)
 
     lilypond_path = Lyp::Lilypond.select_lilypond_version(opts, argv.last)
 
-    $stderr.puts "Lyp #{Lyp::VERSION}"
+    $stderr.puts "Lyp #{Lyp::VERSION}" unless opts[:mode] == :quiet
     Lyp::System.test_installed_status!
     Lyp::Lilypond.compile(argv, opts)
   end

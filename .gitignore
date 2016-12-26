@@ -1,3 +1,6 @@
 *.gem
 releases
 dist
+*.pdf
+*.ps
+*.png

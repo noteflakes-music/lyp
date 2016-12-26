@@ -54,6 +54,8 @@ module Lyp::Lilypond
         options[:use_version] = $1
       when '--invoke-system'
         options[:mode] = :system
+      when '--invoke-quiet'
+        options[:mode] = :quiet
       else
         argv_clean << arg
       end
@@ -110,6 +112,8 @@ module Lyp::Lilypond
       case opts[:mode]
       when :system
         system("#{lilypond} #{argv.join(" ")}")
+      when :quiet
+        `#{lilypond} #{argv.join(" ")} > /dev/null 2>&1`
       when :spawn
         pid = spawn(lilypond, *argv, opts[:spawn_opts] || {})
         Process.detach(pid)
