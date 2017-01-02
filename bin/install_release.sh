@@ -1,25 +1,11 @@
 #!/usr/bin/env bash
 
-echo "Detecting latest lyp version..."
-LATEST_RELEASE=`curl -s https://github.com/noteflakes/lyp/releases/latest`
-VERSION_REGEX="tag/v([0-9\.]+)"
-if [[ $LATEST_RELEASE =~ $VERSION_REGEX ]]
-then
-  LYP_VERSION="${BASH_REMATCH[1]}"
-else
-  echo "Could not get latest version from GitHub."
-fi
-
-WORKDIR="/tmp/lyp-release-installer"
-URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
-
 shopt -s extglob
 set -o errtrace
 set -o errexit
 
 fail() { log "\nERROR: $*\n"; exit 1; }
 has() { type "$1" > /dev/null 2>&1; }
-
 download() {
   if has "curl"; then
     curl -L -o $*
@@ -30,6 +16,25 @@ download() {
   fi
 }
 
+echo "Detecting latest lyp version..."
+if has "curl"; then
+  LATEST_RELEASE=`curl -s https://github.com/noteflakes/lyp/releases/latest`
+elif has "wget"; then
+  LATEST_RELEASE=`wget -qO- https://github.com/noteflakes/lyp/releases/latest`
+else
+  fail "Could not find curl or wget"
+fi
+
+VERSION_REGEX="tag/v([0-9\.]+)"
+if [[ $LATEST_RELEASE =~ $VERSION_REGEX ]]
+then
+  LYP_VERSION="${BASH_REMATCH[1]}"
+else
+  echo "Could not get latest version from GitHub."
+fi
+
+WORKDIR="/tmp/lyp-release-installer"
+URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
 PLATFORM=`uname -sp`
 case $PLATFORM in
   "Linux x86_64")
