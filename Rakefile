@@ -79,9 +79,10 @@ namespace :release do
     end
     sh "rm -rf #{DIST_DIR}/tmp"
     sh "mkdir #{DIST_DIR}/tmp"
-    sh "cp Gemfile Gemfile.lock #{DIST_DIR}/tmp/"
+    sh "cp Gemfile.release #{DIST_DIR}/tmp/Gemfile"
+    sh "cp Gemfile.lock #{DIST_DIR}/tmp/"
     Bundler.with_clean_env do
-      sh "cd #{DIST_DIR}/tmp && env BUNDLE_IGNORE_CONFIG=1 bundle install --path ../vendor --without spec:not_in_release"
+      sh "cd #{DIST_DIR}/tmp && env BUNDLE_IGNORE_CONFIG=1 bundle install --path ../vendor"
     end
     sh "rm -rf #{DIST_DIR}/tmp"
     sh "rm -f #{DIST_DIR}/vendor/*/*/cache/*"
@@ -133,7 +134,8 @@ def create_package(target, os_type = :unix)
   sh "cp -pR #{DIST_DIR}/vendor/lyp #{package_path}/lib/vendor/"
   sh "cp -pR #{DIST_DIR}/vendor/ruby #{package_path}/lib/vendor/"
 
-  sh "cp Gemfile Gemfile.lock #{package_path}/lib/vendor/"
+  sh "cp Gemfile.release #{package_path}/lib/vendor/Gemfile"
+  sh "cp Gemfile.lock #{package_path}/lib/vendor/"
   sh "mkdir #{package_path}/lib/vendor/.bundle"
   sh "cp #{VENDOR_DIR}/lyp/bundler-config #{package_path}/lib/vendor/.bundle/config"
   if !ENV['DIR_ONLY']
