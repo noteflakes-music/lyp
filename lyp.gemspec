@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.name          = 'lyp'
   s.version       = Lyp::VERSION
 
-  s.summary       = "Lyp is a package manager for lilypond"
-  s.description   = "Lyp is a tool for managing lilypond versions and lilypond packages"
+  s.summary       = "Lyp - the Lilypond swiss army knife"
+  s.description   = "Lyp is a tool for installing lilypond and managing lilypond packages"
   s.authors       = ["Sharon Rosner"]
   s.email         = 'ciconia@gmail.com'
 
