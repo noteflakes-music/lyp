@@ -1,3 +1,9 @@
+# Version 1.3.2 2017-01-03
+
+- Fix stock lilypond includes, include search path (#44, #43).
+- Remove rugged dependency from traveling ruby release.
+- Fix install script to work with wget (#41).
+
 # Version 1.3.1 2016-12-26
 
 - Add `lyp benchmark` command (#17).
