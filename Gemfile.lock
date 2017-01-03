@@ -29,7 +29,7 @@ DEPENDENCIES
   httpclient (~> 2.7.1)
   rspec (= 3.2.0)
   ruby-progressbar (~> 1.7.5)
-  rugged (= 0.23.0)
+  rugged (>= 0.23.0)
   thor (~> 0.19.1)
 
 BUNDLED WITH
