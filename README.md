@@ -667,9 +667,9 @@ Runs a Lilypond script (using the currently selected version of Lilypond).
 
 ### lyp flatten
 
-Synopsis: `lyp flatten FILE`
+Synopsis: `lyp flatten SOURCE [DEST]`
 
-Flattens a source file and all included files into a single file.
+Flattens the given input file at `SOURCE` and all included files into a single file to be written to `DEST`. If `DEST` is not specified, the file is written to `STDOUT`.
 
 ### lyp install
 

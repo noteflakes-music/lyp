@@ -160,10 +160,21 @@ class Lyp::CLI < Thor
   end
 
   desc "flatten FILE", "Flatten a file and included files into a single output file"
+  method_option :include, aliases: '-I', type: :string, desc: 'Add to include search path'
   def flatten(input_path, output_path = nil)
     input_path = File.expand_path(input_path)
     output_path = File.expand_path(output_path) if output_path
-    flat = Lyp::Transform.flatten(input_path)
+
+
+    opts = {include_paths: []}
+    if options[:include]
+      opts[:include_paths] << options[:include]
+    end
+    if Lyp::Lilypond.current_lilypond
+      opts[:include_paths] << Lyp::Lilypond.current_lilypond_include_path
+    end
+
+    flat = Lyp::Transform.flatten(input_path, opts)
     if output_path
       File.open(output_path, 'w+') {|f| f << flat}
     else
