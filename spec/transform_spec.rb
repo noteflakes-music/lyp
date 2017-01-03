@@ -19,9 +19,9 @@ RSpec.describe "Lyp::Transform" do
             Lyp::Lilypond.current_lilypond_include_path
           ]
         }
-        out = Lyp::Transform.flatten("#{$spec_dir}/user_files/include_path.ly", opts).gsub(
-          "#{$spec_dir}/user_files/", ""
-        ).strip_whitespace
+        out = Lyp::Transform.flatten("#{$spec_dir}/user_files/include_path.ly", opts).
+        gsub("#{$spec_dir}/", "").
+        strip_whitespace
         expect(out).to eq(IO.read("#{$spec_dir}/user_files/flattened_include_path.ly").strip_whitespace)
       end
     end

@@ -1,5 +1,5 @@
-%%% /Users/sharon/repo/lyp/spec/include_files/mydeutsch.ly
-%%% /Users/sharon/repo/lyp/spec/lilypond_setups/tmp/2.19.37/share/lilypond/current/ly/deutsch.ly
+%%% include_files/mydeutsch.ly
+%%% lilypond_setups/tmp/2.19.37/share/lilypond/current/ly/deutsch.ly
 %%%% common German names for notes
 %%%% This file is part of LilyPond, the GNU music typesetter.
 %%%%
