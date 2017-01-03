@@ -14,14 +14,13 @@ module Lyp::System
     end
     
     def find_rugged_gem
-      found = Gem::Specification.find_all_by_name('rugged').find do |s|
-        RUGGED_REQ =~ s.version
-      end
-      
+      dep = Gem::Dependency.new("rugged", RUGGED_REQ)
+      found = !dep.matching_specs.empty?
+
       require_rugged_gem if found
       found
     end
-    
+
     def require_rugged_gem
       gem 'rugged', RUGGED_REQ.to_s
       req_ext 'rugged'

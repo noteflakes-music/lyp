@@ -24,7 +24,7 @@ module Lyp::Lilypond
       when '-A', '--auto-install-deps'
         options[:resolve] = true
       when '-c', '--cropped'
-        argv_clean += ['-dbackend=eps', '-daux-files=#f']
+        argv_clean.concat ['-dbackend=eps', '-daux-files=#f']
       when '-E', '--env'
         unless ENV['LILYPOND_VERSION']
           STDERR.puts "$LILYPOND_VERSION not set"
@@ -33,6 +33,11 @@ module Lyp::Lilypond
         options[:use_version] = ENV['LILYPOND_VERSION']
       when '-F', '--force-version'
         options[:force_version] = true
+      when '-I', '--include'
+        path = argv.shift
+        options[:include_paths] ||= []
+        options[:include_paths] << path
+        argv_clean << "--include=#{path}"
       when '-n', '--install'
         options[:install] = true
       when '-O', '--open'
@@ -46,7 +51,7 @@ module Lyp::Lilypond
       when '-R', '--raw'
         options[:raw] = true
       when '-S', '--snippet'
-        argv_clean += ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
+        argv_clean.concat ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
         options[:snippet_paper_preamble] = true
       when '-u', '--use'
         options[:use_version] = argv.shift
@@ -98,6 +103,9 @@ module Lyp::Lilypond
     end
 
     def compile(argv, opts = {})
+      opts[:include_paths] ||= []
+      opts[:include_paths] << current_lilypond_include_path
+      
       unless argv.last == '-'
         fn = Lyp.wrap(argv.pop, opts)
         argv << fn
@@ -159,9 +167,17 @@ module Lyp::Lilypond
       settings[:current]
     end
 
+    def current_lilypond_base_path
+      File.expand_path("#{File.dirname(current_lilypond)}/..")
+    end
+
     def current_lilypond_bin_path
       lilypond = current_lilypond
       lilypond && File.dirname(lilypond)
+    end
+
+    def current_lilypond_include_path
+      File.join(current_lilypond_base_path, "share/lilypond/current/ly")
     end
 
     def current_lilypond_version

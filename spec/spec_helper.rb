@@ -1,5 +1,3 @@
-# Bundler.setup(:default, :spec)
-
 $spec_dir = File.dirname(__FILE__)
 require File.join(File.expand_path($spec_dir), '../lib/lyp')
 require 'fileutils'

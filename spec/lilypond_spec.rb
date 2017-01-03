@@ -312,5 +312,23 @@ RSpec.describe "Lyp::Lilypond" do
       end
     end
   end
+
+  it "correctly passes include paths to resolver" do
+    with_lilyponds(:tmp, copy_from: :empty) do
+      with_packages(:tmp, copy_from: :empty) do
+        Lyp::Lilypond.install('2.19.37', silent: true)
+        
+        # fn = "#{$spec_dir}/user_files/include_stock.ly"
+        # expect {Lyp::Lilypond.compile([fn])}.to_not raise_error
+
+        fn = "#{$spec_dir}/user_files/include_path.ly"
+        include_path = "#{$spec_dir}/include_files"
+
+        opts, argv = Lyp::Lilypond.preprocess_argv(["--include", include_path, fn])
+
+        expect {Lyp::Lilypond.compile(argv, opts)}.to_not raise_error
+      end
+    end
+  end
 end
 

@@ -216,13 +216,21 @@ module Lyp
         return if $1 == 'null'
         ref = $2
       end
-      qualified_path = File.expand_path(ref, dir)
 
-      unless File.file?(qualified_path)
-        error("Invalid include file specified in %s", location)
+      full_path = find_include_file(ref, dir, location)
+      queue_file_for_processing(full_path, leaf)
+    end
+
+    def find_include_file(ref, dir, location)
+      search_paths = [dir]
+      search_paths += @opts[:include_paths] if @opts[:include_paths]
+
+      search_paths.each do |path|
+        full_path = File.expand_path(ref, path)
+        return full_path if File.file?(full_path)
       end
 
-      queue_file_for_processing(qualified_path, leaf)
+      error("Missing include file specified in %s", location)
     end
 
     def process_require_command(ref, dir, leaf, opts, location)
