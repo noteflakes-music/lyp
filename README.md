@@ -369,7 +369,7 @@ Files can also be included conditionally by evaluating a scheme expression using
 
 ### Scheme interface
 
-Lyp provides to loaded packages a small API to facilitate handling relative paths and loading of Lilypond include files and scheme files. The API is documented on the [lyp wiki](https://github.com/noteflakes/lyp/wiki/Package-Scheme-Interface).  
+Lyp provides to loaded packages a small API to facilitate handling relative paths and loading of Lilypond include files and scheme files. The API is documented on the [lyp wiki](https://github.com/noteflakes/lyp/wiki/Package-Scheme-API).  
 
 ### Including fonts
 
