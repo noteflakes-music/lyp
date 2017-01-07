@@ -1,6 +1,6 @@
 self.$config = {
   repo: 'noteflakes/lyp',
-  url: 'http://noteflakes.github.io/lyp/',
+  url: 'http://lyp.noteflakes.com/',
 
   home: 'user-guide.md',
   nav: [

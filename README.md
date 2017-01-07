@@ -9,13 +9,13 @@
 
 lyp is an open-source tool that takes the pain out of working with [Lilypond](http://lilypond.org/).
 
-__Use packages__: Install [packages](http://noteflakes.github.io/lyp/#/?id=working-with-packages) to enhance your Lilypond files with additional functionality. Add [specialized tweaks](http://noteflakes.github.io/lyp/#/packages?id=tweaking) or even [change the music font](http://noteflakes.github.io/lyp/#/packages?id=fonts).
+__Use packages__: Install [packages](http://lyp.noteflakes.com/lyp/#/?id=working-with-packages) to enhance your Lilypond files with additional functionality. Add [specialized tweaks](http://lyp.noteflakes.com/lyp/#/packages?id=tweaking) or even [change the music font](http://lyp.noteflakes.com/lyp/#/packages?id=fonts).
 
-__No hassle Lilypond installation__: with lyp you can [install Lilypond](http://noteflakes.github.io/lyp/#/?id=installing-and-using-lilypond) with a single easy command, no need to click links, or unzip and copy files around.
+__No hassle Lilypond installation__: with lyp you can [install Lilypond](http://lyp.noteflakes.com/lyp/#/?id=installing-and-using-lilypond) with a single easy command, no need to click links, or unzip and copy files around.
 
-__Even more tools for power users__: watch and automatically [recompile](http://noteflakes.github.io/lyp/#/?id=lyp-watch) changed source files, [flatten](http://noteflakes.github.io/lyp/#/?id=lyp-flatten) include files, and [automatically install](http://noteflakes.github.io/lyp/#/?id=lyp-compile) package dependencies or any required version of Lilypond.
+__Even more tools for power users__: watch and automatically [recompile](http://lyp.noteflakes.com/lyp/#/?id=lyp-watch) changed source files, [flatten](http://lyp.noteflakes.com/lyp/#/?id=lyp-flatten) include files, and [automatically install](http://lyp.noteflakes.com/lyp/#/?id=lyp-compile) package dependencies or any required version of Lilypond.
 
-For more information, see the lyp [documentation](http://noteflakes.github.io/lyp/).
+For more information, see the lyp [documentation](http://lyp.noteflakes.com/).
 
 ## Contributing
 
