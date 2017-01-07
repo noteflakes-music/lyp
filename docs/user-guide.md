@@ -1,6 +1,6 @@
 # lyp - The Lilypond Swiss Army Knife
 
-Lyp is an open-source tool that takes the pain out of working with [Lilypond](http://lilypond.org/).
+lyp is an open-source tool that takes the pain out of working with [Lilypond](http://lilypond.org/).
 
 __Use packages__: Install <a href="#" jump-to-id="working-with-packages">packages</a> to enhance your Lilypond files with additional functionality. Add <a href="#" router-link="/packages?id=tweaking">specialized tweaks</a> or even <a href="/#" router-link="/packages?id=fonts">change the music font</a>.
 
@@ -12,7 +12,7 @@ __Even more tools for power users__: watch and automatically <a href="#" jump-to
 
 ### System requirements
 
-Lyp is tested to work on recent versions of Linux, macOS and Windows.
+lyp is tested to work on recent versions of Linux, macOS and Windows.
 
 ### Installing lyp as a Ruby gem
 
@@ -82,7 +82,7 @@ $ rm -rf ~/.lyp
 
 ## How lyp works
 
-Lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  installed packages, and installed versions of Lilypond. Lyp provides a wrapper script for Lilypond, which does the following:
+lyp sets up a working directory in `~/.lyp` where it keeps its binaries,  installed packages, and installed versions of Lilypond. lyp provides a wrapper script for Lilypond, which does the following:
 
 - Select the correct version of Lilypond to use (see <a href="#" jump-to-id="installing-and-using-lilypond">below</a>).
 - Scan the given Lilypond file for any dependencies (specified using `\require`), and also recursively scan any include files for dependencies
@@ -102,7 +102,7 @@ The difference between merely copying and including a Lilypond file in your musi
 
 In lyp, a package is a directory that should contain at least a single Lilypond file named `package.ly` in its root directory. A package could contain additional Lilypond and scheme files referenced in the main package file (using relative `\include`s). A package could also depend on other packages by using the `\require` command (see <a href="#" jump-to-id="using-packages">below</a>).
 
-Lyp packages are expected to be published as git repositories. The package is then versioned using git tags. A package can be referenced either using its git URL, a registered canonical name (if it's registered in the [lyp package index](https://github.com/lyp-packages/index)), or alternatively as a local path (which is really meant for package development more than anything else).
+lyp packages are expected to be published as git repositories. The package is then versioned using git tags. A package can be referenced either using its git URL, a registered canonical name (if it's registered in the [lyp package index](https://github.com/lyp-packages/index)), or alternatively as a local path (which is really meant for package development more than anything else).
 
 Packages can also include test files, examples that demonstrate proper usage, ruby source code for enhancing lyp itself, or alternative font files for creating a custom look for Lilypond scores.
 
@@ -186,7 +186,7 @@ $ lyp deps test.ly
 
 ### Package references
 
-A package is normally referenced by its git URL. Lyp lets you provide either fully- or partially qualified URLs. A package hosted on github can be also referenced by the user/repository pair. The following are all equivalent:
+A package is normally referenced by its git URL. lyp lets you provide either fully- or partially qualified URLs. A package hosted on github can be also referenced by the user/repository pair. The following are all equivalent:
 
 ```bash
 # Fully-qualified URLs
@@ -221,7 +221,7 @@ package@0.1.0
 package@stable
 ```
 
-Version constraints specify a range of versions to use. Lyp currently supports two types of constraints:
+Version constraints specify a range of versions to use. lyp currently supports two types of constraints:
 
 - Optimistic constraint: `package>=0.1.0`, which means any version equal to or higher than 0.1.0.
 - Pessimistic constraint: `package~>0.1.0`, which means any version equal or higher than 0.1.0, and lower than 0.2.0. This type of constraint is useful for packages which follow the semantic versioning standard.
@@ -376,7 +376,7 @@ $ lyp which lilypond
 
 ### Running Lilypond
 
-Once one or more versions of Lilypond are installed, the Lilypond command may be used normally to compile Lilypond files. Lyp adds a few extra options:
+Once one or more versions of Lilypond are installed, the Lilypond command may be used normally to compile Lilypond files. lyp adds a few extra options:
 
 - `--auto-install-deps`, `-A` - automatically install any missing dependencies.
 
@@ -594,14 +594,3 @@ Synopsis: `lyp which PACKAGE|lilypond`
 
 Shows the location of the given package or the currently selected Lilypond.
 
-## Contributing
-
-Lyp is written in Ruby, and its code is [available on github](https://github.com/noteflakes/lyp). To hack on it, simply clone the repository. To run the specs:
-
-```bash
-$ cd lyp
-$ bundle install # needs to be run only once
-$ rspec
-```
-
-Please feel free to submit issues and pull requests.

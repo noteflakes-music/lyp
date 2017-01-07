@@ -2,7 +2,7 @@
 
 In lyp, a package is a directory that should contain at least a single Lilypond file named `package.ly` in its root directory. A package could contain additional Lilypond and Scheme files referenced in the main package file (using relative `\include`s). A package could also depend on other packages by using the `\require` command.
 
-Lyp packages are expected to be published as git repositories. The package is then versioned using git tags. A package can be referenced either using its git URL, a registered canonical name (if it's registered in the [lyp package index](https://github.com/lyp-packages/index)), or alternatively as a local path (which is really meant for package development more than anything else).
+lyp packages are expected to be published as git repositories. The package is then versioned using git tags. A package can be referenced either using its git URL, a registered canonical name (if it's registered in the [lyp package index](https://github.com/lyp-packages/index)), or alternatively as a local path (which is really meant for package development more than anything else).
 
 ## Creating a package
 
@@ -46,14 +46,14 @@ When compiling a file using lyp (using either `lyp compile` or `lilypond`), the 
 
 ## Including files
 
-Lyp provides the `\pinclude` and `\pincludeOnce` commands for including files residing in the current package using relative paths. The `\pincludeOnce` commands loads a given file only once:
+lyp provides the `\pinclude` and `\pincludeOnce` commands for including files residing in the current package using relative paths. The `\pincludeOnce` commands loads a given file only once:
 
 ```lilypond
 \pinclude "inc/template.ily"
 \pincludeOnce "inc/init.ily"
 ```
 
-Lyp also defines a `lyp:load` Scheme function for loading Scheme files using relative paths without adding directories to the `%load-path`:
+lyp also defines a `lyp:load` Scheme function for loading Scheme files using relative paths without adding directories to the `%load-path`:
 
 ```lilypond
 #(if (not (defined? 'mypack:init))(lyp:load "scm/init.scm"))
@@ -78,9 +78,9 @@ To express a dependency, packages use the same `\require` command used in user f
 
 ### Including fonts
 
-Lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of Lilypond.
+lyp also supports automatic installation of fonts, based on work by [Abraham Lee](https://github.com/tisimst). When a package is installed, lyp will copy any font files residing in the `fonts` directory into the corresponding `otf` and `svg` directories of all installed versions of Lilypond.
 
-**Note**: fonts will be only installed in versions of Lilypond starting from than 2.18.2. Lyp automatically patches any version newer than 2.19.12 in order to support custom fonts.
+**Note**: fonts will be only installed in versions of Lilypond starting from than 2.18.2. lyp automatically patches any version newer than 2.19.12 in order to support custom fonts.
 
 ### Extending lyp and adding commands
 
@@ -89,16 +89,16 @@ A package can also be used to extend or override lyp's stock functionality or ad
 When a package is installed, lyp executes the code in `ext.rb`. To make the extension run each time lyp is invoked, the extension should include the following line:
 
 ```ruby
-Lyp.install_extension(__FILE__)
+lyp.install_extension(__FILE__)
 ```
 
-More commands can be added to lyp's command line interface by adding methods to the `Lyp::CLI` class using the [Thor](https://github.com/erikhuda/thor/wiki/Method-Options) API. For example:
+More commands can be added to lyp's command line interface by adding methods to the `lyp::CLI` class using the [Thor](https://github.com/erikhuda/thor/wiki/Method-Options) API. For example:
 
 ```ruby
-class Lyp::CLI
+class lyp::CLI
   desc "count", "show package count"
   def count
-    packages = Lyp::Package.list_lyp_index("")
+    packages = lyp::Package.list_lyp_index("")
     puts "#{packages.size} packages installed"
   end
 end
@@ -127,7 +127,7 @@ You can also add your package to the lyp [public package index](https://github.c
 
 ## Scheme API
 
-Lyp provides loaded packages with a Scheme API in order to facilitate handling relative paths and loading of Lilypond include files and Scheme files.
+lyp provides loaded packages with a Scheme API in order to facilitate handling relative paths and loading of Lilypond include files and Scheme files.
 
 ### General
 
@@ -195,3 +195,15 @@ In addition to the above commands, lyp also provides a few utility Scheme proced
 ```
 
 (For example usage see the [assert](https://github.com/lyp-packages/assert/blob/master/assert.scm) package).
+
+## Contributing to lyp
+
+lyp is written in Ruby, and its code is [available on github](https://github.com/noteflakes/lyp). To hack on it, simply clone the repository. To run the specs:
+
+```bash
+$ cd lyp
+$ bundle install # needs to be run only once
+$ rspec
+```
+
+Please feel free to submit issues and pull requests.
