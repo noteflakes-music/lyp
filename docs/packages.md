@@ -1,7 +1,6 @@
 ---
-title: Package Directory
+title: Packages
 ---
-
 # The semi-offical [lyp](https://github.com/noteflakes/lyp#readme) package index
 
 ## Editorial tools

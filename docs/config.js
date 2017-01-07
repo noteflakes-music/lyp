@@ -6,6 +6,7 @@ self.$config = {
   nav: [
     {title: 'user guide', path: '/'},
     {title: 'packages', path: 'packages'},
-    {title: 'developer guide', path: 'developer-guide'}
+    {title: 'developer guide', path: 'developer-guide'},
+    {title: 'FAQ', path: 'faq'}
   ]
 }
