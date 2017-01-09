@@ -38,8 +38,9 @@ title: Packages
 
 ## Special notation
 
-* [slashed-beams](https://github.com/lyp-packages/slashed-beams) - Slashed beams for Lilypond.
+* [frame-engraver](https://github.com/lyp-packages/frame-engraver) - Engrave boxes around notes (for modern notation).
 * [pedal-decorations](https://github.com/lyp-packages/pedal-decorations) - Pedal mark decorations for Lilypond.
+* [slashed-beams](https://github.com/lyp-packages/slashed-beams) - Slashed beams for Lilypond.
 
 ## Support Libraries
 
@@ -48,9 +49,9 @@ title: Packages
 
 ## Tweaking
 
+* [auto-extenders](https://github.com/lyp-packages/auto-extenders) - Automatic lyrics line extenders for Lilypond.
 * [merge-rests](https://github.com/lyp-packages/merge-rests) - Rest merging engraver.
 * [super-shape-me](https://github.com/lyp-packages/super-shape-me) - Slur & tie tweaking for Lilypond.
-* [auto-extenders](https://github.com/lyp-packages/auto-extenders) - Automatic lyrics line extenders for Lilypond.
 
 ## Contributing packages
 
