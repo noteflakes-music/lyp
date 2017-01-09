@@ -422,6 +422,7 @@ class Lyp::CLI < Thor
   end
 
   def self.run
+    trap("INT") {puts; exit}
     start(ARGV)
   rescue => e
     puts e.message
