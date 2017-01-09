@@ -466,13 +466,24 @@ module Lyp::Lilypond
       end
     end
 
-    def install_version(version, opts)
+    def install_version(version, opts, retry_count = 0)
       platform = detect_lilypond_platform
       url = lilypond_install_url(platform, version, opts)
       fn = temp_install_filename(url)
-
-      download_lilypond(url, fn, opts) unless File.file?(fn)
-      install_lilypond_files(fn, platform, version, opts)
+      install_filename_exists = File.file?(fn)
+      
+      download_lilypond(url, fn, opts) unless install_filename_exists
+      begin
+        install_lilypond_files(fn, platform, version, opts)
+      rescue => e
+        retry_count += 1
+        if install_filename_exists && (retry_count < 3)
+          puts "Failed to extract existing archive, retrying download..."
+          FileUtils.rm(fn)
+          return install_version(version, opts, retry_count)
+        end
+        raise e
+      end
 
       patch_font_scm(version)
       copy_fonts_from_all_packages(version, opts)
