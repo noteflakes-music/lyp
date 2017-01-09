@@ -1,10 +1,16 @@
+# Version 1.3.4
+
+- Recover from trying to open broken Lilypond archives.
+- Trap INT signals.
+- Better documentation ([new website](http://lyp.noteflakes.com/)).
+
 # Version 1.3.3 
 
 - Properly suport stock include in flatten (#45).
 
 # Version 1.3.2 2017-01-03
 
-- Fix stock lilypond includes, include search path (#44, #43).
+- Fix stock Lilypond includes, include search path (#44, #43).
 - Remove rugged dependency from traveling ruby release.
 - Fix install script to work with wget (#41).
 
@@ -20,8 +26,8 @@
 
 # Version 1.2.0 2016-12-21
 
-- Implement `lyp accelerate` command for making lyp and lilypond scripts faster (#34).
-- Add `lyp exec` command for running arbitrary lilypond bundled scripts (#35).
+- Implement `lyp accelerate` command for making lyp and Lilypond scripts faster (#34).
+- Add `lyp exec` command for running arbitrary Lilypond bundled scripts (#35).
 
 # Version 1.1.0 2016-12-04
 
@@ -43,8 +49,8 @@
 
 - Better error reporting when installing packages.
 - Add appropriate `\paper` preamble when `--snippet` option is specified (#29).
-- Improve lilypond option processing by allowing a string of single-letter options, e.g. `lilypond -FncO`.
-- Add `--force-version` lilypond option for selecting lilypond version according to version statement in user file (#28).
+- Improve Lilypond option processing by allowing a string of single-letter options, e.g. `lilypond -FncO`.
+- Add `--force-version` Lilypond option for selecting Lilypond version according to version statement in user file (#28).
 
 ## Version 1.0.0 2016-06-29
 
@@ -53,16 +59,16 @@
 
 ## Version 0.3.9 2016-06-27
 
-- Add `--auto-install-deps` lilypond option for automatically installing missing dependencies (#25).
-- Add `--snippet` option to lilypond for creating cropped png images (#24).
+- Add `--auto-install-deps` Lilypond option for automatically installing missing dependencies (#25).
+- Add `--snippet` option to Lilypond for creating cropped png images (#24).
 - Add `--dev` option for installing development packages (#23).
 - Raise error in mismatching require version clauses in same file (#12).
-- Add automatic periodic checking for new unstable versions of lilypond (#7).
+- Add automatic periodic checking for new unstable versions of Lilypond (#7).
 
 ## Version 0.3.8 2016-06-14
 
 - Fix behavior when `-dhelp` switch is specified.
-- Add custom `-c, --cropped` switch for cropped lilypond output (shorthand for `-dbackend=eps -daux-files=#f`).
+- Add custom `-c, --cropped` switch for cropped Lilypond output (shorthand for `-dbackend=eps -daux-files=#f`).
 - Fix installing font packages with nested font directories.
 
 ## Version 0.3.7 2016-06-02
@@ -75,16 +81,16 @@
 ## Version 0.3.6 2016-03-08
 
 - Add `-r/--require` command line for preloading packages (#19).
-- Rewrite `\require`, `\pinclude`, `\pincludeOnce` commands for better compatibility with legacy lilypond code.
+- Rewrite `\require`, `\pinclude`, `\pincludeOnce` commands for better compatibility with legacy Lilypond code.
 
 ## Version 0.3.5 2016-03-01
 
-- Ask for confirmation before patching and installing fonts in system-installed lilyponds.
+- Ask for confirmation before patching and installing fonts in system-installed Lilyponds.
 
 ## Version 0.3.4 2016-02-29
 
-- Make lyp and lilypond binaries load faster.
-- Fix installing fonts for system-installed lilyponds (#18)
+- Make lyp and Lilypond binaries load faster.
+- Fix installing fonts for system-installed Lilyponds (#18).
 - Show package description on search.
 
 ## Version 0.3.3 2016-02-21
@@ -94,12 +100,12 @@
 
 ## Version 0.3.2 2016-02-20
 
-- Fix --raw command line option in lilypond binary script.
+- Fix --raw command line option in Lilypond binary script.
 - Wrap also files without package dependencies, in order to provide the \pinclude, etc. functionality. This can be overriden using the --raw command line option.
 
 ## Version 0.3.1 2016-02-04
 
-- Accept stdin input for lilypond.
+- Accept stdin input for Lilypond.
 - Show `install self` warning only for standalone releases.
 
 ## Version 0.3.0 2016-02-03
@@ -114,10 +120,10 @@
 ## Version 0.2.2 2016-01-31
 
 - Improve README documentation.
-- Fix lilypond wrapper to not eat stock lilypond options (#10).
-- Add --env, --use, --install options to lilypond wrapper, lyp test, lyp compile commands.
+- Fix Lilypond wrapper to not eat stock Lilypond options (#10).
+- Add --env, --use, --install options to Lilypond wrapper, lyp test, lyp compile commands.
 - Remove nokogiri dependency.
-- Fix behaviour when no version of lilypond is installed.
+- Fix behaviour when no version of Lilypond is installed.
 - Various improvements to command line interface.
 
 ## Version 0.2.1 2016-01-28
@@ -134,8 +140,8 @@
 - Fix `lyp install` command.
 - Fix and enhance `lyp compile` command.
 - Fix `lyp uninstall self` command.
-- Accept `scheme-sandbox` argument in lilypond wrapper (#8).
-- Add support for installing custom fonts from packages (starting from lilypond 2.18.2), and automatic patching of lilypond versions lower than 2.19.12 in order to support custom fonts.
+- Accept `scheme-sandbox` argument in Lilypond wrapper (#8).
+- Add support for installing custom fonts from packages (starting from Lilypond 2.18.2), and automatic patching of Lilypond versions lower than 2.19.12 in order to support custom fonts.
 
 ## Version 0.1.4 2016-01-24
 
@@ -143,7 +149,7 @@
 
 ## Version 0.1.3 2016-01-24
 
-- Do not list lilypond script in Gem bindir (#6).
+- Do not list Lilypond script in Gem bindir (#6).
 - Add lyp-* variables, \pinclude command for including files from within packages.
 - Add [installation script](https://github.com/noteflakes/lyp#installation).
 
@@ -162,32 +168,32 @@
 
 - Add resolve command to install all dependencies required for a given .ly file.
 - Add deps command to show required dependencies for a given .ly file.
-- Ampersand can be ommited when specifying version constraints, e.g. lilypond>=2.19.31 etc.
+- Ampersand can be ommited when specifying version constraints, e.g. `lilypond>=2.19.31` etc.
 
 ## Version 0.0.5 2016-01-11
 
-- Add which command (for both packages and lilypond)
-- Add package uninstall command
-- Check validity of default/current lilypond before invoking it
-- Install highest versioned tag if version is not specified
-- CLI now uses thor for prettier code
-- Fix bin/lilypond to work with multiple arguments
+- Add which command (for both packages and Lilypond).
+- Add package uninstall command.
+- Check validity of default/current Lilypond before invoking it.
+- Install highest versioned tag if version is not specified.
+- CLI now uses thor for prettier code.
+- Fix bin/lilypond to work with multiple arguments.
 
 ## Version 0.0.4 2016-01-10
 
-- Search for simple package name (non-url) in [lyp-index](https://github.com/noteflakes/lyp-index)
-- Add support for `lyp search lilypond@<version|stable|unstable|latest>`
-- Implement package installation
-- Move lyp repository to [noteflakes org](https://github.com/noteflakes/lyp)
+- Search for simple package name (non-url) in [lyp-index](https://github.com/noteflakes/lyp-index).
+- Add support for `lyp search lilypond@<version|stable|unstable|latest>`.
+- Implement package installation.
+- Move lyp repository to [noteflakes org](https://github.com/noteflakes/lyp).
 
 ## Version 0.0.3 2016-01-08
 
-- Add uninstall lyp command
-- Add install lyp command
-- Cleanup temp files in /tmp after installing lilypond
-- Add support for 'lyp install lilypond' (install latest stable version)
+- Add uninstall lyp command.
+- Add install lyp command.
+- Cleanup temp files in /tmp after installing Lilypond.
+- Add support for 'lyp install lilypond' (install latest stable version).
 
 ## Version 0.0.2 2016-01-07
 
-- Install, uninstall and switch between different versions of lilypond
-- Resolve package dependencies in user files, and invoke lilypond
+- Install, uninstall and switch between different versions of Lilypond.
+- Resolve package dependencies in user files, and invoke Lilypond.

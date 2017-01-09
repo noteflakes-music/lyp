@@ -49,8 +49,8 @@ $ wget -qO- https://git.io/getlyp | bash
 Windows users can simply download the latest Windows [release](https://github.com/noteflakes/lyp/releases), unzip it and run `lyp install self`:
 
 ```bash
-> unzip lyp-0.2.3-win32.zip
-> lyp-0.2.3-win32/bin/lyp install self
+> unzip lyp-1.3.2-win32.zip
+> lyp-1.3.2-win32/bin/lyp install self
 ```
 
 ### Manually installing releases
