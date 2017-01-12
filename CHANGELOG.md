@@ -1,3 +1,5 @@
+- Remove non-functional `--open` switch.
+- Improve error reporting (print backtrace only when `--verbose` is specified).
 - Add `--music`/`--music-relative` command line switch for quickly entering music on the command line (#47).
 
 # Version 1.3.4

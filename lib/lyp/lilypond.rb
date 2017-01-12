@@ -46,8 +46,6 @@ module Lyp::Lilypond
         argv << fn
       when '-n', '--install'
         options[:install] = true
-      when '-O', '--open'
-        options[:open] = true
       when '-r', '--require'
         options[:ext_require] ||= []
         options[:ext_require] << argv.shift

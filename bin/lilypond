@@ -30,7 +30,6 @@ Lyp-provided options:
   -m, --music-relative=MUSIC          enter music inline (relative pitch)
   -M, --music=MUSIC                   enter music inline (absolute pitch)
   -n, --install                       install the specified version if not found
-  -O, --open                          open the target file after compilation
   -r, --require=PACKAGE               preload the specified package
   -R, --raw                           run raw lilypond (no pre-processing)
   -S, --snippet                       produce png cropped images at 600dpi

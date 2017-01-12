@@ -400,8 +400,6 @@ Once one or more versions of Lilypond are installed, the Lilypond command may be
   $ lilypond -u2.19.35 -n ...
   ```
 
-- `--open`, `-O` - open target file after compilation.
-
 - `--raw`, `-R` - do not pre-process input file (no scanning for dependencies, no wrapping).
 
   ```bash
