@@ -20,7 +20,7 @@ module Lyp::Lilypond
         tmp_args = []
         $1.each_char {|c| tmp_args << "-#{c}"}
         tmp_args << "-#{$2}"
-        argv = tmp_args + argv
+        argv.insert(0, *tmp_args)# = tmp_args + argv
       when '-A', '--auto-install-deps'
         options[:resolve] = true
       when '-c', '--cropped'
@@ -38,6 +38,12 @@ module Lyp::Lilypond
         options[:include_paths] ||= []
         options[:include_paths] << path
         argv_clean << "--include=#{path}"
+      when '-M', '--music'
+        fn = prepare_inline_music_file(argv.shift)
+        argv << fn
+      when '-m', '--music-relative'
+        fn = prepare_inline_music_file(argv.shift, relative: true)
+        argv << fn
       when '-n', '--install'
         options[:install] = true
       when '-O', '--open'
@@ -63,6 +69,22 @@ module Lyp::Lilypond
         options[:mode] = :quiet
       else
         argv_clean << arg
+      end
+    end
+
+    def prepare_inline_music_file(music, opts = {})
+      filename = Lyp.tmp_filename('.ly')
+      File.open(filename, 'w+') do |f|
+        f << format_inline_music(music, opts)
+      end
+      filename
+    end
+
+    def format_inline_music(music, opts)
+      if opts[:relative]
+        "\\relative c' { #{music} }"
+      else
+        "{ #{music} }"
       end
     end
 

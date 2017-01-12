@@ -1,3 +1,5 @@
+- Add `--music`/`--music-relative` command line switch for quickly entering music on the command line (#47).
+
 # Version 1.3.4
 
 - Recover from trying to open broken Lilypond archives.

@@ -62,6 +62,11 @@ module Lyp
     FileUtils.mkdir_p(dir) unless File.directory?(dir)
     dir
   end
+
+  def self.tmp_filename(suffix = nil)
+    fn = (Thread.current.hash * (Time.now.to_f * 1000).to_i % 2**32).to_s(36)
+    "#{TMP_ROOT}/#{fn}#{suffix}"
+  end
   
   def self.sudo_cp(src, dest)
     cmd = "sudo cp #{src} #{dest}"
