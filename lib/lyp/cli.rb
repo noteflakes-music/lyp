@@ -128,6 +128,8 @@ class Lyp::CLI < Thor
   desc "compile [<option>...] <FILE>", "compile given file Lilypond source file"
   def compile(*argv)
     opts, argv = Lyp::Lilypond.preprocess_argv(argv)
+    opts[:verbose] ||= options[:verbose]
+    $cmd_options = opts
 
     lilypond_path = Lyp::Lilypond.select_lilypond_version(opts, argv.last)
 

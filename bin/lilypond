@@ -61,6 +61,6 @@ else
     Lyp::Lilypond.compile($argv, $options)
   rescue => e
     puts e.message
-    puts e.backtrace.join("\n")
+    puts e.backtrace.join("\n") if $options[:verbose]
   end
 end

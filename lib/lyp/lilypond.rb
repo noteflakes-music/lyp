@@ -61,6 +61,9 @@ module Lyp::Lilypond
         options[:snippet_paper_preamble] = true
       when '-u', '--use'
         options[:use_version] = argv.shift
+      when '-V', '--verbose'
+        options[:verbose] = true
+        argv_clean << arg
       when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
         options[:use_version] = $1
       when '--invoke-system'
