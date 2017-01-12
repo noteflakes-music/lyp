@@ -13,6 +13,7 @@ title: Packages
 * [bravura](https://github.com/lyp-packages/bravura) - Bravura SMuFL font for Lilypond.
 * [gootville](https://github.com/lyp-packages/gootville) - Gootville SMuFL font for Lilypond (based on Gonville).
 * [haydn](https://github.com/lyp-packages/haydn) - Haydn font package.
+* [improviso](https://github.com/lyp-packages/improviso) - Improviso font package.
 * [lilyjazz](https://github.com/lyp-packages/lilyjazz) - LilyJazz font package.
 * [paganini](https://github.com/lyp-packages/paganini) - Paganini font package.
 * [profondo](https://github.com/lyp-packages/profondo) - Profondo font package (a non-SMuFL Bravura clone).
