@@ -47,6 +47,7 @@ title: Packages
 
 * [assert](https://github.com/lyp-packages/assert) - Assertions for Lilypond packages.
 * [lys](https://github.com/lyp-packages/lys) - Run Lilypond as a server.
+* [svg-metadata](https://github.com/lyp-packages/svg-metadata) - Add metadata to SVG output.
 
 ## Tweaking
 
