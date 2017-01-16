@@ -1,16 +1,18 @@
+# Version 1.3.5 2017-01-16
+
 - Add `--svg` command line option (#50).
 - Improve Lilypond commandline option parsing.
 - Remove non-functional `--open` switch.
 - Improve error reporting (print backtrace only when `--verbose` is specified).
 - Add `--music`/`--music-relative` command line switch for quickly entering music on the command line (#47).
 
-# Version 1.3.4
+# Version 1.3.4 2017-01-09
 
 - Recover from trying to open broken Lilypond archives.
 - Trap INT signals.
 - Better documentation ([new website](http://lyp.noteflakes.com/)).
 
-# Version 1.3.3 
+# Version 1.3.3 2017-01-03
 
 - Properly suport stock include in flatten (#45).
 
