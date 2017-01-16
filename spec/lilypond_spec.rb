@@ -332,3 +332,199 @@ RSpec.describe "Lyp::Lilypond" do
   end
 end
 
+RSpec.describe "Lilypond.preprocess_argv" do
+  it "supports -A/--auto-install-deps" do
+    argv = ["-A", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({resolve: true})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--auto-install-deps", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({resolve: true})
+    expect(a).to eq(["myfile.ly"])
+  end
+
+  it "supports -c/--cropped" do
+    argv = ["-c", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({})
+    expect(a).to eq(['-dbackend=eps', '-daux-files=#f', 'myfile.ly'])
+
+    argv = ["--cropped", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({})
+    expect(a).to eq(['-dbackend=eps', '-daux-files=#f', 'myfile.ly'])
+  end
+
+  it "supports -E/--env" do
+    argv = ["-E", "myfile.ly"]
+    expect(proc {Lyp::Lilypond.preprocess_argv(argv)}).to raise_error
+
+    argv = ["--env", "myfile.ly"]
+    expect(proc {Lyp::Lilypond.preprocess_argv(argv)}).to raise_error
+
+    ENV["LILYPOND_VERSION"] = "2.19.53"
+
+    argv = ["-E", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({use_version: "2.19.53"})
+    expect(a).to eq(['myfile.ly'])
+
+    argv = ["--env", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({use_version: "2.19.53"})
+    expect(a).to eq(['myfile.ly'])
+  end
+
+  it "supports -F/--force-version" do
+    argv = ["-F", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({force_version: true})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--force-version", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({force_version: true})
+    expect(a).to eq(["myfile.ly"])
+  end
+
+  it "tracks include directories" do
+    argv = ["-I", "foo/bar", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({include_paths: ["foo/bar"]})
+    expect(a).to eq(["--include=foo/bar", "myfile.ly"])
+
+    argv = ["-Ifoo/bar", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({include_paths: ["foo/bar"]})
+    expect(a).to eq(["--include=foo/bar", "myfile.ly"])
+
+    argv = ["-AFIfoo/bar", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({resolve: true, force_version: true, include_paths: ["foo/bar"]})
+    expect(a).to eq(["--include=foo/bar", "myfile.ly"])
+
+    argv = ["--include", "foo/bar", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({include_paths: ["foo/bar"]})
+    expect(a).to eq(["--include=foo/bar", "myfile.ly"])
+  end    
+
+  it "supports -M/--music" do
+    argv = ["-M", "c4 d e f"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(IO.read(a[0])).to eq("{ c4 d e f }")
+
+    argv = ["--music", "c4 d e f"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(IO.read(a[0])).to eq("{ c4 d e f }")
+  end
+
+  it "supports -m/--music-relative" do
+    argv = ["-m", "c4 d e f"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(IO.read(a[0])).to eq("\\relative c' { c4 d e f }")
+
+    argv = ["--music-relative", "c4 d e f"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(IO.read(a[0])).to eq("\\relative c' { c4 d e f }")
+  end
+
+  it "supports -n/--install" do
+    argv = ["-n", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({install: true})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--install", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({install: true})
+    expect(a).to eq(["myfile.ly"])
+  end
+
+  it "supports -r/--require" do
+    argv = ["-r", "assert", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({ext_require: ["assert"]})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["-rassert", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({ext_require: ["assert"]})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--require", "assert", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({ext_require: ["assert"]})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--require=assert", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({ext_require: ["assert"]})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["-rassert", "-rslash", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({ext_require: ["assert", "slash"]})
+    expect(a).to eq(["myfile.ly"])
+  end    
+
+  it "supports -R/--raw" do
+    argv = ["-R", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({raw: true})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--raw", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({raw: true})
+    expect(a).to eq(["myfile.ly"])
+  end
+
+  it "supports -S/--snippet" do
+    argv = ["-S", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({snippet_paper_preamble: true})
+    expect(a).to eq(['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600', "myfile.ly"])
+
+    argv = ["--snippet", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({snippet_paper_preamble: true})
+    expect(a).to eq(['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600', "myfile.ly"])
+  end
+
+  it "supports -u/--use" do
+    argv = ["-u", "2.19.35", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({use_version: "2.19.35"})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["-u2.19.36", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({use_version: "2.19.36"})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--use", "2.19.37", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({use_version: "2.19.37"})
+    expect(a).to eq(["myfile.ly"])
+
+    argv = ["--use=2.19.38", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({use_version: "2.19.38"})
+    expect(a).to eq(["myfile.ly"])
+  end    
+  
+  it "supports -V/--verbose" do
+    argv = ["-V", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({verbose: true})
+    expect(a).to eq(["-V", "myfile.ly"])
+
+    argv = ["--verbose", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({verbose: true})
+    expect(a).to eq(["--verbose", "myfile.ly"])
+  end
+end

@@ -1,7 +1,14 @@
 module Lyp::Lilypond
   class << self
-    NO_ARGUMENT_OPTIONS_REGEXP = /^\-([REnFOcSA]+)(.+)/
+    # multiple options in shorthand form, e.g. -FnO
+    NO_ARGUMENT_SHORTHAND_REGEXP = /^\-([AcEFnRSV]+)(.+)/
 
+    # shorthand option with argument, e.g. -ifoo-bar.ly
+    ARGUMENT_SHORTHAND_REGEXP = /^\-([efHiIjlmMoru])(.+)/
+
+    # longhand option with equal sign and argument, e.g. --include=foo/bar
+    ARGUMENT_EQUAL_REGEXP = /^--([^=]+)=(.+)/
+    
     def preprocess_argv(argv)
       options = {}
       argv = argv.dup # copy for iterating
@@ -15,20 +22,22 @@ module Lyp::Lilypond
 
     def parse_lilypond_arg(arg, argv, argv_clean, options)
       case arg
-      when NO_ARGUMENT_OPTIONS_REGEXP
-        # handle multiple options in shorthand form, e.g. -FnO
+      when ARGUMENT_EQUAL_REGEXP
+        argv.insert(0, "--#{$1}", $2)
+      when ARGUMENT_SHORTHAND_REGEXP
+        argv.insert(0, "-#{$1}", $2)
+      when NO_ARGUMENT_SHORTHAND_REGEXP
         tmp_args = []
         $1.each_char {|c| tmp_args << "-#{c}"}
         tmp_args << "-#{$2}"
-        argv.insert(0, *tmp_args)# = tmp_args + argv
+        argv.insert(0, *tmp_args)
       when '-A', '--auto-install-deps'
         options[:resolve] = true
       when '-c', '--cropped'
         argv_clean.concat ['-dbackend=eps', '-daux-files=#f']
       when '-E', '--env'
         unless ENV['LILYPOND_VERSION']
-          STDERR.puts "$LILYPOND_VERSION not set"
-          exit 1
+          raise "$LILYPOND_VERSION not set"
         end
         options[:use_version] = ENV['LILYPOND_VERSION']
       when '-F', '--force-version'
@@ -62,8 +71,6 @@ module Lyp::Lilypond
       when '-V', '--verbose'
         options[:verbose] = true
         argv_clean << arg
-      when /^(?:\-u|\-\-use\=)"?([^\s]+)"?/
-        options[:use_version] = $1
       when '--invoke-system'
         options[:mode] = :system
       when '--invoke-quiet'
