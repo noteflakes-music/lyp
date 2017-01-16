@@ -527,4 +527,11 @@ RSpec.describe "Lilypond.preprocess_argv" do
     expect(o).to eq({verbose: true})
     expect(a).to eq(["--verbose", "myfile.ly"])
   end
+
+  it "supports --svg" do
+    argv = ["--svg", "myfile.ly"]
+    o, a = Lyp::Lilypond.preprocess_argv(argv)
+    expect(o).to eq({})
+    expect(a).to eq(["-dbackend=svg", "myfile.ly"])
+  end
 end

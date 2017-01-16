@@ -75,6 +75,8 @@ module Lyp::Lilypond
         options[:mode] = :system
       when '--invoke-quiet'
         options[:mode] = :quiet
+      when '--svg'
+        argv_clean.concat ['-dbackend=svg']
       else
         argv_clean << arg
       end

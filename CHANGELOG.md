@@ -1,3 +1,5 @@
+- Add `--svg` command line option (#50).
+- Improve Lilypond commandline option parsing.
 - Remove non-functional `--open` switch.
 - Improve error reporting (print backtrace only when `--verbose` is specified).
 - Add `--music`/`--music-relative` command line switch for quickly entering music on the command line (#47).
