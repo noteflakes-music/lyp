@@ -30,6 +30,7 @@ title: Packages
 
 ## Instrument-specific notation
 
+* [chtab](https://github.com/lyp-packages/chtab) - Alternative TabStaff algorithm.
 * [lilydrum](https://github.com/lyp-packages/lilydrum) - Right-left drum notation (mainly for pipeband snare drumming).
 
 ## OpenLilyLib
