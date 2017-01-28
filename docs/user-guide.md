@@ -472,6 +472,7 @@ Compiles Lilypond source files. This command is synonymous to running `lilypond`
   ```
 
 - `--snippet`/`-S`: produce png cropped images at 600dpi (equivalent to `--cropped --png -dresolution=600`)
+- `--svg`: produce SVG output
 - `--use=VERSION`/`-uVERSION`: use the given version of Lilypond:
   
   ```bash
