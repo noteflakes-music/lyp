@@ -2,7 +2,7 @@
 title: News
 ---
 
-# lyp - use Lilypond like a pro!
+# lyp - Use Lilypond Like a Boss!
 
 The power of [Lilypond](http://lilypond.org/), without the pain: <b><a href="#" router-link="/user-guide?id=working-with-packages">Install packages</a></b> to enhance your Lilypond files with additional functionality, like <a href="#" router-link="/packages?id=tweaking">specialized tweaks</a> or <a href="#" router-link="/packages?id=fonts">alternative music fonts</a>. <b><a href="#" router-link="/user-guide?id=installing-and-using-lilypond">install Lilypond</a></b> with a single easy command. <b><a href="#" router-link="/user-guide?id=lyp-watch">Automatically recompile</a></b> your files, flatten include files and <a href="#" router-link="/user-guide">more</a>.
 
@@ -17,7 +17,7 @@ $ lyp install lilypond@unstable
 
 _2017/1/15_ 
 
-Whether you're using Lilypond for the first time, or am a seasoned Lilypond veteran and want to upgrade to the latest version of Lilypond, lyp is there for you. Install lyp on your machine and you're basically free to use any available version of Lilypond (for more information on installing lyp consult the <a href="#" router-link="/user-guide?id=installation">user guide</a>):
+Whether you're using Lilypond for the first time, or am a seasoned Lilypond veteran and want to upgrade to the latest version of Lilypond, lyp is there to help you. Install lyp on your machine and you're basically free to use any available version of Lilypond (for more information on installing lyp consult the <a href="#" router-link="/user-guide?id=installation">user guide</a>):
 
 ```bash
 $ gem install lyp
@@ -96,3 +96,6 @@ Lilypond versions:
 ```
 
 __Summary__: lyp takes the pain out of installing Lilypond. you can have as many versions of Lilypond installed on your machine as you wish, and the latest one is only a single simple command away.
+
+<hr/>
+
