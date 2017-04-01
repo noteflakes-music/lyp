@@ -13,7 +13,7 @@ $ lyp install lilypond@unstable
 
 <hr/>
 
-#### Installing Lilypond with lyp
+## Installing Lilypond with lyp
 
 _2017/1/15_ 
 
