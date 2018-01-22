@@ -493,7 +493,7 @@ module Lyp::Lilypond
         "linux-64"
       when "ppc-linux"
         "linux-ppc"
-      when "x64-mingw32"
+      when /mingw|mswin/
         "mingw"
       end
     end

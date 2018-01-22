@@ -202,8 +202,8 @@ RSpec.describe "Lyp::Lilypond" do
     end
 
     with_lilyponds(:simple) do
-      Lyp::Lilypond.install('~>2.17.30', silent: true)
-      version = "2.17.97"
+      Lyp::Lilypond.install('~>2.18.1', silent: true)
+      version = "2.18.2"
       
       files = Dir["#{$lilyponds_dir}/#{version}/#{$LILYPOND_BIN_DIR}/*"].map {|fn| File.basename(fn)}
       expect(files).to include(Lyp::WINDOWS ? 'lilypond.exe' : 'lilypond')
