@@ -163,6 +163,14 @@ RSpec.describe Lyp::DependencyResolver do
     end
   end
 
+  it "supports require with symbol instead of string" do
+    with_packages(:simple) do
+      resolver = resolver('spec/user_files/simple_symbol.ly')
+      o = resolver.compile_dependency_tree
+      expect(o.dependencies.keys).to eq(%w{a c})
+    end
+  end
+
   it "correctly resolves a circular dependency" do
     with_packages(:circular) do
       r = resolver('spec/user_files/circular.ly').resolve_package_dependencies
@@ -272,14 +280,6 @@ RSpec.describe Lyp::DependencyResolver do
       expect(r[:package_refs]).to eq({"b@abc" => "b"})
       expect(r[:package_dirs]['b']).to eq(
         "#{$packages_dir}/b@abc"
-      )
-
-      r = resolver('spec/user_files/b.ly').resolve_package_dependencies
-
-      expect(r[:definite_versions]).to eq(%w{b@def c@0.3.0})
-      expect(r[:package_refs]).to eq({"b" => "b", "c" => "c"})
-      expect(r[:package_dirs]['b']).to eq(
-        "#{$packages_dir}/b@def"
       )
 
       r = resolver('spec/user_files/b_def.ly').resolve_package_dependencies

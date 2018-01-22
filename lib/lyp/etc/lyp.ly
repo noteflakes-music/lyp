@@ -117,6 +117,7 @@
       (ly:parser-include-string parser str)))
 
   (define (lyp:include parser location path once)  (let* (
+      (path (if (symbol? path) (symbol->string path) path))
       (current-dir  (lyp:this-dir))
       (abs-path     (if (lyp:absolute-path? path)
                         path
@@ -146,7 +147,8 @@
 )
 
 % command form
-require = #(define-void-function (parser location ref)(string?) (let* (
+require = #(define-void-function (parser location ref)(string-or-symbol?) (let* (
+    (ref (if (symbol? ref) (symbol->string ref) ref))
     (name (lyp:ref->name ref))
     (package-dir (lyp:name->dir name))
     (entry-point-path (lyp:join-path package-dir "package.ly"))
@@ -160,14 +162,14 @@ require = #(define-void-function (parser location ref)(string?) (let* (
   ))
 ))
 
-pinclude = #(define-void-function (parser location path)(string?)
+pinclude = #(define-void-function (parser location path)(string-or-symbol?)
   (lyp:include parser location path #f))
 
-pcondInclude = #(define-void-function (parser location expr path)(scheme? string?)
+pcondInclude = #(define-void-function (parser location expr path)(scheme? string-or-symbol?)
   (if expr (lyp:include parser location path #f)))
 
-pincludeOnce = #(define-void-function (parser location path)(string?)
+pincludeOnce = #(define-void-function (parser location path)(string-or-symbol?)
   (lyp:include parser location path #t))
 
-pcondIncludeOnce = #(define-void-function (parser location expr path)(scheme? string?) 
+pcondIncludeOnce = #(define-void-function (parser location expr path)(scheme? string-or-symbol?) 
   (if expr (lyp:include parser location path #t)))

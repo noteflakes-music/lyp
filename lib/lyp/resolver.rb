@@ -120,7 +120,7 @@ module Lyp
       end
     end
 
-    DEP_RE = /\\(require|include|pinclude|pincludeOnce) "([^"]+)"/.freeze
+    DEP_RE = /\\(require|include|pinclude|pincludeOnce)\s+(?:"|#')?([^\s"]+)"?/.freeze
     INCLUDE = "include".freeze
     PINCLUDE = "pinclude".freeze
     PINCLUDE_ONCE = "pincludeOnce".freeze
