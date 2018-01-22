@@ -410,9 +410,12 @@ module Lyp
     # Return a hash of all packages found in the packages directory, creating a
     # leaf for each package
     def get_available_packages(dir)
-      packages = Dir["#{Lyp.packages_dir}/*"].inject({}) do |m, p|
-        name = File.basename(p)
-        m[name] = DependencyPackage.new(File.join(p, MAIN_PACKAGE_FILE))
+      packages = Dir["#{Lyp.packages_dir}/**/*"].inject({}) do |m, p|
+        entry_point_path = File.join(p, MAIN_PACKAGE_FILE)
+        if File.file?(entry_point_path)
+          package_name = p.gsub(/^#{Lyp.packages_dir}\//, '')
+          m[package_name] = DependencyPackage.new(entry_point_path)
+        end
         m
       end
 
