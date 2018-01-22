@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# Make sure encoding is UTF-8
+Encoding.default_external = "UTF-8"
+
 $LOAD_PATH.unshift File.expand_path("../lib", File.dirname(__FILE__))
 
 require 'lyp/version'
