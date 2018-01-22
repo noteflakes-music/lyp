@@ -225,12 +225,17 @@ module Lyp
       search_paths = [dir]
       search_paths += @opts[:include_paths] if @opts[:include_paths]
 
+      # Reminder: return inside a proc returns from the caller
+      search = proc {|fn| return fn if File.file?(fn) }
+
       search_paths.each do |path|
         full_path = File.expand_path(ref, path)
-        return full_path if File.file?(full_path)
+        search.(full_path)
+        search.("#{full_path}.ily")
+        search.("#{full_path}.ly")
       end
 
-      error("Missing include file specified in %s", location)
+      error("Could not find include file reference #{ref} specified in %s", location)
     end
 
     def process_require_command(ref, dir, leaf, opts, location)

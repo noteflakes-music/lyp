@@ -165,7 +165,11 @@ RSpec.describe Lyp::DependencyResolver do
 
   it "supports require with symbol instead of string" do
     with_packages(:simple) do
-      resolver = resolver('spec/user_files/simple_symbol.ly')
+      # resolver = resolver('spec/user_files/simple_symbol.ly')
+      # o = resolver.compile_dependency_tree
+      # expect(o.dependencies.keys).to eq(%w{a c})
+
+      resolver = resolver('spec/user_files/include_symbol.ly')
       o = resolver.compile_dependency_tree
       expect(o.dependencies.keys).to eq(%w{a c})
     end
