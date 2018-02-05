@@ -1,3 +1,11 @@
+# Version 1.3.7 2018-01-22
+
+- Fix installation of non-registered github packages (#54).
+- Set default encoding to UTF-8 (#52).
+- Fix Lilypond install on Windows.
+- Accept symbol arguments for require, include commands (#49).
+- Improve docs.
+
 # Version 1.3.5 2017-01-16
 
 - Add `--svg` command line option (#50).

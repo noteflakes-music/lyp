@@ -383,7 +383,8 @@ module Lyp::Lilypond
       end
     end
 
-    BASE_URL = "http://download.linuxaudio.org/lilypond/binaries"
+    # BASE_URL = "http://download.linuxaudio.org/lilypond/binaries"
+    BASE_URL = "http://lilypond.org/downloads/binaries"
 
     # Returns a list of versions of lilyponds available for download
     def search(version_specifier = nil)
