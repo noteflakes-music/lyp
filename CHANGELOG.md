@@ -1,3 +1,7 @@
+# Version 1.3.8 2018-02-05
+
+- Fix Lilypond installation link (the  http://download.linuxaudio.org/lilypond links don't work anymore).
+
 # Version 1.3.7 2018-01-22
 
 - Fix installation of non-registered github packages (#54).
