@@ -4,7 +4,9 @@ title: News
 
 # lyp - Use Lilypond Like a Boss!
 
-The power of [Lilypond](http://lilypond.org/), without the pain: <b><a href="#" router-link="/user-guide?id=working-with-packages">Install packages</a></b> to enhance your Lilypond files with additional functionality, like <a href="#" router-link="/packages?id=tweaking">specialized tweaks</a> or <a href="#" router-link="/packages?id=fonts">alternative music fonts</a>. <b><a href="#" router-link="/user-guide?id=installing-and-using-lilypond">install Lilypond</a></b> with a single easy command. <b><a href="#" router-link="/user-guide?id=lyp-watch">Automatically recompile</a></b> your files, flatten include files and <a href="#" router-link="/user-guide">more</a>.
+## The power of [Lilypond](http://lilypond.org/), without the pain
+
+<b><a href="#" router-link="/user-guide?id=working-with-packages">Install packages</a></b> to enhance your Lilypond files with additional functionality, like <a href="#" router-link="/packages?id=tweaking">specialized tweaks</a> or <a href="#" router-link="/packages?id=fonts">alternative music fonts</a>. <b><a href="#" router-link="/user-guide?id=installing-and-using-lilypond">install Lilypond</a></b> with a single easy command. <b><a href="#" router-link="/user-guide?id=lyp-watch">Automatically recompile</a></b> your files, flatten include files and <a href="#" router-link="/user-guide">more</a>.
 
 ```bash
 $ gem install lyp
