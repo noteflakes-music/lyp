@@ -15,7 +15,12 @@ __No hassle Lilypond installation__: with lyp you can [install Lilypond](http://
 
 __Even more tools for power users__: watch and automatically [recompile](http://lyp.noteflakes.com/#/?id=lyp-watch) changed source files, [flatten](http://lyp.noteflakes.com/#/?id=lyp-flatten) include files, and [automatically install](http://lyp.noteflakes.com/#/?id=lyp-compile) package dependencies or any required version of Lilypond.
 
-For more information, see the lyp [documentation](http://lyp.noteflakes.com/).
+## Documentation
+
+- [User guide](http://lyp.noteflakes.com/#/user-guide)
+- [Available packages](http://lyp.noteflakes.com/#/packages)
+- [Developer guide](http://lyp.noteflakes.com/#/developer-guide)
+- [FAQ](http://lyp.noteflakes.com/#/faq)
 
 ## Contributing
 
