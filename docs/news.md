@@ -9,6 +9,33 @@ The power of [Lilypond](http://lilypond.org/), without the pain: <b><a href="#" 
 ```bash
 $ gem install lyp
 $ lyp install lilypond@unstable
+$ lilypond mymusic.ly
+```
+
+<hr/>
+
+## New release for lyp
+
+_2018/2/5_
+
+It's been a year since I last worked on lyp. Fortunately, some people still care about it and have brought some [issues](https://github.com/noteflakes/lyp/issues) to my attention. I've been able to help some of them and have just put out a new release. Also, in the last few days the old Lilypond binaries download link has stopped working. I've updated lyp to download from the new location (on the lilypond.org website). So you should update your lyp installation to the latest version - 1.3.8. Here are some of the changes since 2017:
+
+- Fix Lilypond installation link (the  http://download.linuxaudio.org/lilypond links don't work anymore).
+- Fix installation of non-registered github packages (#54).
+- Set default encoding to UTF-8 (#52).
+- Fix Lilypond install on Windows.
+- Accept symbol arguments for require, include commands (#49).
+- Improve docs.
+- Add `--svg` command line option (#50).
+- Improve Lilypond commandline option parsing.
+- Remove non-functional `--open` switch.
+- Improve error reporting (print backtrace only when `--verbose` is specified).
+- Add `--music`/`--music-relative` command line switch for quickly entering music on the command line (#47).
+
+If you installed lyp as a gem, you can update it by running `gem update lyp`. If installed as a stand-alone app, please download the [new release](https://github.com/noteflakes/lyp/releases/tag/1.3.8), or use the install script ([view source](https://git.io/getlyp)):
+
+```bash
+$ curl -sSL https://git.io/getlyp | bash
 ```
 
 <hr/>
