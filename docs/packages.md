@@ -58,4 +58,4 @@ title: Packages
 
 ## Contributing packages
 
-To add your package to this package directory, see the [lyp index repository](https://github.com/lyp-packages/edition-engraver).
+To add your package to this package directory, see the [lyp index repository](https://github.com/lyp-packages/index).
