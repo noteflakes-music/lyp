@@ -66,6 +66,8 @@ module Lyp::Lilypond
       when '-S', '--snippet'
         argv_clean.concat ['-dbackend=eps', '-daux-files=#f', '--png', '-dresolution=600']
         options[:snippet_paper_preamble] = true
+      when '--svg'
+        argv_clean.concat ['-dbackend=svg']
       when '-u', '--use'
         options[:use_version] = argv.shift
       when '-V', '--verbose'
@@ -75,10 +77,47 @@ module Lyp::Lilypond
         options[:mode] = :system
       when '--invoke-quiet'
         options[:mode] = :quiet
-      when '--svg'
-        argv_clean.concat ['-dbackend=svg']
       else
         argv_clean << arg
+      end
+    end
+
+    def preprocess_bin_script_argv(argv)
+      options = {}
+      argv = argv.dup # copy for iterating
+      argv_clean = []
+      while arg = argv.shift
+        parse_lilypond_bin_script_arg(arg, argv, argv_clean, options)
+      end
+
+      [options, argv_clean]
+    end
+
+    def parse_lilypond_bin_script_arg(arg, argv, argv_clean, options)
+      case arg
+      when ARGUMENT_EQUAL_REGEXP
+        argv.insert(0, "--#{$1}", $2)
+      when ARGUMENT_SHORTHAND_REGEXP
+        argv.insert(0, "-#{$1}", $2)
+      when NO_ARGUMENT_SHORTHAND_REGEXP
+        tmp_args = []
+        $1.each_char {|c| tmp_args << "-#{c}"}
+        tmp_args << "-#{$2}"
+        argv.insert(0, *tmp_args)
+      when '-E', '--env'
+        unless ENV['LILYPOND_VERSION']
+          raise "$LILYPOND_VERSION not set"
+        end
+        options[:use_version] = ENV['LILYPOND_VERSION']
+      when '-n', '--install'
+        options[:install] = true
+      when '-u', '--use'
+        options[:use_version] = argv.shift
+      when '--invoke-system'
+        options[:mode] = :system
+      else
+        argv_clean << arg
+        argv_clean += argv
       end
     end
 
@@ -148,6 +187,10 @@ module Lyp::Lilypond
 
     def invoke(argv, opts = {})
       lilypond = current_lilypond
+
+      if opts[:verbose]
+        puts "#{lilypond} #{argv.join(" ")}"
+      end
 
       case opts[:mode]
       when :system

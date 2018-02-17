@@ -54,7 +54,7 @@ class Lyp::CLI < Thor
       "w" => :watch,
       "x" => :exec
 
-  check_unknown_options! :except => [:compile, :watch, :benchmark]
+  check_unknown_options! :except => [:compile, :exec, :watch, :benchmark]
   class_option :verbose, aliases: '-V', :type => :boolean, desc: 'show verbose output'
 
   no_commands do
@@ -129,9 +129,10 @@ class Lyp::CLI < Thor
   def compile(*argv)
     opts, argv = Lyp::Lilypond.preprocess_argv(argv)
     opts[:verbose] ||= options[:verbose]
+    argv.unshift('-V') if options[:verbose]
     $cmd_options = opts
 
-    lilypond_path = Lyp::Lilypond.select_lilypond_version(opts, argv.last)
+    Lyp::Lilypond.select_lilypond_version(opts, argv.last)
 
     $stderr.puts "Lyp #{Lyp::VERSION}" unless opts[:mode] == :quiet
     Lyp::System.test_installed_status!
@@ -156,7 +157,15 @@ class Lyp::CLI < Thor
 
   desc "exec <CMD> [<options>...]", "Execute a lilypond script"
   def exec(*argv)
-    $stderr.puts "Lyp #{Lyp::VERSION}"
+    opts, argv = Lyp::Lilypond.preprocess_bin_script_argv(argv)
+    opts[:verbose] ||= options[:verbose]
+    $cmd_options = opts
+
+    $cmd_options = opts
+
+    Lyp::Lilypond.select_lilypond_version(opts, argv.last)
+
+    $stderr.puts "Lyp #{Lyp::VERSION}" unless opts[:mode] == :quiet
     Lyp::System.test_installed_status!
     Lyp::Lilypond.invoke_script(argv, {})
   end

@@ -463,7 +463,18 @@ Compiles Lilypond source files. This command is synonymous to running `lilypond`
 
 - `--force-version`/`-F`: use Lilypond version specified in user file
 - `--install`/`-n`: install version of Lilypond if not found (if the required version was overriden using any of `--env`, `--force-version` or `--use`)
-- `--open`/`-O`: open output file after compilation
+- `--music=<MUSIC>`/`-M<MUSIC>`: compile the given Lilypond code:
+
+```bash
+$ lyp c -M"c'4 e' g' e' c'1" -o test
+```
+
+- `--music-relative=<MUSIC>`/`-m<MUSIC>`: compile the given Lilypond code in relative pitch:
+
+```bash
+$ lyp c -m"c4 e g e c1" -o test
+```
+
 - `--raw`/`-R`: run Lilypond "raw" (no pre-processing of dependencies)
 - `--require=PACKAGE`/`-rPACKAGE`: preload the specified package
 
@@ -489,11 +500,26 @@ Shows dependencies for a given source file.
 
 ### lyp exec
 
-Synopsis: `lyp exec SCRIPT ...`
+Synopsis: `lyp exec ... SCRIPT ...`
 
 Shorthand: `lyp x`
 
-Runs a Lilypond script (using the currently selected version of Lilypond).
+Runs a Lilypond script (using the currently selected version of Lilypond). The `exec` command accepts the following options:
+
+- `--env`/`-E`: use the Lilypond version specified in the `LILYPOND_VERSION` environment variable:
+
+  ```bash
+  $ LILYPOND_VERSION=2.19.50 lyp x midi2ly ...
+  ```
+
+- `--install`/`-n`: install version of Lilypond if not found (if the required version was overriden using any of `--env`, `--force-version` or `--use`)
+- `--use=VERSION`/`-uVERSION`: use the given version of Lilypond:
+  
+  ```bash
+  $ lyp x -u2.19.53 midi2ly...
+  # automatically install given version of Lilypond
+  $ lyp c -nu2.19.53 midi2ly ...
+  ```
 
 ### lyp flatten
 
@@ -507,7 +533,12 @@ Synopsis: `lyp install PACKAGE|lilypond@VERSION`
 
 Shorthand: `lyp i`
 
-Installs a package or a Lilypond. See <a href="#" jump-to-id="installing-packages">installing packages</a> and <a href="#" jump-to-id="installing-and-using-lilypond">installing versions of Lilypond</a> above.
+Installs a package or a Lilypond. See <a href="#" jump-to-id="installing-packages">installing packages</a> and <a href="#" jump-to-id="installing-and-using-lilypond">installing versions of Lilypond</a> above. The `install` command accepts the following options:
+
+- `--default`/`-d`: make the version to install the default version (when installing Lilypond)
+- `--dev`: install the current working directory as a development package
+- `--test`/`-t`: run package tests after installation (when installing a package)
+- `--update`/`-u`: remove any old versions (when installing a package)
 
 ### lyp list
 
