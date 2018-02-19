@@ -453,7 +453,7 @@ Shorthand: `lyp c`
 
 Compiles Lilypond source files. This command is synonymous to running `lilypond`. You can pass along any switches accepted by Lilypond. In addition, lyp adds a few options to provide additional functionality:
 
-- `--auto-install-deps`/`-a`: install any missing dependencies
+- `--auto-install-deps`/`-A`: install any missing dependencies
 - `--cropped`/`-c`: crop output (requires setting 0 margins)
 - `--env`/`-E`: use the Lilypond version specified in the `LILYPOND_VERSION` environment variable:
 
