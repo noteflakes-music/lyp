@@ -62,6 +62,8 @@ For `\pcondIncludeOnce` you should change the second argument to `lyp:load:ref`:
 )
 ```
 
+Stay tuned as we update the documentation to reflect the changes. We'll also make updates to the existing packages to use the new API.
+
 <hr/>
 
 ## New release for lyp
