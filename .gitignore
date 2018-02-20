@@ -5,3 +5,6 @@ dist
 *.ps
 *.png
 *.svg
+test.ly
+spec/package_setups/tmp
+spec/lilypond_setups/tmp

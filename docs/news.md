@@ -20,6 +20,10 @@ $ lilypond mymusic.ly
 
 _2018/2/5_
 
+<div>
+  <script src="https://asciinema.org/a/123683.js" id="asciicast-123683" async></script>
+</div>
+
 It's been a year since I last worked on lyp. Fortunately, some people still care about it and have brought some [issues](https://github.com/noteflakes/lyp/issues) to my attention. I've been able to help some of them and have just put out a new release. Also, in the last few days the old Lilypond binaries download link has stopped working. I've updated lyp to download from the new location (on the lilypond.org website). So you should update your lyp installation to the latest version - 1.3.8. Here are some of the changes since 2017:
 
 - Fix Lilypond installation link (the  http://download.linuxaudio.org/lilypond links don't work anymore).

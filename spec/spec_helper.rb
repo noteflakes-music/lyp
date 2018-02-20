@@ -38,6 +38,8 @@ module Lyp
       case opts[:mode]
       when :system
         run_cmd("#{lilypond} #{argv.join(' ')}", false)
+      when :capture
+        `#{lilypond} #{argv.join(" ")}  2>&1`
       else
         run_cmd("#{lilypond} #{argv.join(' ')}")
         true
@@ -139,8 +141,8 @@ RSpec.configure do |config|
   end
 
   config.after(:all) do
-    FileUtils.rm_rf("#{$spec_dir}/lilypond_setups/tmp")
-    FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
+    # FileUtils.rm_rf("#{$spec_dir}/lilypond_setups/tmp")
+    # FileUtils.rm_rf("#{$spec_dir}/package_setups/tmp")
   end
 
   config.before(:each) do

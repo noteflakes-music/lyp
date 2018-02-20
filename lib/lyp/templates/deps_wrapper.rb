@@ -4,6 +4,9 @@
 #   package_paths: {
 #     <specifier> => <package path>
 #     ...
+#   },
+#   opts: {
+#     ...
 #   }
 # }
 
@@ -54,6 +57,7 @@ end
   (define lyp:input-filename {{quote_path[user_filename]}})
   (define lyp:input-dirname {{quote_path[user_dirname]}})
   (define lyp:current-package-dir {{quote_path[current_package_dir]}})
+  (define lyp:verbose {{_[:opts][:verbose] ? '#t' : '#f'}})
 `
 
 _[:package_refs].each do |spec, name|

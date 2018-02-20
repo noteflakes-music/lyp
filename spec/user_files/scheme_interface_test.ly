@@ -44,7 +44,46 @@
 #(define null:counter2 0)
 #(define null:counter3 0)
 
+% \lyp-load with relative filenames
+\lyp-load "null/include.ly"
+\lyp-load "null/include.ly"
+#(assert:eq? null:counter1 2)
+#(assert:throw (lambda () (lyp-load "null/abc.ly")))
+#(assert:throw (lambda () (lyp-load "abc/def.ly")))
+
+% \lyp-load without extensions
+#(set! null:counter1 0)
+\lyp-load "null/include"
+#(assert:eq? null:counter1 1)
+
+% \lyp-include
+#(set! null:counter2 0)
+#(set! lyp:file-included? (make-hash-table))
+\lyp-include "null/include_once.ly"
+\lyp-include "null/include_once.ly"
+#(assert:eq? null:counter2 1)
+#(assert:throw (lambda () (lyp-include "null/abc.ly")))
+#(assert:throw (lambda () (lyp-include "abc/def.ly")))
+
+% \lyp-include without extensions
+#(set! null:counter2 0)
+#(set! lyp:file-included? (make-hash-table))
+\lyp-include "null/include_once"
+\lyp-include "null/include_once"
+#(assert:eq? null:counter2 1)
+#(assert:throw (lambda () (lyp-include "null/abc")))
+#(assert:throw (lambda () (lyp-include "abc/def")))
+
+% \lyp-include with multiple files
+#(set! null:counter1 100)
+#(set! null:counter2 200)
+#(set! lyp:file-included? (make-hash-table))
+\lyp-include #'(null/include_once null/include)
+#(assert:eq? null:counter1 101)
+#(assert:eq? null:counter2 201)
+
 % \pinclude
+#(set! null:counter1 0)
 \pinclude "null/include.ly"
 \pinclude "null/include.ly"
 #(assert:eq? null:counter1 2)
@@ -52,6 +91,8 @@
 #(assert:throw (lambda () (pinclude "abc/def.ly")))
 
 % \pincludeOnce
+#(set! null:counter2 0)
+#(set! lyp:file-included? (make-hash-table))
 \pincludeOnce "null/include_once.ly"
 \pincludeOnce "null/include_once.ly"
 #(assert:eq? null:counter2 1)
