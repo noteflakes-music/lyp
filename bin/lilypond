@@ -37,6 +37,7 @@ Lyp-provided options:
   -R, --raw                           run raw lilypond (no pre-processing)
   -S, --snippet                       produce png cropped images at 600dpi
                                       (--cropped --png -dresolution=600)
+      --svg                           compile to SVG
   -u, --use=VERSION                   use the given version of lilypond
 EOF
 

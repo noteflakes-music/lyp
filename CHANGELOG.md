@@ -1,3 +1,5 @@
+- Introduce new commands for requiring packages and including files (#61).
+
 # Version 1.3.8 2018-02-05
 
 - Fix Lilypond installation link (the  http://download.linuxaudio.org/lilypond links don't work anymore).

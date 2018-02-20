@@ -16,13 +16,57 @@ $ lilypond mymusic.ly
 
 <hr/>
 
+## A Better Interface for Loading Packages and Files
+
+_2018/2/20_
+
+One of the main goals for lyp is to let Lilypond users easily structure their Lilypond code in a modular way. Separating different parts of your notation project - specific instruments or movements - into separate files, makes it easier to enter and edit the music, especially for large musical projects.
+
+In order to further facilitate working with modular code, we've introduced new commands for requiring and including files. These commands remove some of the ambiguity around the old commands such as `\pinclude`. They also are prefixed so as to show they come from lyp and not from Lilypond, and provide a richer functionality. The old commands are still there, but are deprecated and will eventually be removed in the future.
+
+Over the coming weeks We'll be updating the docs to include the new commands and how they're used. For now, here is a summary of the changes:
+
+### \require
+
+`\require` has become `\lyp-require`. It can now also accept a list of packages to load, e.g. `\lyp-require #'(assert oll-core auto-extenders edition engraver)`.
+
+### \pinclude
+
+`pinclude` has become `\lyp-load`. It accepts file references without extension (it will look for both `.ly` and `.ily` matches), directory references (for loading all files in a directory), and even wildcard patterns (for example `\lyp-load "lib/**/*.ly"` will load all files in any subdirectory under `lib`)
+
+### \pincludeOnce
+
+`pincludeOnce` has become `lyp-include`. This makes more sense, as most of the time you'll need to include a file only once. If you need to repeatdly include a file (perhaps containing a recurrent musical phrase), you can always use `\lyp-load`.
+
+### \pcondInclude and \pcondIncludeOnce
+
+Both `\pcondInclude` and `\pcondIncludeOnce` are deprecated. Judging from the currently available packages, their use is minimal. If you need this functionality, you'll have to wrap your includes and requires with a scheme expression. For example, the following:
+
+```lilypond
+\pcondInclude #(is-it-true?) "myfile.ly"
+```
+
+Should be changed to:
+
+```lilypond
+#(if (is-it-true?)
+  (lyp:load:ref "myfile.ly" #f)
+)
+```
+
+For `\pcondIncludeOnce` you should change the second argument to `lyp:load:ref`:
+
+```lilypond
+#(if (is-it-true?)
+  (lyp:load:ref "myfile.ly" #t)
+)
+```
+
+<hr/>
+
 ## New release for lyp
 
 _2018/2/5_
-
-<div>
-  <script src="https://asciinema.org/a/123683.js" id="asciicast-123683" async></script>
-</div>
 
 It's been a year since I last worked on lyp. Fortunately, some people still care about it and have brought some [issues](https://github.com/noteflakes/lyp/issues) to my attention. I've been able to help some of them and have just put out a new release. Also, in the last few days the old Lilypond binaries download link has stopped working. I've updated lyp to download from the new location (on the lilypond.org website). So you should update your lyp installation to the latest version - 1.3.8. Here are some of the changes since 2017:
 

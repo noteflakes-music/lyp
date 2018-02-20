@@ -120,7 +120,11 @@ module Lyp
       end
     end
 
-    DEP_RE = /\\(require|include|pinclude|pincludeOnce)\s+(?:"|#')?([^\s"]+)"?/.freeze
+    # DEP_RE = /\\((?:lyp[\-\:]require)|lyp-load|lyp-include|require|include|pinclude|pincludeOnce)\s+(?:"|#')?([^\s"\)]+)"?/.freeze
+    DEP_RE = /\\(lyp-require|lyp-load|lyp-include|require|include|pinclude|pincludeOnce)\s+(?:"|#')?([^\s"]+)"?/.freeze
+    LYP_REQUIRE = "lyp-require".freeze
+    LYP_INCLUDE = "lyp-include".freeze
+    LYP_LOAD    = "lyp-load".freeze
     INCLUDE = "include".freeze
     PINCLUDE = "pinclude".freeze
     PINCLUDE_ONCE = "pincludeOnce".freeze
@@ -183,9 +187,9 @@ module Lyp
         location[:line] += 1
         line.scan(DEP_RE) do |type, ref|
           case type
-          when INCLUDE, PINCLUDE, PINCLUDE_ONCE
+          when LYP_INCLUDE, LYP_LOAD, INCLUDE, PINCLUDE, PINCLUDE_ONCE
             process_include_command(ref, dir, leaf, opts, location)
-          when REQUIRE
+          when LYP_REQUIRE, REQUIRE
             process_require_command(ref, dir, leaf, opts, location)
           end
         end
