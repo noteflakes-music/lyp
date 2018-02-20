@@ -44,19 +44,19 @@
 #(define null:counter2 0)
 #(define null:counter3 0)
 
-% \lyp-load with relative filenames
+% lyp-load with relative filenames
 \lyp-load "null/include.ly"
 \lyp-load "null/include.ly"
 #(assert:eq? null:counter1 2)
 #(assert:throw (lambda () (lyp-load "null/abc.ly")))
 #(assert:throw (lambda () (lyp-load "abc/def.ly")))
 
-% \lyp-load without extensions
+% lyp-load without extensions
 #(set! null:counter1 0)
 \lyp-load "null/include"
 #(assert:eq? null:counter1 1)
 
-% \lyp-include
+% lyp-include
 #(set! null:counter2 0)
 #(set! lyp:file-included? (make-hash-table))
 \lyp-include "null/include_once.ly"
@@ -65,7 +65,7 @@
 #(assert:throw (lambda () (lyp-include "null/abc.ly")))
 #(assert:throw (lambda () (lyp-include "abc/def.ly")))
 
-% \lyp-include without extensions
+% lyp-include without extensions
 #(set! null:counter2 0)
 #(set! lyp:file-included? (make-hash-table))
 \lyp-include "null/include_once"
@@ -74,15 +74,15 @@
 #(assert:throw (lambda () (lyp-include "null/abc")))
 #(assert:throw (lambda () (lyp-include "abc/def")))
 
-% \lyp-include with multiple files
-#(set! null:counter1 100)
-#(set! null:counter2 200)
-#(set! lyp:file-included? (make-hash-table))
-\lyp-include #'(null/include_once null/include)
-#(assert:eq? null:counter1 101)
-#(assert:eq? null:counter2 201)
+% lyp-include with multiple files
+% #(set! null:counter1 100)
+% #(set! null:counter2 200)
+% #(set! lyp:file-included? (make-hash-table))
+% ..lyp-include #'(null/include_once null/include)
+% #(assert:eq? null:counter1 101)
+% #(assert:eq? null:counter2 201)
 
-% \pinclude
+% pinclude
 #(set! null:counter1 0)
 \pinclude "null/include.ly"
 \pinclude "null/include.ly"
@@ -90,7 +90,7 @@
 #(assert:throw (lambda () (pinclude "null/abc.ly")))
 #(assert:throw (lambda () (pinclude "abc/def.ly")))
 
-% \pincludeOnce
+% pincludeOnce
 #(set! null:counter2 0)
 #(set! lyp:file-included? (make-hash-table))
 \pincludeOnce "null/include_once.ly"
@@ -99,7 +99,7 @@
 #(assert:throw (lambda () (pincludeOnce "null/abc.ly")))
 #(assert:throw (lambda () (pincludeOnce "abc/def.ly")))
 
-% \pcondInclude
+% pcondInclude
 #(define cond-include #f)
 \pcondInclude ##f "scheme_interface_test_cond_include.ly"
 #(assert:eq? cond-include #f)
@@ -126,7 +126,7 @@
 #(hash-set! lyp:package-refs "null@0.1.2" "null")
 #(hash-set! lyp:package-dirs "null" (string-append lyp:cwd "/spec/user_files/null"))
 
-% \require
+% require
 \require "null@0.1.2"
 
 % form used for package testing, providing a relative path for the package
