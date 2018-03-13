@@ -18,14 +18,14 @@ download() {
 
 echo "Detecting latest lyp version..."
 if has "curl"; then
-  LATEST_RELEASE=`curl -s https://github.com/noteflakes/lyp/releases/latest`
+  LATEST_RELEASE=`curl -Ls https://github.com/noteflakes/lyp/releases/latest`
 elif has "wget"; then
   LATEST_RELEASE=`wget -qO- https://github.com/noteflakes/lyp/releases/latest`
 else
   fail "Could not find curl or wget"
 fi
 
-VERSION_REGEX="tag/v([0-9\.]+)"
+VERSION_REGEX="Version ([0-9\.]+)"
 if [[ $LATEST_RELEASE =~ $VERSION_REGEX ]]
 then
   LYP_VERSION="${BASH_REMATCH[1]}"
@@ -34,7 +34,7 @@ else
 fi
 
 WORKDIR="/tmp/lyp-release-installer"
-URL_BASE="https://github.com/noteflakes/lyp/releases/download/v$LYP_VERSION"
+URL_BASE="https://github.com/noteflakes/lyp/releases/download/$LYP_VERSION"
 PLATFORM=`uname -sp`
 case $PLATFORM in
   "Linux x86_64")
