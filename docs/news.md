@@ -16,6 +16,18 @@ $ lilypond mymusic.ly
 
 <hr/>
 
+## No More Self-Contained Releases, for the Time Being
+
+_2018/3/13_
+
+Up until now, there have been two ways to install lyp: as a Ruby gem, and as a self-contained embedded ruby installation (for those who do not have Ruby installed on their system).
+
+Unfortunately, packaging lyp into a self-contained release proved problematic, as it made it impossible to use a more recent version of Ruby and other dependencies.
+
+Therefore, for the time being new versions of lyp will be released only as Ruby gems. The self-contained releases will always be there, but will no longer be supported.
+
+<hr/>
+
 ## A Better Interface for Loading Packages and Files
 
 _2018/2/20_
@@ -84,11 +96,7 @@ It's been a year since I last worked on lyp. Fortunately, some people still care
 - Improve error reporting (print backtrace only when `--verbose` is specified).
 - Add `--music`/`--music-relative` command line switch for quickly entering music on the command line (#47).
 
-If you installed lyp as a gem, you can update it by running `gem update lyp`. If installed as a stand-alone app, please download the [new release](https://github.com/noteflakes/lyp/releases/tag/1.3.8), or use the install script ([view source](https://git.io/getlyp)):
-
-```bash
-$ curl -sSL https://git.io/getlyp | bash
-```
+You can install lyp by running `gem install lyp`.
 
 <hr/>
 

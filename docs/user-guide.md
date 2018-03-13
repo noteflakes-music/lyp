@@ -18,11 +18,11 @@ __Even more tools for power users__: watch and automatically <a href="#" jump-to
 
 lyp is tested to work on recent versions of Linux, macOS and Windows.
 
-### Installing lyp as a Ruby gem
+### Installing lyp
 
-If you have a recent (>=1.9.3) version of Ruby on your machine, you can install lyp as a gem.
+To install lyp you'll need to have a recent version of Ruby on your machine. MacOS and various Linux distributions come with Ruby pre-installed. Windows users can use [RubyInstaller](https://rubyinstaller.org/) if they don't already have it installed. 
 
-_Note_: A recent version of Ruby (2.0.0 or later) is included in macOS 10.9.0 or later.
+Once you have Ruby installed, run the following:
 
 ```bash
 # Linux/macOS:
@@ -31,42 +31,6 @@ $ gem install lyp
 # Windows:
 > gem install lyp-win
 ```
-
-### Installing lyp as a standalone release
-
-If you don't have Ruby on your machine you can install lyp as a stand alone package using the install script ([view source](https://git.io/getlyp)):
-
-```bash
-$ curl -sSL https://git.io/getlyp | bash
-```
-
-or with Wget:
-
-```bash
-$ wget -qO- https://git.io/getlyp | bash
-```
-
-Windows users can simply download the latest Windows [release](https://github.com/noteflakes/lyp/releases), unzip it and run `lyp install self`:
-
-```bash
-> unzip lyp-1.3.8-win32.zip
-> lyp-1.3.8-win32/bin/lyp install self
-```
-
-### Manually installing releases
-
-(This section is for Linux / macOS users.)
-
-If you feel uneasy about piping curl output to bash, you can install lyp yourself by downloading a [release](https://github.com/noteflakes/lyp/releases), untarring it, and running `lyp install self`:
-
-```bash
-$ cd /Downloads
-# assuming linux-64 platform
-$ tar -xzf lyp-1.3.8-linux-x86_64.tar.gz
-$ lyp-1.3.8-linux-x86_64/lyp install self
-```
-
-**Note**: using the standalone release of lyp requires having git on your machine.
 
 ### Uninstalling lyp
 
