@@ -3,6 +3,8 @@ title: Packages
 ---
 # The semi-offical [lyp](https://github.com/noteflakes/lyp#readme) package index
 
+For instructions on how to add your own package to the index, please consult the [lyp-packages repository](https://github.com/lyp-packages/index#contributing).
+
 ## Editorial tools
 
 * [edition-engraver](https://github.com/lyp-packages/edition-engraver) - Editorial tweaking for Lilypond.
