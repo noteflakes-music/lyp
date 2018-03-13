@@ -1,4 +1,4 @@
-# Version 1.3.9 2018-02-13
+# Version 1.3.10 2018-02-13
 
 - Update rugged dependency (#64)
 - Fix install script (#65)
