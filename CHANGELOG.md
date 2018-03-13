@@ -1,3 +1,7 @@
+# Version 1.3.9 2018-02-13
+
+- Update rugged dependency (#64)
+- Fix install script (#65)
 - Introduce new commands for requiring packages and including files (#61).
 
 # Version 1.3.8 2018-02-05
