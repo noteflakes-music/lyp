@@ -1,5 +1,6 @@
-# Version 1.3.10 2018-02-13
+# Version 1.3.11 2018-02-13
 
+- Remove self-contained releases.
 - Update rugged dependency (#64)
 - Fix install script (#65)
 - Introduce new commands for requiring packages and including files (#61).
