@@ -49,11 +49,16 @@ module Lyp
   end
 
   class DependencyPackage < DependencyLeaf
-    attr_reader :path
+    attr_reader :path, :name, :version
 
     def initialize(path, dependencies = {})
       @path = path
       super(dependencies)
+
+      if @path =~ /([^\/@]+)(?:@([^\/]*))?\/package.ly$/
+        @name = $1
+        @version = $2
+      end
     end
   end
 
@@ -592,6 +597,19 @@ module Lyp
       IO.read(path).lines[line - 1]
     rescue => e
       "???"
+    end
+
+    def self.find_package(ref)
+      resolver = new(Lyp::DependencyLeaf.new, {})
+      o = Lyp::DependencyLeaf.new
+      
+      resolver.find_package_versions(ref, o, nil)
+
+      o.dependencies.values.first.versions.values.last
+
+      # expect(o.dependencies['b'].clause).to eq('b@>=0.2')
+      # expect(o.dependencies['b'].versions['b@0.2'].path).to eq("#{$packages_dir}/b@0.2/package.ly")
+      # expect(o.dependencies['b'].versions['b@0.2.2'].path).to eq("#{$packages_dir}/b@0.2.2/package.ly")
     end
   end
 end

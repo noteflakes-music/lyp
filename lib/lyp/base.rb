@@ -36,6 +36,9 @@ module Lyp
   # etc/lyp.ly contains lyp:* procedure definitions for loading packages and
   # other support code.
   LYP_LY_LIB_PATH = File.join(ETC_DIRECTORY, 'lyp.ly')
+  LYP_SCM_LIB_PATH = File.join(ETC_DIRECTORY, 'lyp.scm')
+
+  LYP_RESOLVER_PATH = File.join(File.dirname(__FILE__), '../../bin/lyp-resolve')
   
   LILYPOND_NOT_FOUND_MSG = "No version of lilypond found.\nTo install lilypond run 'lyp install lilypond'"
 

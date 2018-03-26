@@ -1,3 +1,13 @@
+- Resolver bin script
+
+  - command line arguments:
+    
+      bin/lyp-resolve <PACKAGEREF> <ABSFILEPATH>
+
+  - returned output in scheme representation:
+
+      ("beethoven" "0.1" "/users/sharon/.lyp/packages/beethoven@0.1/package.ly")
+
 - Add post about using custom fonts
 - Add post about compiling with lyp
 

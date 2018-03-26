@@ -50,6 +50,8 @@ end
 
 `
 #(ly:set-option 'relative-includes #t)
+#(define lyp:scm-path "{{Lyp::LYP_SCM_LIB_PATH}}")
+#(define lyp:resolver-path "{{Lyp::LYP_RESOLVER_PATH}}")
 \include "{{Lyp::LYP_LY_LIB_PATH}}"
 
 #(begin
@@ -58,19 +60,6 @@ end
   (define lyp:input-dirname {{quote_path[user_dirname]}})
   (define lyp:current-package-dir {{quote_path[current_package_dir]}})
   (define lyp:verbose {{_[:opts][:verbose] ? '#t' : '#f'}})
-`
-
-_[:package_refs].each do |spec, name|
-`
-  (hash-set! lyp:package-refs "{{spec}}" "{{name}}")`
-end
-
-_[:package_dirs].each do |package, path|
-`
-  (hash-set! lyp:package-dirs "{{package}}" {{quote_path[path]}})`
-end
-
-`
 )
 
 #(ly:debug "package loader is ready")
@@ -79,7 +68,7 @@ end
 if _[:preload]
   _[:preload].each do |package|
 `
-\require "{{package}}"
+\lyp-require "{{package}}"
 `
   end
 end
