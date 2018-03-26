@@ -161,13 +161,20 @@ class Lyp::CLI < Thor
     opts[:verbose] ||= options[:verbose]
     $cmd_options = opts
 
-    $cmd_options = opts
-
-    Lyp::Lilypond.select_lilypond_version(opts, argv.last)
-
-    $stderr.puts "Lyp #{Lyp::VERSION}" unless opts[:mode] == :quiet
+    Lyp::Lilypond.select_lilypond_version(opts, nil)
+    
+    unless opts[:mode] == :quiet
+      version = Lyp::Lilypond.current_lilypond_version
+      $stderr.puts "Lyp #{Lyp::VERSION}\nLilypond #{version}"
+    end
     Lyp::System.test_installed_status!
-    Lyp::Lilypond.invoke_script(argv, {})
+
+    if argv.empty?
+      path = Lyp::Lilypond.current_lilypond_bin_path
+      puts `ls -C #{path}`
+    else
+      Lyp::Lilypond.invoke_script(argv, opts)
+    end
   end
 
   desc "flatten FILE", "Flatten a file and included files into a single output file"
