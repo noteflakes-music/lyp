@@ -1,7 +1,6 @@
----
-title: Packages
----
-# The semi-offical [lyp](https://github.com/noteflakes/lyp#readme) package index
+# Packages
+
+## The semi-offical lyp package index
 
 For instructions on how to add your own package to the index, please consult the [lyp-packages repository](https://github.com/lyp-packages/index#contributing).
 

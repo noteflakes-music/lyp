@@ -1,6 +1,5 @@
----
-title: FAQ
----
+# FAQ
+
 #### Does Lilypond really need packages?
 
 Yes! Before lyp, Lilypond users had now better way to share code than to post it on [lilypond-user](http://lilypond.1069038.n5.nabble.com/User-f3.html), on [LSR](http://lsr.di.unimi.it/LSR/Search), or just pass some files around.

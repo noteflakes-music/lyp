@@ -1,6 +1,5 @@
----
-title: Developer Guide
----
+# Developer Guide
+
 ## What is a package?
 
 In lyp, a package is a directory that should contain at least a single Lilypond file named `package.ly` in its root directory. A package could contain additional Lilypond and Scheme files referenced in the main package file (using relative `\include`s). A package could also depend on other packages by using the `\require` command.

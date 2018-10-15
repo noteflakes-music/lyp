@@ -1,8 +1,4 @@
----
-title: User Guide
----
-
-# lyp - The Lilypond Swiss Army Knife
+# User Guide
 
 lyp is an open-source tool that takes the pain out of working with [Lilypond](http://lilypond.org/).
 

@@ -1,10 +1,6 @@
----
-title: News
----
-
 # lyp - Use Lilypond Like a Boss!
 
-## The power of [Lilypond](http://lilypond.org/), without the pain
+#### The power of [Lilypond](http://lilypond.org/), without the pain...
 
 <b><a href="#" router-link="/user-guide?id=working-with-packages">Install packages</a></b> to enhance your Lilypond files with additional functionality, like <a href="#" router-link="/packages?id=tweaking">specialized tweaks</a> or <a href="#" router-link="/packages?id=fonts">alternative music fonts</a>. <b><a href="#" router-link="/user-guide?id=installing-and-using-lilypond">install Lilypond</a></b> with a single easy command. <b><a href="#" router-link="/user-guide?id=lyp-watch">Automatically recompile</a></b> your files, flatten include files and <a href="#" router-link="/user-guide">more</a>.
 
@@ -16,7 +12,7 @@ $ lilypond mymusic.ly
 
 <hr/>
 
-## No More Self-Contained Releases, for the Time Being
+#### No More Self-Contained Releases, for the Time Being
 
 _2018/3/13_
 
@@ -28,7 +24,7 @@ Therefore, for the time being new versions of lyp will be released only as Ruby 
 
 <hr/>
 
-## A Better Interface for Loading Packages and Files
+#### A Better Interface for Loading Packages and Files
 
 _2018/2/20_
 
@@ -38,19 +34,19 @@ In order to further facilitate working with modular code, we've introduced new c
 
 Over the coming weeks We'll be updating the docs to include the new commands and how they're used. For now, here is a summary of the changes:
 
-### \require
+#### \require
 
 `\require` has become `\lyp-require`. It can now also accept a list of packages to load, e.g. `\lyp-require #'(assert oll-core auto-extenders edition engraver)`.
 
-### \pinclude
+#### \pinclude
 
 `pinclude` has become `\lyp-load`. It accepts file references without extension (it will look for both `.ly` and `.ily` matches), directory references (for loading all files in a directory), and even wildcard patterns (for example `\lyp-load "lib/**/*.ly"` will load all files in any subdirectory under `lib`)
 
-### \pincludeOnce
+#### \pincludeOnce
 
 `pincludeOnce` has become `lyp-include`. This makes more sense, as most of the time you'll need to include a file only once. If you need to repeatdly include a file (perhaps containing a recurrent musical phrase), you can always use `\lyp-load`.
 
-### \pcondInclude and \pcondIncludeOnce
+#### \pcondInclude and \pcondIncludeOnce
 
 Both `\pcondInclude` and `\pcondIncludeOnce` are deprecated. Judging from the currently available packages, their use is minimal. If you need this functionality, you'll have to wrap your includes and requires with a scheme expression. For example, the following:
 
@@ -78,7 +74,7 @@ Stay tuned as we update the documentation to reflect the changes. We'll also mak
 
 <hr/>
 
-## New release for lyp
+#### New release for lyp
 
 _2018/2/5_
 
@@ -100,7 +96,7 @@ You can install lyp by running `gem install lyp`.
 
 <hr/>
 
-## Installing Lilypond with lyp
+#### Installing Lilypond with lyp
 
 _2017/1/15_ 
 
