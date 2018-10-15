@@ -730,7 +730,7 @@ module Lyp::Lilypond
       return unless Lyp.confirm_action(prompt)
 
       puts "Patching #{target_fn}:" unless opts[:silent]
-      if File.writeable?(target_fn)
+      if File.writable?(target_fn)
         FileUtils.cp(target_fn, "#{target_fn}.old")
         FileUtils.cp(Lyp::FONT_PATCH_FILENAME, target_fn)
       else
