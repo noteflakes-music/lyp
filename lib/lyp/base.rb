@@ -1,9 +1,11 @@
 require 'fileutils'
+require 'etc'
 
 module Lyp
+  USER = Etc.getlogin
   WINDOWS = Gem.win_platform?
   TMP_DIR = WINDOWS ? "#{Dir.home}/AppData/Local/Temp" : "/tmp"
-  TMP_ROOT = "#{TMP_DIR}/lyp"
+  TMP_ROOT = "#{TMP_DIR}/lyp-#{USER}"
   FileUtils.mkdir_p(TMP_ROOT)
 
   # A package specifier is of the form <package>@<version specifier>, where
